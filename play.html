@@ -7,12 +7,12 @@
 body {
     text-align: center;
     font-family: sans-serif;
-    padding: 30px;
+    padding: 20px;
 }
 button {
-    font-size: 24px;
-    padding: 20px 40px;
-    margin: 20px;
+    font-size: 22px;
+    padding: 15px 30px;
+    margin: 10px;
     cursor: pointer;
     background: #28a745;
     color: white;
@@ -21,10 +21,10 @@ button {
 }
 #word {
     font-size: 40px;
-    margin: 30px;
+    margin: 20px;
 }
-input[type=range] {
-    width: 80%;
+.genre-box {
+    margin: 10px 0;
 }
 </style>
 </head>
@@ -37,23 +37,37 @@ input[type=range] {
 <button onclick="speakWord()">読み上げる</button>
 <button onclick="nextWord()">次の単語</button>
 
+<h2>ジャンルを選択</h2>
+<div id="genreArea"></div>
+
 <h2>読み上げ速度</h2>
 <input id="rate" type="range" min="0.5" max="2" step="0.1">
 <div id="rateValue"></div>
 
 <h2>読み上げ間隔（秒）</h2>
 <input id="interval" type="number" min="1" max="20">
+<div id="intervalValue"></div>
+
 <button onclick="toggleAuto()">自動再生 ON/OFF</button>
 
 <br><br>
 <button onclick="location.href='index.html'">ホームに戻る</button>
 
 <script>
-// 単語リスト
-let words = JSON.parse(localStorage.getItem("words")) || ["apple", "banana", "grape", "orange", "strawberry"];
-let currentIndex = 0;
+// ジャンル一覧
+const genreList = ["動物", "数字", "体", "色", "日常品", "その他"];
 
-// 設定の読み込み
+// localStorage からジャンル別単語を読み込み
+let wordsByGenre = JSON.parse(localStorage.getItem("wordsByGenre")) || {
+    "動物": [],
+    "数字": [],
+    "体": [],
+    "色": [],
+    "日常品": [],
+    "その他": []
+};
+
+// 読み上げ設定
 let rate = Number(localStorage.getItem("rate")) || 1.0;
 let intervalSec = Number(localStorage.getItem("interval")) || 5;
 let autoPlay = false;
@@ -62,10 +76,53 @@ let timer = null;
 // UI に反映
 document.getElementById("rate").value = rate;
 document.getElementById("rateValue").textContent = rate;
+
 document.getElementById("interval").value = intervalSec;
+document.getElementById("intervalValue").textContent = intervalSec + " 秒";
+
+// ジャンル選択 UI を生成
+function renderGenres() {
+    const area = document.getElementById("genreArea");
+    area.innerHTML = "";
+
+    genreList.forEach(g => {
+        const div = document.createElement("div");
+        div.className = "genre-box";
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = g;
+        cb.id = "cb-" + g;
+
+        const label = document.createElement("label");
+        label.textContent = g;
+        label.htmlFor = "cb-" + g;
+
+        div.appendChild(cb);
+        div.appendChild(label);
+        area.appendChild(div);
+    });
+}
+renderGenres();
+
+// 選択されたジャンルの単語をまとめる
+function getSelectedWords() {
+    let list = [];
+    genreList.forEach(g => {
+        const cb = document.getElementById("cb-" + g);
+        if (cb.checked) {
+            list = list.concat(wordsByGenre[g]);
+        }
+    });
+    return list.length > 0 ? list : ["（ジャンル未選択）"];
+}
+
+let words = getSelectedWords();
+let currentIndex = 0;
 
 // 読み上げ
 function speakWord() {
+    words = getSelectedWords();
     const utter = new SpeechSynthesisUtterance(words[currentIndex]);
     utter.lang = "en-US";
     utter.rate = rate;
@@ -74,8 +131,10 @@ function speakWord() {
 
 // 次の単語
 function nextWord() {
+    words = getSelectedWords();
     currentIndex = (currentIndex + 1) % words.length;
     document.getElementById("word").textContent = words[currentIndex];
+
     if (autoPlay) {
         clearTimeout(timer);
         timer = setTimeout(() => {
@@ -106,6 +165,7 @@ document.getElementById("rate").oninput = function() {
 // 間隔変更
 document.getElementById("interval").oninput = function() {
     intervalSec = Number(this.value);
+    document.getElementById("intervalValue").textContent = intervalSec + " 秒";
     localStorage.setItem("interval", intervalSec);
 };
 
