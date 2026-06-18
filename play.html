@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>読み上げ</title>
+<style>
+body {
+    text-align: center;
+    font-family: sans-serif;
+    padding: 30px;
+}
+button {
+    font-size: 24px;
+    padding: 20px 40px;
+    margin: 20px;
+    cursor: pointer;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 10px;
+}
+#word {
+    font-size: 40px;
+    margin: 30px;
+}
+</style>
+</head>
+<body>
+
+<h1>読み上げ</h1>
+
+<div id="word">---</div>
+
+<button onclick="speakWord()">読み上げる</button>
+<button onclick="nextWord()">次の単語</button>
+<br>
+<button onclick="location.href='index.html'">ホームに戻る</button>
+
+<script>
+// localStorage から単語を読み込む
+let words = JSON.parse(localStorage.getItem("words")) || ["apple", "banana", "grape", "orange", "strawberry"];
+
+let currentIndex = 0;
+
+function speakWord() {
+    const utter = new SpeechSynthesisUtterance(words[currentIndex]);
+    utter.lang = "en-US";
+    speechSynthesis.speak(utter);
+}
+
+function nextWord() {
+    currentIndex = (currentIndex + 1) % words.length;
+    document.getElementById("word").textContent = words[currentIndex];
+}
+
+// 初期表示
+document.getElementById("word").textContent = words[currentIndex];
+</script>
+
+</body>
+</html>

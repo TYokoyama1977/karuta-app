@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>単語編集</title>
+<style>
+body {
+    text-align: center;
+    font-family: sans-serif;
+    padding: 30px;
+}
+input {
+    font-size: 20px;
+    padding: 10px;
+    margin: 10px;
+}
+button {
+    font-size: 20px;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+    background: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 10px;
+}
+ul {
+    list-style: none;
+    padding: 0;
+}
+li {
+    font-size: 24px;
+    margin: 10px;
+}
+</style>
+</head>
+<body>
+
+<h1>単語編集</h1>
+
+<input id="newWord" placeholder="単語を入力">
+<button onclick="addWord()">追加</button>
+
+<ul id="list"></ul>
+
+<button onclick="location.href='index.html'">ホームに戻る</button>
+
+<script>
+// localStorage から読み込み
+let words = JSON.parse(localStorage.getItem("words")) || ["apple", "banana", "grape", "orange", "strawberry"];
+
+function save() {
+    localStorage.setItem("words", JSON.stringify(words));
+}
+
+function renderList() {
+    const ul = document.getElementById("list");
+    ul.innerHTML = "";
+    words.forEach((w, i) => {
+        const li = document.createElement("li");
+        li.textContent = w + " ";
+        const del = document.createElement("button");
+        del.textContent = "削除";
+        del.onclick = () => {
+            words.splice(i, 1);
+            save();
+            renderList();
+        };
+        li.appendChild(del);
+        ul.appendChild(li);
+    });
+}
+
+function addWord() {
+    const w = document.getElementById("newWord").value.trim();
+    if (w) {
+        words.push(w);
+        save();
+        document.getElementById("newWord").value = "";
+        renderList();
+    }
+}
+
+renderList();
+</script>
+
+</body>
+</html>
