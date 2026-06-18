@@ -1,176 +1,167 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>読み上げ</title>
-<style>
-body {
-    text-align: center;
-    font-family: sans-serif;
-    padding: 20px;
-}
-button {
-    font-size: 22px;
-    padding: 15px 30px;
-    margin: 10px;
-    cursor: pointer;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 10px;
-}
-#word {
-    font-size: 40px;
-    margin: 20px;
-}
-.genre-box {
-    margin: 10px 0;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>読み上げ</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        #currentWord {
+            font-size: 40px;
+            margin: 20px 0;
+        }
+
+        /* 自動再生ボタンの色 */
+        #autoPlayBtn {
+            padding: 8px 16px;
+            font-size: 18px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* ON（緑） */
+        .on {
+            background-color: #4CAF50;
+        }
+
+        /* OFF（灰） */
+        .off {
+            background-color: #888;
+        }
+    </style>
 </head>
 <body>
 
 <h1>読み上げ</h1>
 
-<div id="word">---</div>
+<div id="currentWord">cat</div>
 
-<button onclick="speakWord()">読み上げる</button>
+<button onclick="speakCurrent()">読み上げる</button>
 <button onclick="nextWord()">次の単語</button>
 
-<h2>ジャンルを選択</h2>
-<div id="genreArea"></div>
+<h3>ジャンルを選択</h3>
+<select id="genreSelect" onchange="loadWords()">
+    <option value="動物">動物</option>
+    <option value="数字">数字</option>
+    <option value="体">体</option>
+    <option value="色">色</option>
+    <option value="日常品">日常品</option>
+    <option value="その他">その他</option>
+</select>
 
-<h2>読み上げ速度</h2>
-<input id="rate" type="range" min="0.5" max="2" step="0.1">
-<div id="rateValue"></div>
+<h3>読み上げ速度</h3>
+<input type="number" id="rateInput" step="0.1" min="0.5" max="2" value="1">
 
-<h2>読み上げ間隔（秒）</h2>
-<input id="interval" type="number" min="1" max="20">
-<div id="intervalValue"></div>
-
-<button onclick="toggleAuto()">自動再生 ON/OFF</button>
+<h3>読み上げ間隔（秒）</h3>
+<input type="number" id="intervalInput" min="1" max="20" value="6">
+<span id="intervalLabel">6 秒</span>
 
 <br><br>
-<button onclick="location.href='index.html'">ホームに戻る</button>
+
+<!-- ★ 自動再生ボタン（色付き） -->
+<button id="autoPlayBtn" onclick="toggleAutoPlay()">自動再生: OFF</button>
+
+<br><br>
+<a href="index.html">ホームに戻る</a>
 
 <script>
-// ジャンル一覧
-const genreList = ["動物", "数字", "体", "色", "日常品", "その他"];
+    // 単語データ（edit.html と共有）
+    let words = JSON.parse(localStorage.getItem("words")) || {
+        "動物": [],
+        "数字": [],
+        "体": [],
+        "色": [],
+        "日常品": [],
+        "その他": []
+    };
 
-// localStorage からジャンル別単語を読み込み
-let wordsByGenre = JSON.parse(localStorage.getItem("wordsByGenre")) || {
-    "動物": [],
-    "数字": [],
-    "体": [],
-    "色": [],
-    "日常品": [],
-    "その他": []
-};
+    let currentWords = [];
+    let currentIndex = 0;
 
-// 読み上げ設定
-let rate = Number(localStorage.getItem("rate")) || 1.0;
-let intervalSec = Number(localStorage.getItem("interval")) || 5;
-let autoPlay = false;
-let timer = null;
+    // 自動再生状態
+    let autoPlay = JSON.parse(localStorage.getItem("autoPlay")) || false;
 
-// UI に反映
-document.getElementById("rate").value = rate;
-document.getElementById("rateValue").textContent = rate;
+    // 読み上げ
+    function speak(text) {
+        const rate = parseFloat(document.getElementById("rateInput").value);
+        const uttr = new SpeechSynthesisUtterance(text);
+        uttr.rate = rate;
+        speechSynthesis.speak(uttr);
+    }
 
-document.getElementById("interval").value = intervalSec;
-document.getElementById("intervalValue").textContent = intervalSec + " 秒";
+    function speakCurrent() {
+        const text = document.getElementById("currentWord").textContent;
+        speak(text);
+    }
 
-// ジャンル選択 UI を生成
-function renderGenres() {
-    const area = document.getElementById("genreArea");
-    area.innerHTML = "";
-
-    genreList.forEach(g => {
-        const div = document.createElement("div");
-        div.className = "genre-box";
-
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.value = g;
-        cb.id = "cb-" + g;
-
-        const label = document.createElement("label");
-        label.textContent = g;
-        label.htmlFor = "cb-" + g;
-
-        div.appendChild(cb);
-        div.appendChild(label);
-        area.appendChild(div);
-    });
-}
-renderGenres();
-
-// 選択されたジャンルの単語をまとめる
-function getSelectedWords() {
-    let list = [];
-    genreList.forEach(g => {
-        const cb = document.getElementById("cb-" + g);
-        if (cb.checked) {
-            list = list.concat(wordsByGenre[g]);
+    // 次の単語
+    function nextWord() {
+        if (currentIndex >= currentWords.length) {
+            alert("これ以上単語がありません");
+            return;
         }
-    });
-    return list.length > 0 ? list : ["（ジャンル未選択）"];
-}
 
-let words = getSelectedWords();
-let currentIndex = 0;
+        const word = currentWords[currentIndex];
+        document.getElementById("currentWord").textContent = word;
+        currentIndex++;
 
-// 読み上げ
-function speakWord() {
-    words = getSelectedWords();
-    const utter = new SpeechSynthesisUtterance(words[currentIndex]);
-    utter.lang = "en-US";
-    utter.rate = rate;
-    speechSynthesis.speak(utter);
-}
+        // ★ 次の単語をクリックしたら読み上げる
+        speak(word);
 
-// 次の単語
-function nextWord() {
-    words = getSelectedWords();
-    currentIndex = (currentIndex + 1) % words.length;
-    document.getElementById("word").textContent = words[currentIndex];
-
-    if (autoPlay) {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            speakWord();
-            nextWord();
-        }, intervalSec * 1000);
+        // ★ 自動再生が ON のときは次も自動で読む
+        if (autoPlay) {
+            const interval = parseInt(document.getElementById("intervalInput").value) * 1000;
+            setTimeout(nextWord, interval);
+        }
     }
-}
 
-// 自動再生 ON/OFF
-function toggleAuto() {
-    autoPlay = !autoPlay;
-    if (autoPlay) {
-        speakWord();
-        nextWord();
-    } else {
-        clearTimeout(timer);
+    // ジャンル読み込み
+    function loadWords() {
+        const genre = document.getElementById("genreSelect").value;
+        currentWords = words[genre];
+        currentIndex = 0;
+        if (currentWords.length > 0) {
+            document.getElementById("currentWord").textContent = currentWords[0];
+        }
     }
-}
 
-// 速度変更
-document.getElementById("rate").oninput = function() {
-    rate = Number(this.value);
-    document.getElementById("rateValue").textContent = rate;
-    localStorage.setItem("rate", rate);
-};
+    // 自動再生ボタンの表示更新
+    function updateAutoPlayButton() {
+        const btn = document.getElementById("autoPlayBtn");
+        btn.textContent = "自動再生: " + (autoPlay ? "ON" : "OFF");
 
-// 間隔変更
-document.getElementById("interval").oninput = function() {
-    intervalSec = Number(this.value);
-    document.getElementById("intervalValue").textContent = intervalSec + " 秒";
-    localStorage.setItem("interval", intervalSec);
-};
+        if (autoPlay) {
+            btn.classList.remove("off");
+            btn.classList.add("on");
+        } else {
+            btn.classList.remove("on");
+            btn.classList.add("off");
+        }
+    }
 
-// 初期表示
-document.getElementById("word").textContent = words[currentIndex];
+    // 自動再生 ON/OFF 切り替え
+    function toggleAutoPlay() {
+        autoPlay = !autoPlay;
+        localStorage.setItem("autoPlay", JSON.stringify(autoPlay));
+        updateAutoPlayButton();
+    }
+
+    // 読み上げ間隔の表示更新
+    document.getElementById("intervalInput").oninput = () => {
+        document.getElementById("intervalLabel").textContent =
+            document.getElementById("intervalInput").value + " 秒";
+    };
+
+    // 初期化
+    window.onload = () => {
+        loadWords();
+        updateAutoPlayButton();
+    };
 </script>
 
 </body>

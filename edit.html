@@ -1,135 +1,146 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>単語編集</title>
-<style>
-body {
-    text-align: center;
-    font-family: sans-serif;
-    padding: 20px;
-}
-.genre-box {
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    padding: 15px;
-    margin: 20px 0;
-}
-.genre-title {
-    font-size: 28px;
-    margin-bottom: 10px;
-}
-input {
-    font-size: 18px;
-    padding: 8px;
-    margin: 5px;
-}
-button {
-    font-size: 18px;
-    padding: 8px 15px;
-    margin: 5px;
-    cursor: pointer;
-    background: #ff9800;
-    color: white;
-    border: none;
-    border-radius: 8px;
-}
-ul {
-    list-style: none;
-    padding: 0;
-}
-li {
-    font-size: 22px;
-    margin: 5px;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>単語編集</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-top: 30px;
+        }
+
+        /* 横並びタグ表示 */
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 8px 0 20px;
+        }
+
+        .word-item {
+            display: flex;
+            align-items: center;
+            background: #f2f2f2;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .word-item button {
+            margin-left: 6px;
+            padding: 2px 6px;
+            font-size: 14px;
+        }
+
+        .genre-box {
+            margin-bottom: 25px;
+        }
+    </style>
 </head>
 <body>
 
 <h1>単語編集</h1>
 
-<div id="genres"></div>
+<p>ジャンルを選んで単語を追加できます。</p>
 
-<button onclick="location.href='index.html'">ホームに戻る</button>
+<select id="genreSelect">
+    <option value="動物">動物</option>
+    <option value="数字">数字</option>
+    <option value="体">体</option>
+    <option value="色">色</option>
+    <option value="日常品">日常品</option>
+    <option value="その他">その他</option>
+</select>
+
+<input type="text" id="wordInput" placeholder="単語を入力">
+<button onclick="addWord()">追加</button>
+
+<hr>
+
+<div id="wordList"></div>
 
 <script>
-// 6ジャンルを定義
-const genreList = ["動物", "数字", "体", "色", "日常品", "その他"];
+    // 6ジャンル固定
+    const defaultWords = {
+        "動物": [],
+        "数字": [],
+        "体": [],
+        "色": [],
+        "日常品": [],
+        "その他": []
+    };
 
-// localStorage から読み込み（なければ空のジャンルを作る）
-let words = JSON.parse(localStorage.getItem("wordsByGenre")) || {
-    "動物": [],
-    "数字": [],
-    "体": [],
-    "色": [],
-    "日常品": [],
-    "その他": []
-};
+    // localStorage から読み込み
+    let words = JSON.parse(localStorage.getItem("words")) || defaultWords;
 
-// 保存
-function save() {
-    localStorage.setItem("wordsByGenre", JSON.stringify(words));
-}
+    // 単語追加
+    function addWord() {
+        const genre = document.getElementById("genreSelect").value;
+        const word = document.getElementById("wordInput").value.trim();
 
-// ジャンルごとの UI を生成
-function render() {
-    const container = document.getElementById("genres");
-    container.innerHTML = "";
+        if (word === "") return;
 
-    genreList.forEach(genre => {
-        const box = document.createElement("div");
-        box.className = "genre-box";
+        words[genre].push(word);
+        document.getElementById("wordInput").value = "";
 
-        // タイトル
-        const title = document.createElement("div");
-        title.className = "genre-title";
-        title.textContent = genre;
-        box.appendChild(title);
+        saveWords();
+        updateWordList();
+    }
 
-        // 単語リスト
-        const ul = document.createElement("ul");
-        words[genre].forEach((w, i) => {
-            const li = document.createElement("li");
-            li.textContent = w + " ";
+    // 単語削除
+    function deleteWord(genre, index) {
+        words[genre].splice(index, 1);
+        saveWords();
+        updateWordList();
+    }
 
-            const del = document.createElement("button");
-            del.textContent = "削除";
-            del.onclick = () => {
-                words[genre].splice(i, 1);
-                save();
-                render();
-            };
+    // 保存
+    function saveWords() {
+        localStorage.setItem("words", JSON.stringify(words));
+    }
 
-            li.appendChild(del);
-            ul.appendChild(li);
-        });
-        box.appendChild(ul);
+    // 表示更新（横並びタグ表示）
+    function updateWordList() {
+        const container = document.getElementById("wordList");
+        container.innerHTML = "";
 
-        // 追加欄
-        const input = document.createElement("input");
-        input.placeholder = "単語を追加";
-        input.id = "input-" + genre;
+        for (let genre in words) {
+            const genreBox = document.createElement("div");
+            genreBox.className = "genre-box";
 
-        const addBtn = document.createElement("button");
-        addBtn.textContent = "追加";
-        addBtn.onclick = () => {
-            const value = input.value.trim();
-            if (value) {
-                words[genre].push(value);
-                input.value = "";
-                save();
-                render();
-            }
-        };
+            const title = document.createElement("h2");
+            title.textContent = genre;
+            genreBox.appendChild(title);
 
-        box.appendChild(input);
-        box.appendChild(addBtn);
+            const list = document.createElement("div");
+            list.className = "word-list";
 
-        container.appendChild(box);
-    });
-}
+            words[genre].forEach((w, index) => {
+                const item = document.createElement("div");
+                item.className = "word-item";
 
-render();
+                const text = document.createElement("span");
+                text.textContent = w;
+
+                const delBtn = document.createElement("button");
+                delBtn.textContent = "削除";
+                delBtn.onclick = () => deleteWord(genre, index);
+
+                item.appendChild(text);
+                item.appendChild(delBtn);
+                list.appendChild(item);
+            });
+
+            genreBox.appendChild(list);
+            container.appendChild(genreBox);
+        }
+    }
+
+    updateWordList();
 </script>
 
 </body>
