@@ -7,30 +7,40 @@
 body {
     text-align: center;
     font-family: sans-serif;
-    padding: 30px;
+    padding: 20px;
+}
+.genre-box {
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 20px 0;
+}
+.genre-title {
+    font-size: 28px;
+    margin-bottom: 10px;
 }
 input {
-    font-size: 20px;
-    padding: 10px;
-    margin: 10px;
+    font-size: 18px;
+    padding: 8px;
+    margin: 5px;
 }
 button {
-    font-size: 20px;
-    padding: 10px 20px;
-    margin: 10px;
+    font-size: 18px;
+    padding: 8px 15px;
+    margin: 5px;
     cursor: pointer;
     background: #ff9800;
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
 }
 ul {
     list-style: none;
     padding: 0;
 }
 li {
-    font-size: 24px;
-    margin: 10px;
+    font-size: 22px;
+    margin: 5px;
 }
 </style>
 </head>
@@ -38,50 +48,88 @@ li {
 
 <h1>単語編集</h1>
 
-<input id="newWord" placeholder="単語を入力">
-<button onclick="addWord()">追加</button>
-
-<ul id="list"></ul>
+<div id="genres"></div>
 
 <button onclick="location.href='index.html'">ホームに戻る</button>
 
 <script>
-// localStorage から読み込み
-let words = JSON.parse(localStorage.getItem("words")) || ["apple", "banana", "grape", "orange", "strawberry"];
+// 6ジャンルを定義
+const genreList = ["動物", "数字", "体", "色", "日常品", "その他"];
 
+// localStorage から読み込み（なければ空のジャンルを作る）
+let words = JSON.parse(localStorage.getItem("wordsByGenre")) || {
+    "動物": [],
+    "数字": [],
+    "体": [],
+    "色": [],
+    "日常品": [],
+    "その他": []
+};
+
+// 保存
 function save() {
-    localStorage.setItem("words", JSON.stringify(words));
+    localStorage.setItem("wordsByGenre", JSON.stringify(words));
 }
 
-function renderList() {
-    const ul = document.getElementById("list");
-    ul.innerHTML = "";
-    words.forEach((w, i) => {
-        const li = document.createElement("li");
-        li.textContent = w + " ";
-        const del = document.createElement("button");
-        del.textContent = "削除";
-        del.onclick = () => {
-            words.splice(i, 1);
-            save();
-            renderList();
+// ジャンルごとの UI を生成
+function render() {
+    const container = document.getElementById("genres");
+    container.innerHTML = "";
+
+    genreList.forEach(genre => {
+        const box = document.createElement("div");
+        box.className = "genre-box";
+
+        // タイトル
+        const title = document.createElement("div");
+        title.className = "genre-title";
+        title.textContent = genre;
+        box.appendChild(title);
+
+        // 単語リスト
+        const ul = document.createElement("ul");
+        words[genre].forEach((w, i) => {
+            const li = document.createElement("li");
+            li.textContent = w + " ";
+
+            const del = document.createElement("button");
+            del.textContent = "削除";
+            del.onclick = () => {
+                words[genre].splice(i, 1);
+                save();
+                render();
+            };
+
+            li.appendChild(del);
+            ul.appendChild(li);
+        });
+        box.appendChild(ul);
+
+        // 追加欄
+        const input = document.createElement("input");
+        input.placeholder = "単語を追加";
+        input.id = "input-" + genre;
+
+        const addBtn = document.createElement("button");
+        addBtn.textContent = "追加";
+        addBtn.onclick = () => {
+            const value = input.value.trim();
+            if (value) {
+                words[genre].push(value);
+                input.value = "";
+                save();
+                render();
+            }
         };
-        li.appendChild(del);
-        ul.appendChild(li);
+
+        box.appendChild(input);
+        box.appendChild(addBtn);
+
+        container.appendChild(box);
     });
 }
 
-function addWord() {
-    const w = document.getElementById("newWord").value.trim();
-    if (w) {
-        words.push(w);
-        save();
-        document.getElementById("newWord").value = "";
-        renderList();
-    }
-}
-
-renderList();
+render();
 </script>
 
 </body>

@@ -23,6 +23,9 @@ button {
     font-size: 40px;
     margin: 30px;
 }
+input[type=range] {
+    width: 80%;
+}
 </style>
 </head>
 <body>
@@ -33,25 +36,78 @@ button {
 
 <button onclick="speakWord()">読み上げる</button>
 <button onclick="nextWord()">次の単語</button>
-<br>
+
+<h2>読み上げ速度</h2>
+<input id="rate" type="range" min="0.5" max="2" step="0.1">
+<div id="rateValue"></div>
+
+<h2>読み上げ間隔（秒）</h2>
+<input id="interval" type="number" min="1" max="20">
+<button onclick="toggleAuto()">自動再生 ON/OFF</button>
+
+<br><br>
 <button onclick="location.href='index.html'">ホームに戻る</button>
 
 <script>
-// localStorage から単語を読み込む
+// 単語リスト
 let words = JSON.parse(localStorage.getItem("words")) || ["apple", "banana", "grape", "orange", "strawberry"];
-
 let currentIndex = 0;
 
+// 設定の読み込み
+let rate = Number(localStorage.getItem("rate")) || 1.0;
+let intervalSec = Number(localStorage.getItem("interval")) || 5;
+let autoPlay = false;
+let timer = null;
+
+// UI に反映
+document.getElementById("rate").value = rate;
+document.getElementById("rateValue").textContent = rate;
+document.getElementById("interval").value = intervalSec;
+
+// 読み上げ
 function speakWord() {
     const utter = new SpeechSynthesisUtterance(words[currentIndex]);
     utter.lang = "en-US";
+    utter.rate = rate;
     speechSynthesis.speak(utter);
 }
 
+// 次の単語
 function nextWord() {
     currentIndex = (currentIndex + 1) % words.length;
     document.getElementById("word").textContent = words[currentIndex];
+    if (autoPlay) {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            speakWord();
+            nextWord();
+        }, intervalSec * 1000);
+    }
 }
+
+// 自動再生 ON/OFF
+function toggleAuto() {
+    autoPlay = !autoPlay;
+    if (autoPlay) {
+        speakWord();
+        nextWord();
+    } else {
+        clearTimeout(timer);
+    }
+}
+
+// 速度変更
+document.getElementById("rate").oninput = function() {
+    rate = Number(this.value);
+    document.getElementById("rateValue").textContent = rate;
+    localStorage.setItem("rate", rate);
+};
+
+// 間隔変更
+document.getElementById("interval").oninput = function() {
+    intervalSec = Number(this.value);
+    localStorage.setItem("interval", intervalSec);
+};
 
 // 初期表示
 document.getElementById("word").textContent = words[currentIndex];
