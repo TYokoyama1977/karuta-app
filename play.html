@@ -8,18 +8,32 @@
     body {
       font-family: "Segoe UI", sans-serif;
       background-color: #fff8e7;
-      text-align: center;
       margin: 0;
       padding: 0;
+      text-align: center;
     }
 
-    h1 {
+    /* ヘッダー */
+    header {
       background-color: #ffcc66;
       color: #333;
       padding: 15px;
-      margin: 0;
       font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    header button {
+      background-color: #66cc99;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
     }
 
     /* アイコン表示 */
@@ -31,7 +45,7 @@
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 25px;
       margin-top: 10px;
     }
 
@@ -41,6 +55,7 @@
       align-items: center;
       cursor: pointer;
       transition: transform 0.2s;
+      width: 100px;
     }
 
     .genre img {
@@ -55,21 +70,10 @@
       transform: scale(1.1);
     }
 
-    .genre p {
+    .genre input[type="checkbox"] {
       margin-top: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    /* チェックボックス */
-    .checkbox-area {
-      margin-top: 20px;
-      font-size: 18px;
-    }
-
-    .checkbox-area label {
-      margin-right: 15px;
+      transform: scale(1.5);
+      cursor: pointer;
     }
 
     /* 読み上げ設定 */
@@ -114,37 +118,60 @@
       background-color: #55aa88;
     }
 
-    .status {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #555;
+    /* 現在の単語表示 */
+    #currentWord {
+      font-size: 28px;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #333;
+      min-height: 40px;
     }
   </style>
 </head>
 <body>
-  <h1>読み上げ</h1>
 
-  <!-- アイコン表示 -->
+  <!-- ヘッダー -->
+  <header>
+    <div>読み上げ</div>
+    <button onclick="location.href='index.html'">ホームに戻る</button>
+  </header>
+
+  <!-- アイコン表示（チェックボックス付き） -->
   <div class="genre-selection">
     <h2>ジャンルを選択</h2>
     <div class="genre-icons">
-      <div class="genre"><img src="images/animal_icon.png" alt="Animal"><p>動物</p></div>
-      <div class="genre"><img src="images/number_icon.png" alt="Number"><p>数字</p></div>
-      <div class="genre"><img src="images/fruit_icon.png" alt="Fruit"><p>果物</p></div>
-      <div class="genre"><img src="images/color_icon.png" alt="Color"><p>色</p></div>
-      <div class="genre"><img src="images/insect_icon.png" alt="Insect"><p>昆虫</p></div>
-      <div class="genre"><img src="images/other_icon.png" alt="Other"><p>その他</p></div>
-    </div>
-  </div>
 
-  <!-- チェックボックス -->
-  <div class="checkbox-area">
-    <label><input type="checkbox" class="genreCheck" value="animal"> 動物</label>
-    <label><input type="checkbox" class="genreCheck" value="number"> 数字</label>
-    <label><input type="checkbox" class="genreCheck" value="fruit"> 果物</label>
-    <label><input type="checkbox" class="genreCheck" value="color"> 色</label>
-    <label><input type="checkbox" class="genreCheck" value="insect"> 昆虫</label>
-    <label><input type="checkbox" class="genreCheck" value="other"> その他</label>
+      <div class="genre" data-genre="animal">
+        <img src="images/animal_icon.png" alt="Animal">
+        <input type="checkbox" class="genreCheck" value="animal">
+      </div>
+
+      <div class="genre" data-genre="number">
+        <img src="images/number_icon.png" alt="Number">
+        <input type="checkbox" class="genreCheck" value="number">
+      </div>
+
+      <div class="genre" data-genre="fruit">
+        <img src="images/fruit_icon.png" alt="Fruit">
+        <input type="checkbox" class="genreCheck" value="fruit">
+      </div>
+
+      <div class="genre" data-genre="color">
+        <img src="images/color_icon.png" alt="Color">
+        <input type="checkbox" class="genreCheck" value="color">
+      </div>
+
+      <div class="genre" data-genre="insect">
+        <img src="images/insect_icon.png" alt="Insect">
+        <input type="checkbox" class="genreCheck" value="insect">
+      </div>
+
+      <div class="genre" data-genre="other">
+        <img src="images/other_icon.png" alt="Other">
+        <input type="checkbox" class="genreCheck" value="other">
+      </div>
+
+    </div>
   </div>
 
   <!-- 読み上げ設定 -->
@@ -167,15 +194,18 @@
   <!-- ボタン -->
   <div class="controls">
     <button id="playButton">自動再生 ON</button>
-    <button id="nextButton">次の単語</button>
-    <button onclick="location.href='index.html'">ホームに戻る</button>
-    <div class="status" id="statusText">ジャンルを選んでください</div>
+
+    <!-- ★ 修正：ボタン名を変更 -->
+    <button id="nextButton">次の単語を読み上げ</button>
+
+    <!-- ★ 読み上げ中の単語表示 -->
+    <div id="currentWord"></div>
   </div>
 
   <script>
     const playButton = document.getElementById("playButton");
     const nextButton = document.getElementById("nextButton");
-    const statusText = document.getElementById("statusText");
+    const currentWord = document.getElementById("currentWord");
 
     const rateSlider = document.getElementById("rateSlider");
     const intervalSlider = document.getElementById("intervalSlider");
@@ -192,6 +222,14 @@
 
     intervalSlider.addEventListener("input", () => {
       intervalValue.textContent = intervalSlider.value;
+    });
+
+    // アイコンをクリックしたらチェックを切り替える
+    document.querySelectorAll(".genre").forEach(box => {
+      box.addEventListener("click", () => {
+        const checkbox = box.querySelector("input[type='checkbox']");
+        checkbox.checked = !checkbox.checked;
+      });
     });
 
     // localStorage から単語を取得
@@ -218,12 +256,11 @@
     // 読み上げ
     function speakWord() {
       const word = getRandomWord();
-      if (!word) {
-        statusText.textContent = "単語がありません";
-        return;
-      }
+      if (!word) return;
 
-      statusText.textContent = `読み上げ: ${word}`;
+      // ★ 読み上げ中の単語を表示
+      currentWord.textContent = word;
+
       const uttr = new SpeechSynthesisUtterance(word);
       uttr.rate = parseFloat(rateSlider.value);
       speechSynthesis.speak(uttr);
