@@ -22,6 +22,7 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
+    /* アイコン表示 */
     .genre-selection {
       margin-top: 20px;
     }
@@ -61,6 +62,38 @@
       color: #333;
     }
 
+    /* チェックボックス */
+    .checkbox-area {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .checkbox-area label {
+      margin-right: 15px;
+    }
+
+    /* 読み上げ設定 */
+    .settings {
+      margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .setting-item {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    .setting-item input[type=range] {
+      width: 60%;
+    }
+
+    /* ボタン */
     .controls {
       margin-top: 30px;
     }
@@ -74,6 +107,7 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s;
+      margin: 5px;
     }
 
     button:hover {
@@ -90,6 +124,7 @@
 <body>
   <h1>読み上げ</h1>
 
+  <!-- アイコン表示 -->
   <div class="genre-selection">
     <h2>ジャンルを選択</h2>
     <div class="genre-icons">
@@ -102,29 +137,114 @@
     </div>
   </div>
 
+  <!-- チェックボックス -->
+  <div class="checkbox-area">
+    <label><input type="checkbox" class="genreCheck" value="animal"> 動物</label>
+    <label><input type="checkbox" class="genreCheck" value="number"> 数字</label>
+    <label><input type="checkbox" class="genreCheck" value="fruit"> 果物</label>
+    <label><input type="checkbox" class="genreCheck" value="color"> 色</label>
+    <label><input type="checkbox" class="genreCheck" value="insect"> 昆虫</label>
+    <label><input type="checkbox" class="genreCheck" value="other"> その他</label>
+  </div>
+
+  <!-- 読み上げ設定 -->
+  <div class="settings">
+    <h3>読み上げ設定</h3>
+
+    <div class="setting-item">
+      <label>読み上げ速度: </label>
+      <span id="rateValue">1</span>
+      <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
+    </div>
+
+    <div class="setting-item">
+      <label>読み上げ間隔（秒）: </label>
+      <span id="intervalValue">6</span>
+      <input type="range" id="intervalSlider" min="1" max="10" step="1" value="6">
+    </div>
+  </div>
+
+  <!-- ボタン -->
   <div class="controls">
     <button id="playButton">自動再生 ON</button>
+    <button id="nextButton">次の単語</button>
+    <button onclick="location.href='index.html'">ホームに戻る</button>
     <div class="status" id="statusText">ジャンルを選んでください</div>
   </div>
 
   <script>
     const playButton = document.getElementById("playButton");
+    const nextButton = document.getElementById("nextButton");
     const statusText = document.getElementById("statusText");
-    let autoPlay = false;
 
+    const rateSlider = document.getElementById("rateSlider");
+    const intervalSlider = document.getElementById("intervalSlider");
+    const rateValue = document.getElementById("rateValue");
+    const intervalValue = document.getElementById("intervalValue");
+
+    let autoPlay = false;
+    let timer = null;
+
+    // スライダー表示更新
+    rateSlider.addEventListener("input", () => {
+      rateValue.textContent = rateSlider.value;
+    });
+
+    intervalSlider.addEventListener("input", () => {
+      intervalValue.textContent = intervalSlider.value;
+    });
+
+    // localStorage から単語を取得
+    function getWordsByGenre(genre) {
+      const data = JSON.parse(localStorage.getItem("words")) || {};
+      return data[genre] || [];
+    }
+
+    // チェックされたジャンルからランダム単語を取得
+    function getRandomWord() {
+      const checked = [...document.querySelectorAll(".genreCheck:checked")].map(c => c.value);
+      if (checked.length === 0) return null;
+
+      let allWords = [];
+      checked.forEach(g => {
+        allWords = allWords.concat(getWordsByGenre(g));
+      });
+
+      if (allWords.length === 0) return null;
+
+      return allWords[Math.floor(Math.random() * allWords.length)];
+    }
+
+    // 読み上げ
+    function speakWord() {
+      const word = getRandomWord();
+      if (!word) {
+        statusText.textContent = "単語がありません";
+        return;
+      }
+
+      statusText.textContent = `読み上げ: ${word}`;
+      const uttr = new SpeechSynthesisUtterance(word);
+      uttr.rate = parseFloat(rateSlider.value);
+      speechSynthesis.speak(uttr);
+    }
+
+    // 自動再生 ON/OFF
     playButton.addEventListener("click", () => {
       autoPlay = !autoPlay;
+
       playButton.textContent = autoPlay ? "自動再生 OFF" : "自動再生 ON";
       playButton.style.backgroundColor = autoPlay ? "#66cc99" : "#aaa";
-      statusText.textContent = autoPlay ? "自動再生モードです" : "手動モードです";
+
+      if (autoPlay) {
+        timer = setInterval(speakWord, intervalSlider.value * 1000);
+      } else {
+        clearInterval(timer);
+      }
     });
 
-    document.querySelectorAll(".genre").forEach(genre => {
-      genre.addEventListener("click", () => {
-        const name = genre.querySelector("p").textContent;
-        statusText.textContent = `${name}ジャンルを選択しました`;
-      });
-    });
+    // 次の単語
+    nextButton.addEventListener("click", speakWord);
   </script>
 </body>
 </html>
