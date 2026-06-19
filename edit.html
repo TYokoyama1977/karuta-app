@@ -1,161 +1,210 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>単語編集</title>
-<style>
-    body {
-        font-family: sans-serif;
-        padding: 20px;
-    }
-
-    h2 {
-        margin-top: 0;
-    }
-
-    /* アイコンボタン */
-    .genre-icons {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-    .genre-icons img {
-        width: 70px;
-        height: 70px;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-    .genre-icons img:hover {
-        transform: scale(1.1);
-    }
-
-    /* 単語タグ表示 */
-    .word-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin: 10px 0;
-    }
-    .word-item {
-        display: flex;
-        align-items: center;
-        background: #f2f2f2;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 16px;
-    }
-    .word-item button {
-        margin-left: 6px;
-        padding: 2px 6px;
-        font-size: 14px;
-    }
-
-    #homeBtn {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        padding: 8px 12px;
-        font-size: 14px;
-    }
-</style>
+  <meta charset="UTF-8" />
+  <title>単語編集 v1</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 16px; }
+    h1 { margin-bottom: 8px; }
+    label { display: block; margin-top: 8px; }
+    input, select, button { margin-top: 4px; }
+    table { border-collapse: collapse; margin-top: 16px; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 4px 8px; text-align: left; }
+    .row-actions button { margin-right: 4px; }
+  </style>
 </head>
 <body>
+  <h1>単語編集（v1）</h1>
+  <a href="index.html">ホームに戻る</a>
 
-<h2>単語編集</h2>
+  <!-- カテゴリ選択 -->
+  <section>
+    <h2>カテゴリ選択</h2>
+    <label>
+      カテゴリ:
+      <select id="categorySelect">
+        <option value="animal">animal</option>
+        <option value="fruit">fruit</option>
+        <option value="color">color</option>
+      </select>
+    </label>
+    <button id="loadWordsBtn">このカテゴリの単語を読み込む</button>
+  </section>
 
-<!-- ホームボタン -->
-<button id="homeBtn" onclick="location.href='index.html'">ホームに戻る</button>
+  <!-- 単語一覧 -->
+  <section>
+    <h2>単語一覧</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>英単語</th>
+          <th>日本語</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="wordsTableBody">
+        <!-- JSで埋める -->
+      </tbody>
+    </table>
+  </section>
 
-<!-- アイコン選択 -->
-<div class="genre-icons">
-    <img src="images/animal_icon.png" onclick="selectGenre('animal')">
-    <img src="images/number_icon.png" onclick="selectGenre('number')">
-    <img src="images/fruit_icon.png" onclick="selectGenre('fruit')">
-    <img src="images/color_icon.png" onclick="selectGenre('color')">
-    <img src="images/insect_icon.png" onclick="selectGenre('insect')">
-    <img src="images/other_icon.png" onclick="selectGenre('other')">
-</div>
+  <!-- 単語追加・編集フォーム -->
+  <section>
+    <h2>単語追加 / 編集</h2>
+    <input type="hidden" id="editingId" />
 
-<h3 id="genreTitle">ジャンルを選択</h3>
+    <label>
+      英単語:
+      <input type="text" id="wordInput" />
+    </label>
+    <label>
+      日本語:
+      <input type="text" id="meaningInput" />
+    </label>
 
-<!-- 単語一覧 -->
-<div id="wordList"></div>
+    <button id="saveWordBtn">保存（v1）</button>
+    <button id="cancelEditBtn">編集キャンセル</button>
+  </section>
 
-<!-- 単語追加 -->
-<input type="text" id="wordInput" placeholder="単語を入力">
-<button onclick="addWord()">追加</button>
+  <script>
+    // ★ v1 API のベースURL（必要に応じて書き換えてください）
+    const API_BASE = '/v1/words';
 
-<script>
-    // ★ play.html と完全に同じ構造（小文字）で読み込む
-    let words = JSON.parse(localStorage.getItem("words")) || {
-        animal: [],
-        number: [],
-        fruit: [],
-        color: [],
-        insect: [],
-        other: []
-    };
+    const categorySelect = document.getElementById('categorySelect');
+    const loadWordsBtn = document.getElementById('loadWordsBtn');
+    const wordsTableBody = document.getElementById('wordsTableBody');
+    const editingIdInput = document.getElementById('editingId');
+    const wordInput = document.getElementById('wordInput');
+    const meaningInput = document.getElementById('meaningInput');
+    const saveWordBtn = document.getElementById('saveWordBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
 
-    let currentGenre = null;
+    // 単語一覧取得（v1）
+    async function loadWords() {
+      const category = categorySelect.value;
+      wordsTableBody.innerHTML = '<tr><td colspan="4">読み込み中...</td></tr>';
 
-    function selectGenre(genre) {
-        currentGenre = genre;
-        document.getElementById("genreTitle").textContent = genre + " の単語";
-        updateWordList();
+      try {
+        const res = await fetch(`${API_BASE}?category=${encodeURIComponent(category)}`);
+        if (!res.ok) throw new Error('API error: ' + res.status);
+        const data = await res.json(); // 例: [{id, word, meaning, category}, ...]
+
+        renderWords(data);
+      } catch (e) {
+        console.error(e);
+        wordsTableBody.innerHTML =
+          '<tr><td colspan="4">読み込みに失敗しました（v1）。コンソールを確認してください。</td></tr>';
+      }
     }
 
-    function updateWordList() {
-        const container = document.getElementById("wordList");
-        container.innerHTML = "";
+    function renderWords(words) {
+      if (!Array.isArray(words) || words.length === 0) {
+        wordsTableBody.innerHTML = '<tr><td colspan="4">このカテゴリには単語がありません。</td></tr>';
+        return;
+      }
 
-        if (!currentGenre) return;
+      wordsTableBody.innerHTML = '';
+      words.forEach(w => {
+        const tr = document.createElement('tr');
 
-        const list = document.createElement("div");
-        list.className = "word-list";
+        const tdId = document.createElement('td');
+        tdId.textContent = w.id ?? '';
+        tr.appendChild(tdId);
 
-        words[currentGenre].forEach((w, index) => {
-            const item = document.createElement("div");
-            item.className = "word-item";
+        const tdWord = document.createElement('td');
+        tdWord.textContent = w.word ?? '';
+        tr.appendChild(tdWord);
 
-            const text = document.createElement("span");
-            text.textContent = w;
+        const tdMeaning = document.createElement('td');
+        tdMeaning.textContent = w.meaning ?? '';
+        tr.appendChild(tdMeaning);
 
-            const delBtn = document.createElement("button");
-            delBtn.textContent = "削除";
-            delBtn.onclick = () => deleteWord(index);
+        const tdActions = document.createElement('td');
+        tdActions.className = 'row-actions';
 
-            item.appendChild(text);
-            item.appendChild(delBtn);
-            list.appendChild(item);
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '編集';
+        editBtn.onclick = () => startEdit(w);
+        tdActions.appendChild(editBtn);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '削除';
+        deleteBtn.onclick = () => deleteWord(w.id);
+        tdActions.appendChild(deleteBtn);
+
+        tr.appendChild(tdActions);
+        wordsTableBody.appendChild(tr);
+      });
+    }
+
+    function startEdit(wordObj) {
+      editingIdInput.value = wordObj.id ?? '';
+      wordInput.value = wordObj.word ?? '';
+      meaningInput.value = wordObj.meaning ?? '';
+    }
+
+    function clearForm() {
+      editingIdInput.value = '';
+      wordInput.value = '';
+      meaningInput.value = '';
+    }
+
+    // 単語保存（追加 or 更新）v1
+    async function saveWord() {
+      const id = editingIdInput.value;
+      const category = categorySelect.value;
+      const word = wordInput.value.trim();
+      const meaning = meaningInput.value.trim();
+
+      if (!word || !meaning) {
+        alert('英単語と日本語を入力してください。');
+        return;
+      }
+
+      const payload = { id: id || undefined, word, meaning, category };
+
+      try {
+        const res = await fetch(API_BASE, {
+          method: id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
         });
+        if (!res.ok) throw new Error('API error: ' + res.status);
 
-        container.appendChild(list);
+        clearForm();
+        await loadWords(); // 更新後に再読み込み
+      } catch (e) {
+        console.error(e);
+        alert('保存（v1）に失敗しました。コンソールを確認してください。');
+      }
     }
 
-    function addWord() {
-        if (!currentGenre) return alert("ジャンルを選択してください");
+    // 単語削除 v1
+    async function deleteWord(id) {
+      if (!id) return;
+      if (!confirm('この単語を削除しますか？')) return;
 
-        const input = document.getElementById("wordInput");
-        const newWord = input.value.trim();
-        if (newWord === "") return;
+      try {
+        const res = await fetch(`${API_BASE}/${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+        });
+        if (!res.ok) throw new Error('API error: ' + res.status);
 
-        words[currentGenre].push(newWord);
-        input.value = "";
-
-        saveWords();
-        updateWordList();
+        await loadWords();
+      } catch (e) {
+        console.error(e);
+        alert('削除（v1）に失敗しました。コンソールを確認してください。');
+      }
     }
 
-    function deleteWord(index) {
-        words[currentGenre].splice(index, 1);
-        saveWords();
-        updateWordList();
-    }
+    // イベント設定
+    loadWordsBtn.addEventListener('click', loadWords);
+    saveWordBtn.addEventListener('click', saveWord);
+    cancelEditBtn.addEventListener('click', clearForm);
 
-    function saveWords() {
-        localStorage.setItem("words", JSON.stringify(words));
-    }
-</script>
-
+    // 初期表示：デフォルトカテゴリを読み込み
+    loadWords();
+  </script>
 </body>
 </html>
