@@ -14,7 +14,7 @@
   </style>
 </head>
 <body>
-  <h1>単語編集（v1）</h1>
+  <h1>単語編集 v1</h1>
   <a href="index.html">ホームに戻る</a>
 
   <!-- カテゴリ選択 -->
@@ -24,8 +24,11 @@
       カテゴリ:
       <select id="categorySelect">
         <option value="animal">animal</option>
-        <option value="fruit">fruit</option>
+        <option value="fluit">fluit</option>
         <option value="color">color</option>
+        <option value="other">other</option>
+        <option value="insect">insect</option>
+        <option value="number">number</option>
       </select>
     </label>
     <button id="loadWordsBtn">このカテゴリの単語を読み込む</button>
@@ -39,13 +42,10 @@
         <tr>
           <th>ID</th>
           <th>英単語</th>
-          <th>日本語</th>
           <th>操作</th>
         </tr>
       </thead>
-      <tbody id="wordsTableBody">
-        <!-- JSで埋める -->
-      </tbody>
+      <tbody id="wordsTableBody"></tbody>
     </table>
   </section>
 
@@ -58,17 +58,12 @@
       英単語:
       <input type="text" id="wordInput" />
     </label>
-    <label>
-      日本語:
-      <input type="text" id="meaningInput" />
-    </label>
 
-    <button id="saveWordBtn">保存（v1）</button>
+    <button id="saveWordBtn">保存</button>
     <button id="cancelEditBtn">編集キャンセル</button>
   </section>
 
   <script>
-    // ★ v1 API のベースURL（必要に応じて書き換えてください）
     const API_BASE = '/v1/words';
 
     const categorySelect = document.getElementById('categorySelect');
@@ -76,31 +71,28 @@
     const wordsTableBody = document.getElementById('wordsTableBody');
     const editingIdInput = document.getElementById('editingId');
     const wordInput = document.getElementById('wordInput');
-    const meaningInput = document.getElementById('meaningInput');
     const saveWordBtn = document.getElementById('saveWordBtn');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
 
-    // 単語一覧取得（v1）
     async function loadWords() {
       const category = categorySelect.value;
-      wordsTableBody.innerHTML = '<tr><td colspan="4">読み込み中...</td></tr>';
+      wordsTableBody.innerHTML = '<tr><td colspan="3">読み込み中...</td></tr>';
 
       try {
         const res = await fetch(`${API_BASE}?category=${encodeURIComponent(category)}`);
         if (!res.ok) throw new Error('API error: ' + res.status);
-        const data = await res.json(); // 例: [{id, word, meaning, category}, ...]
-
+        const data = await res.json();
         renderWords(data);
       } catch (e) {
         console.error(e);
         wordsTableBody.innerHTML =
-          '<tr><td colspan="4">読み込みに失敗しました（v1）。コンソールを確認してください。</td></tr>';
+          '<tr><td colspan="3">読み込みに失敗しました。</td></tr>';
       }
     }
 
     function renderWords(words) {
       if (!Array.isArray(words) || words.length === 0) {
-        wordsTableBody.innerHTML = '<tr><td colspan="4">このカテゴリには単語がありません。</td></tr>';
+        wordsTableBody.innerHTML = '<tr><td colspan="3">このカテゴリには単語がありません。</td></tr>';
         return;
       }
 
@@ -108,32 +100,15 @@
       words.forEach(w => {
         const tr = document.createElement('tr');
 
-        const tdId = document.createElement('td');
-        tdId.textContent = w.id ?? '';
-        tr.appendChild(tdId);
+        tr.innerHTML = `
+          <td>${w.id ?? ''}</td>
+          <td>${w.word ?? ''}</td>
+          <td class="row-actions">
+            <button onclick='startEdit(${JSON.stringify(w)})'>編集</button>
+            <button onclick='deleteWord("${w.id}")'>削除</button>
+          </td>
+        `;
 
-        const tdWord = document.createElement('td');
-        tdWord.textContent = w.word ?? '';
-        tr.appendChild(tdWord);
-
-        const tdMeaning = document.createElement('td');
-        tdMeaning.textContent = w.meaning ?? '';
-        tr.appendChild(tdMeaning);
-
-        const tdActions = document.createElement('td');
-        tdActions.className = 'row-actions';
-
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '編集';
-        editBtn.onclick = () => startEdit(w);
-        tdActions.appendChild(editBtn);
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '削除';
-        deleteBtn.onclick = () => deleteWord(w.id);
-        tdActions.appendChild(deleteBtn);
-
-        tr.appendChild(tdActions);
         wordsTableBody.appendChild(tr);
       });
     }
@@ -141,28 +116,24 @@
     function startEdit(wordObj) {
       editingIdInput.value = wordObj.id ?? '';
       wordInput.value = wordObj.word ?? '';
-      meaningInput.value = wordObj.meaning ?? '';
     }
 
     function clearForm() {
       editingIdInput.value = '';
       wordInput.value = '';
-      meaningInput.value = '';
     }
 
-    // 単語保存（追加 or 更新）v1
     async function saveWord() {
       const id = editingIdInput.value;
       const category = categorySelect.value;
       const word = wordInput.value.trim();
-      const meaning = meaningInput.value.trim();
 
-      if (!word || !meaning) {
-        alert('英単語と日本語を入力してください。');
+      if (!word) {
+        alert('英単語を入力してください。');
         return;
       }
 
-      const payload = { id: id || undefined, word, meaning, category };
+      const payload = { id: id || undefined, word, category };
 
       try {
         const res = await fetch(API_BASE, {
@@ -173,14 +144,13 @@
         if (!res.ok) throw new Error('API error: ' + res.status);
 
         clearForm();
-        await loadWords(); // 更新後に再読み込み
+        await loadWords();
       } catch (e) {
         console.error(e);
-        alert('保存（v1）に失敗しました。コンソールを確認してください。');
+        alert('保存に失敗しました。');
       }
     }
 
-    // 単語削除 v1
     async function deleteWord(id) {
       if (!id) return;
       if (!confirm('この単語を削除しますか？')) return;
@@ -194,16 +164,14 @@
         await loadWords();
       } catch (e) {
         console.error(e);
-        alert('削除（v1）に失敗しました。コンソールを確認してください。');
+        alert('削除に失敗しました。');
       }
     }
 
-    // イベント設定
     loadWordsBtn.addEventListener('click', loadWords);
     saveWordBtn.addEventListener('click', saveWord);
     cancelEditBtn.addEventListener('click', clearForm);
 
-    // 初期表示：デフォルトカテゴリを読み込み
     loadWords();
   </script>
 </body>
