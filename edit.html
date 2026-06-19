@@ -65,25 +65,39 @@
   <script>
     const STORAGE_KEY = "words";
 
-    // localStorage からデータ取得
+    // ★ localStorage の自動初期化
     function loadStorage() {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (data) return JSON.parse(data);
+      let data = null;
 
-      // ★ 初期データ（animal に dog / cat を追加）
-      const initial = {
-        animal: ["dog", "cat"],
-        fluit: [],
-        color: [],
-        other: [],
-        insect: [],
-        number: []
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-      return initial;
+      try {
+        data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      } catch (e) {
+        console.warn("localStorage が壊れていたため初期化します");
+      }
+
+      // データが無い or 壊れている場合は初期化
+      if (!data || typeof data !== "object") {
+        data = {
+          animal: ["dog", "cat"],
+          fluit: [],
+          color: [],
+          other: [],
+          insect: [],
+          number: []
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+
+      // カテゴリが欠けていたら補完
+      const categories = ["animal", "fluit", "color", "other", "insect", "number"];
+      categories.forEach(cat => {
+        if (!Array.isArray(data[cat])) data[cat] = [];
+      });
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      return data;
     }
 
-    // localStorage に保存
     function saveStorage(data) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
@@ -99,7 +113,7 @@
     function loadWords() {
       const category = categorySelect.value;
       const data = loadStorage();
-      const words = data[category] || [];
+      const words = data[category];
 
       if (words.length === 0) {
         wordsTableBody.innerHTML = '<tr><td colspan="2">単語がありません。</td></tr>';
@@ -150,10 +164,8 @@
       const index = editingIndexInput.value;
 
       if (index === "") {
-        // 新規追加
         words.push(word);
       } else {
-        // 編集
         words[index] = word;
       }
 
