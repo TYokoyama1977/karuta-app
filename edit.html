@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>単語編集 v1</title>
+  <title>単語編集</title>
   <style>
     body { font-family: system-ui, sans-serif; padding: 16px; }
     h1 { margin-bottom: 8px; }
@@ -14,7 +14,7 @@
   </style>
 </head>
 <body>
-  <h1>単語編集 v1</h1>
+  <h1>単語編集</h1>
   <a href="index.html">ホームに戻る</a>
 
   <!-- カテゴリ選択 -->
@@ -40,7 +40,6 @@
     <table>
       <thead>
         <tr>
-          <th>ID</th>
           <th>英単語</th>
           <th>操作</th>
         </tr>
@@ -52,7 +51,7 @@
   <!-- 単語追加・編集フォーム -->
   <section>
     <h2>単語追加 / 編集</h2>
-    <input type="hidden" id="editingId" />
+    <input type="hidden" id="editingIndex" />
 
     <label>
       英単語:
@@ -64,48 +63,58 @@
   </section>
 
   <script>
-    const API_BASE = '/v1/words';
+    const STORAGE_KEY = "words";
 
-    const categorySelect = document.getElementById('categorySelect');
-    const loadWordsBtn = document.getElementById('loadWordsBtn');
-    const wordsTableBody = document.getElementById('wordsTableBody');
-    const editingIdInput = document.getElementById('editingId');
-    const wordInput = document.getElementById('wordInput');
-    const saveWordBtn = document.getElementById('saveWordBtn');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    // localStorage からデータ取得
+    function loadStorage() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (data) return JSON.parse(data);
 
-    async function loadWords() {
-      const category = categorySelect.value;
-      wordsTableBody.innerHTML = '<tr><td colspan="3">読み込み中...</td></tr>';
-
-      try {
-        const res = await fetch(`${API_BASE}?category=${encodeURIComponent(category)}`);
-        if (!res.ok) throw new Error('API error: ' + res.status);
-        const data = await res.json();
-        renderWords(data);
-      } catch (e) {
-        console.error(e);
-        wordsTableBody.innerHTML =
-          '<tr><td colspan="3">読み込みに失敗しました。</td></tr>';
-      }
+      // ★ 初期データ（animal に dog / cat を追加）
+      const initial = {
+        animal: ["dog", "cat"],
+        fluit: [],
+        color: [],
+        other: [],
+        insect: [],
+        number: []
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+      return initial;
     }
 
-    function renderWords(words) {
-      if (!Array.isArray(words) || words.length === 0) {
-        wordsTableBody.innerHTML = '<tr><td colspan="3">このカテゴリには単語がありません。</td></tr>';
+    // localStorage に保存
+    function saveStorage(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    const categorySelect = document.getElementById("categorySelect");
+    const loadWordsBtn = document.getElementById("loadWordsBtn");
+    const wordsTableBody = document.getElementById("wordsTableBody");
+    const editingIndexInput = document.getElementById("editingIndex");
+    const wordInput = document.getElementById("wordInput");
+    const saveWordBtn = document.getElementById("saveWordBtn");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+    function loadWords() {
+      const category = categorySelect.value;
+      const data = loadStorage();
+      const words = data[category] || [];
+
+      if (words.length === 0) {
+        wordsTableBody.innerHTML = '<tr><td colspan="2">単語がありません。</td></tr>';
         return;
       }
 
-      wordsTableBody.innerHTML = '';
-      words.forEach(w => {
-        const tr = document.createElement('tr');
+      wordsTableBody.innerHTML = "";
+      words.forEach((word, index) => {
+        const tr = document.createElement("tr");
 
         tr.innerHTML = `
-          <td>${w.id ?? ''}</td>
-          <td>${w.word ?? ''}</td>
+          <td>${word}</td>
           <td class="row-actions">
-            <button onclick='startEdit(${JSON.stringify(w)})'>編集</button>
-            <button onclick='deleteWord("${w.id}")'>削除</button>
+            <button onclick="startEdit(${index})">編集</button>
+            <button onclick="deleteWord(${index})">削除</button>
           </td>
         `;
 
@@ -113,64 +122,61 @@
       });
     }
 
-    function startEdit(wordObj) {
-      editingIdInput.value = wordObj.id ?? '';
-      wordInput.value = wordObj.word ?? '';
+    function startEdit(index) {
+      const category = categorySelect.value;
+      const data = loadStorage();
+      const words = data[category];
+
+      editingIndexInput.value = index;
+      wordInput.value = words[index];
     }
 
     function clearForm() {
-      editingIdInput.value = '';
-      wordInput.value = '';
+      editingIndexInput.value = "";
+      wordInput.value = "";
     }
 
-    async function saveWord() {
-      const id = editingIdInput.value;
+    function saveWord() {
       const category = categorySelect.value;
-      const word = wordInput.value.trim();
+      const data = loadStorage();
+      const words = data[category];
 
+      const word = wordInput.value.trim();
       if (!word) {
-        alert('英単語を入力してください。');
+        alert("英単語を入力してください。");
         return;
       }
 
-      const payload = { id: id || undefined, word, category };
+      const index = editingIndexInput.value;
 
-      try {
-        const res = await fetch(API_BASE, {
-          method: id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error('API error: ' + res.status);
-
-        clearForm();
-        await loadWords();
-      } catch (e) {
-        console.error(e);
-        alert('保存に失敗しました。');
+      if (index === "") {
+        // 新規追加
+        words.push(word);
+      } else {
+        // 編集
+        words[index] = word;
       }
+
+      saveStorage(data);
+      clearForm();
+      loadWords();
     }
 
-    async function deleteWord(id) {
-      if (!id) return;
-      if (!confirm('この単語を削除しますか？')) return;
+    function deleteWord(index) {
+      const category = categorySelect.value;
+      const data = loadStorage();
+      const words = data[category];
 
-      try {
-        const res = await fetch(`${API_BASE}/${encodeURIComponent(id)}`, {
-          method: 'DELETE',
-        });
-        if (!res.ok) throw new Error('API error: ' + res.status);
+      if (!confirm("この単語を削除しますか？")) return;
 
-        await loadWords();
-      } catch (e) {
-        console.error(e);
-        alert('削除に失敗しました。');
-      }
+      words.splice(index, 1);
+      saveStorage(data);
+      loadWords();
     }
 
-    loadWordsBtn.addEventListener('click', loadWords);
-    saveWordBtn.addEventListener('click', saveWord);
-    cancelEditBtn.addEventListener('click', clearForm);
+    loadWordsBtn.addEventListener("click", loadWords);
+    saveWordBtn.addEventListener("click", saveWord);
+    cancelEditBtn.addEventListener("click", clearForm);
 
     loadWords();
   </script>
