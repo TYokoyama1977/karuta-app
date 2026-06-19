@@ -68,12 +68,12 @@
 
 <!-- アイコン選択 -->
 <div class="genre-icons">
-    <img src="images/animal_icon.png" onclick="selectGenre('Animal')">
-    <img src="images/number_icon.png" onclick="selectGenre('Number')">
-    <img src="images/fruit_icon.png" onclick="selectGenre('Fruit')">
-    <img src="images/color_icon.png" onclick="selectGenre('Color')">
-    <img src="images/insect_icon.png" onclick="selectGenre('Insect')">
-    <img src="images/other_icon.png" onclick="selectGenre('Other')">
+    <img src="images/animal_icon.png" onclick="selectGenre('animal')">
+    <img src="images/number_icon.png" onclick="selectGenre('number')">
+    <img src="images/fruit_icon.png" onclick="selectGenre('fruit')">
+    <img src="images/color_icon.png" onclick="selectGenre('color')">
+    <img src="images/insect_icon.png" onclick="selectGenre('insect')">
+    <img src="images/other_icon.png" onclick="selectGenre('other')">
 </div>
 
 <h3 id="genreTitle">ジャンルを選択</h3>
@@ -86,14 +86,14 @@
 <button onclick="addWord()">追加</button>
 
 <script>
-    // ローカルストレージから読み込み
+    // ★ play.html と完全に同じ構造（小文字）で読み込む
     let words = JSON.parse(localStorage.getItem("words")) || {
-        Animal: [],
-        Number: [],
-        Fruit: [],
-        Color: [],
-        Insect: [],
-        Other: []
+        animal: [],
+        number: [],
+        fruit: [],
+        color: [],
+        insect: [],
+        other: []
     };
 
     let currentGenre = null;
