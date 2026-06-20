@@ -1,255 +1,250 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>単語編集</title>
-    <style>
-        body {
-            font-family: "Arial Rounded MT Bold", Arial;
-            padding: 20px;
-            background: #fff7e6;
-        }
+  <meta charset="UTF-8">
+  <title>単語編集 - 英語かるたアプリ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        h2 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
 
-        /* ホームボタン */
-        .home-btn {
-            display: inline-block;
-            padding: 10px 15px;
-            background: #4da6ff;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+    /* ホームボタン（play.html と統一） */
+    .edit-header {
+      padding: 10px;
+      text-align: left;
+    }
 
-        /* ジャンルボタン */
-        .genre-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
+    .home-btn {
+      font-size: 18px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: #eee;
+    }
 
-        .genre-btn {
-            padding: 10px 15px;
-            background: #ffb84d;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+    h2 {
+      margin-top: 10px;
+      font-size: 24px;
+      color: #333;
+    }
 
-        .genre-btn.active {
-            background: #ff8c42;
-            color: white;
-        }
+    /* ジャンルボタン */
+    .genre-buttons {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
-        /* 単語リスト */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
+    .genre-btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      background: #ddd;
+      font-size: 16px;
+    }
 
-        td {
-            border-bottom: 1px solid #ccc;
-            padding: 8px;
-            font-size: 18px;
-        }
+    .genre-btn.active {
+      background: #ffcc66;
+    }
 
-        button {
-            padding: 5px 10px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-        }
+    /* 入力欄 */
+    #wordInput {
+      width: 70%;
+      padding: 12px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid #aaa;
+      margin-top: 20px;
+    }
 
-        .delete-btn {
-            background: #ff6666;
-            color: white;
-        }
+    #addBtn {
+      padding: 12px 20px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      background: #66cc66;
+      color: white;
+      margin-left: 10px;
+    }
 
-        .add-area {
-            margin-top: 20px;
-            text-align: center;
-        }
+    /* 注意文 */
+    .note {
+      font-size: 14px;
+      color: #555;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
 
-        input {
-            padding: 8px;
-            font-size: 16px;
-            width: 200px;
-        }
+    /* 単語リスト */
+    .word-list {
+      margin-top: 20px;
+      width: 85%;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
 
-        .add-btn {
-            padding: 8px 15px;
-            background: #4da6ff;
-            color: white;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
+    .word-item {
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
 
-        .genre-title {
-            font-size: 22px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-    </style>
+    .delete-btn {
+      background: #ff6666;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+  </style>
 </head>
+
 <body>
 
-<a href="index.html" class="home-btn">🏠 ホームに戻る</a>
+  <!-- ホームボタン -->
+  <div class="edit-header">
+    <button class="home-btn" onclick="location.href='index.html'">🏠 ホームに戻る</button>
+  </div>
 
-<h2>単語編集（最大20個）</h2>
+  <h2 id="genreTitle">Number</h2>
 
-<!-- ジャンルボタン -->
-<div class="genre-buttons">
-    <button class="genre-btn" onclick="changeGenre('number')">Number</button>
-    <button class="genre-btn" onclick="changeGenre('animal')">Animal</button>
-    <button class="genre-btn" onclick="changeGenre('fruit')">Fruit</button>
-    <button class="genre-btn" onclick="changeGenre('color')">Color</button>
-    <button class="genre-btn" onclick="changeGenre('insect')">Insect</button>
-    <button class="genre-btn" onclick="changeGenre('other')">Other</button>
-</div>
+  <!-- ジャンルボタン -->
+  <div class="genre-buttons">
+    <button class="genre-btn active" data-genre="Number">Number</button>
+    <button class="genre-btn" data-genre="Animal">Animal</button>
+    <button class="genre-btn" data-genre="Fruit">Fruit</button>
+    <button class="genre-btn" data-genre="Color">Color</button>
+    <button class="genre-btn" data-genre="Insect">Insect</button>
+    <button class="genre-btn" data-genre="Other">Other</button>
+  </div>
 
-<!-- 現在のジャンル名 -->
-<div id="genreTitle" class="genre-title">Number の単語リスト</div>
+  <!-- 入力欄 -->
+  <div>
+    <input id="wordInput" type="text" placeholder="単語を入力">
+    <button id="addBtn">追加</button>
+  </div>
 
-<!-- 単語リスト -->
-<div id="wordList"></div>
+  <!-- 注意文（あなたの要望） -->
+  <p class="note">
+    ※単語登録にて正誤判定はしません。<br>
+    ※間違って登録した場合は削除して再度正しい単語を登録してください。
+  </p>
 
-<!-- 追加エリア -->
-<div class="add-area">
-    <input type="text" id="newWord" placeholder="単語を入力">
-    <button class="add-btn" onclick="addWord()">追加</button>
-</div>
+  <!-- 単語リスト -->
+  <div id="wordList" class="word-list"></div>
 
-<script>
-const APP_VERSION = "1.0.0";
+  <script>
+    let currentGenre = "Number";
 
-const initialWords = {
-    number: ["one","two","three","four","five","six","seven","eight","nine","ten"],
-    animal: ["dog","cat","rabbit","lion","elephant","giraffe","bear","monkey","horse","sheep","gorilla"],
-    fruit: ["orange","apple","strawberry","pineapple","banana","peach","grape","watermelon","cherry"],
-    color: ["black","white","red","blue","yellow","green","pink","purple","brown","orange"],
-    insect: ["butterfly","ant","bee","ladybug","beetle","cicada","dragonfly","grasshopper"],
-    other: ["car","bus","table","chair","house","clock","train","food","drink"]
-};
+    // データ読み込み（破損時は自動修復）
+    function loadData() {
+      let data = localStorage.getItem("wordsData");
+      if (!data) {
+        return {
+          Number: ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"],
+          Animal: [],
+          Fruit: [],
+          Color: [],
+          Insect: [],
+          Other: []
+        };
+      }
 
-let words = {};
-let currentGenre = "number";
-
-function loadData() {
-    const saved = JSON.parse(localStorage.getItem("words"));
-    const savedVersion = localStorage.getItem("version");
-
-    if (!saved || savedVersion !== APP_VERSION) {
-        words = JSON.parse(JSON.stringify(initialWords));
-        localStorage.setItem("words", JSON.stringify(words));
-        localStorage.setItem("version", APP_VERSION);
-    } else {
-        words = saved;
+      try {
+        return JSON.parse(data);
+      } catch {
+        alert("データが破損していたため修復しました。");
+        return {
+          Number: [],
+          Animal: [],
+          Fruit: [],
+          Color: [],
+          Insect: [],
+          Other: []
+        };
+      }
     }
 
-    // 誤字修正
-    if (words.animal) {
-        const idx = words.animal.indexOf("golira");
-        if (idx !== -1) {
-            words.animal[idx] = "gorilla";
-            localStorage.setItem("words", JSON.stringify(words));
-        }
+    let wordsData = loadData();
+
+    // 保存
+    function saveData() {
+      localStorage.setItem("wordsData", JSON.stringify(wordsData));
     }
-}
 
-function changeGenre(genre) {
-    currentGenre = genre;
+    // ジャンル切り替え
+    document.querySelectorAll(".genre-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".genre-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
 
-    document.querySelectorAll(".genre-btn").forEach(btn => btn.classList.remove("active"));
-    event.target.classList.add("active");
+        currentGenre = btn.dataset.genre;
+        genreTitle.textContent = currentGenre;
 
-    document.getElementById("genreTitle").textContent =
-        `${genre.charAt(0).toUpperCase() + genre.slice(1)} の単語リスト`;
-
-    renderWordList();
-}
-
-function renderWordList() {
-    const listArea = document.getElementById("wordList");
-    listArea.innerHTML = "";
-
-    const list = words[currentGenre];
-
-    const countText = document.createElement("div");
-    countText.textContent = `現在 ${list.length} / 20 個`;
-    countText.style.fontWeight = "bold";
-    countText.style.marginBottom = "10px";
-    listArea.appendChild(countText);
-
-    const table = document.createElement("table");
-
-    list.forEach((word, index) => {
-        const row = document.createElement("tr");
-
-        const noCell = document.createElement("td");
-        noCell.textContent = index + 1;
-        row.appendChild(noCell);
-
-        const wordCell = document.createElement("td");
-        wordCell.textContent = word;
-        row.appendChild(wordCell);
-
-        const actionCell = document.createElement("td");
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "削除";
-        delBtn.className = "delete-btn";
-        delBtn.onclick = () => deleteWord(index);
-
-        actionCell.appendChild(delBtn);
-        row.appendChild(actionCell);
-
-        table.appendChild(row);
+        renderList();
+      });
     });
 
-    listArea.appendChild(table);
-}
+    // 単語追加
+    addBtn.addEventListener("click", () => {
+      const word = wordInput.value.trim();
+      if (!word) return;
 
-function addWord() {
-    const newWord = document.getElementById("newWord").value.trim();
-    if (!newWord) return;
-
-    if (words[currentGenre].length >= 20) {
-        alert("21個目は登録できません");
+      if (wordsData[currentGenre].length >= 20) {
+        alert("登録できる単語は20個までです。");
         return;
+      }
+
+      wordsData[currentGenre].push(word);
+      saveData();
+      renderList();
+
+      wordInput.value = "";
+    });
+
+    // 単語リスト表示
+    function renderList() {
+      wordList.innerHTML = "";
+
+      wordsData[currentGenre].forEach((word, index) => {
+        const div = document.createElement("div");
+        div.className = "word-item";
+
+        div.innerHTML = `
+          <span>${index + 1}. ${word}</span>
+          <button class="delete-btn" data-index="${index}">削除</button>
+        `;
+
+        wordList.appendChild(div);
+      });
+
+      // 削除ボタン
+      document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = btn.dataset.index;
+          wordsData[currentGenre].splice(i, 1);
+          saveData();
+          renderList();
+        });
+      });
     }
 
-    words[currentGenre].push(newWord);
-    localStorage.setItem("words", JSON.stringify(words));
-    document.getElementById("newWord").value = "";
-    renderWordList();
-}
-
-function deleteWord(index) {
-    words[currentGenre].splice(index, 1);
-    localStorage.setItem("words", JSON.stringify(words));
-    renderWordList();
-}
-
-loadData();
-changeGenre("number");
-</script>
+    renderList();
+  </script>
 
 </body>
 </html>

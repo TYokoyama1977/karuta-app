@@ -1,189 +1,296 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>読み上げ</title>
-    <style>
-        body {
-            font-family: "Arial Rounded MT Bold", Arial;
-            padding: 20px;
-            background: #fff7e6;
-        }
+  <meta charset="UTF-8">
+  <title>読み上げ - 英語かるたアプリ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        .tabs {
-            display: flex;
-            border-bottom: 3px solid #ffa64d;
-            margin-bottom: 20px;
-        }
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
 
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            cursor: pointer;
-            font-size: 18px;
-            background: #ffe0b3;
-            border-radius: 10px 10px 0 0;
-            margin-right: 5px;
-        }
+    /* ホームボタン（edit.html と統一） */
+    .play-header {
+      padding: 10px;
+      text-align: left;
+    }
 
-        .tab.active {
-            background: #ffb84d;
-            font-weight: bold;
-        }
+    .home-btn {
+      font-size: 18px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: #eee;
+    }
 
-        .content {
-            display: none;
-        }
+    /* タブ */
+    .tab-buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
 
-        .content.active {
-            display: block;
-        }
+    .tab-btn {
+      padding: 12px 20px;
+      margin: 0 5px;
+      border: none;
+      border-radius: 8px;
+      background: #ddd;
+      font-size: 18px;
+    }
 
-        #displayWord {
-            font-size: 48px;
-            text-align: center;
-            margin-top: 30px;
-            font-weight: bold;
-        }
+    .tab-btn.active {
+      background: #ffcc66;
+    }
 
-        button {
-            padding: 12px 20px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px 0;
-        }
+    .tab-content {
+      display: none;
+      margin-top: 20px;
+    }
 
-        .next-btn {
-            background: #4da6ff;
-            color: white;
-        }
+    .tab-content.active {
+      display: block;
+    }
 
-        .shuffle-btn {
-            background: #ff8c42;
-            color: white;
-        }
+    /* 読み上げタブの上部ボタン */
+    .reading-header {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
 
-        .genreBox label {
-            display: block;
-            margin: 5px 0;
-            font-size: 18px;
-        }
-    </style>
+    .top-btn {
+      font-size: 18px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: #eee;
+    }
+
+    #autoPlayToggle.auto-on {
+      background: #4CAF50;
+      color: white;
+    }
+
+    #autoPlayToggle.auto-off {
+      background: #aaa;
+      color: white;
+    }
+
+    /* 単語表示 */
+    #currentWord {
+      font-size: 40px;
+      margin-top: 30px;
+      color: #333;
+    }
+
+    /* ボタン */
+    .main-btn {
+      margin-top: 20px;
+      padding: 20px 40px;
+      font-size: 22px;
+      border-radius: 50px;
+      border: none;
+      background: #ffcc66;
+    }
+
+    .main-btn:hover {
+      background: #ffdd88;
+    }
+
+    /* 設定タブ */
+    .settings {
+      margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      width: 85%;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .setting-item {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    .setting-item input[type=range] {
+      width: 70%;
+    }
+  </style>
 </head>
+
 <body>
 
-<h2>読み上げ</h2>
+  <!-- ホームボタン -->
+  <div class="play-header">
+    <button id="homeButton" class="home-btn">🏠 ホームに戻る</button>
+  </div>
 
-<div class="tabs">
-    <div class="tab active" onclick="switchTab('readTab')">🔊 読み上げ</div>
-    <div class="tab" onclick="switchTab('settingTab')">⚙️ 設定</div>
-</div>
+  <!-- タブ切り替え -->
+  <div class="tab-buttons">
+    <button class="tab-btn active" data-tab="readTab">🔊 読み上げ</button>
+    <button class="tab-btn" data-tab="settingTab">⚙️ 設定</button>
+  </div>
 
-<!-- 読み上げタブ -->
-<div id="readTab" class="content active">
-    <div id="wordCount">選択中の単語数: 0 個</div>
-    <div id="remainingCount">残り: 0 個</div>
+  <!-- 読み上げタブ -->
+  <div id="readTab" class="tab-content active">
 
-    <button class="next-btn" onclick="nextWord()">次の単語を読み上げ</button>
-    <button class="shuffle-btn" onclick="resetShuffle()">🔁 もう一度シャッフル</button>
-
-    <div id="displayWord">---</div>
-</div>
-
-<!-- 設定タブ -->
-<div id="settingTab" class="content">
-    <h3>ジャンル選択</h3>
-
-    <div class="genreBox">
-        <label><input type="checkbox" value="number" onchange="updateWordList()"> Number</label>
-        <label><input type="checkbox" value="animal" onchange="updateWordList()"> Animal</label>
-        <label><input type="checkbox" value="fruit" onchange="updateWordList()"> Fruit</label>
-        <label><input type="checkbox" value="color" onchange="updateWordList()"> Color</label>
-        <label><input type="checkbox" value="insect" onchange="updateWordList()"> Insect</label>
-        <label><input type="checkbox" value="other" onchange="updateWordList()"> Other</label>
+    <div class="reading-header">
+      <button id="pauseButton" class="top-btn">⏸ ポーズ</button>
+      <button id="autoPlayToggle" class="top-btn auto-off">自動再生 OFF</button>
     </div>
-</div>
 
-<br>
-<a href="index.html">ホームに戻る</a>
+    <div id="currentWord">---</div>
 
-<script>
-let words = JSON.parse(localStorage.getItem("words"));
-let remainingWords = [];
+    <button id="nextWordBtn" class="main-btn">次の単語</button>
 
-// タブ切り替え
-function switchTab(tabId) {
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    document.querySelectorAll(".content").forEach(c => c.classList.remove("active"));
+    <p id="remainingCount">残り：0</p>
 
-    event.target.classList.add("active");
-    document.getElementById(tabId).classList.add("active");
-}
+    <button id="shuffleResetBtn" class="main-btn">🔄 シャッフルして最初から</button>
+  </div>
 
-// 選択ジャンル取得
-function getSelectedGenres() {
-    return [...document.querySelectorAll("input[type=checkbox]:checked")].map(cb => cb.value);
-}
+  <!-- 設定タブ -->
+  <div id="settingTab" class="tab-content">
 
-// 単語リスト更新
-function updateWordList() {
-    const selected = getSelectedGenres();
-    let allWords = [];
+    <div class="settings">
+      <h3>読み上げ設定</h3>
 
-    selected.forEach(g => allWords = allWords.concat(words[g]));
+      <div class="setting-item">
+        <label>読み上げ速度: </label>
+        <span id="rateValue">1</span>
+        <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
+      </div>
 
-    remainingWords = shuffleArray(allWords);
+      <div class="setting-item">
+        <label>読み上げ間隔（秒）: </label>
+        <span id="intervalValue">6</span>
+        <input type="range" id="intervalSlider" min="1" max="10" step="1" value="6">
+      </div>
+    </div>
 
-    document.getElementById("wordCount").textContent =
-        `選択中の単語数: ${allWords.length} 個`;
+  </div>
 
-    document.getElementById("remainingCount").textContent =
-        `残り: ${remainingWords.length} 個`;
+  <script>
+    // ホームへ戻る
+    document.getElementById("homeButton").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
 
-    document.getElementById("displayWord").textContent = "---";
-}
+    // タブ切り替え
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
 
-// 次の単語
-function nextWord() {
-    if (remainingWords.length === 0) {
-        speak("No more words");
-        document.getElementById("displayWord").textContent = "終了";
-        return;
+        document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      });
+    });
+
+    // 読み上げ設定
+    rateSlider.addEventListener("input", () => {
+      rateValue.textContent = rateSlider.value;
+    });
+
+    intervalSlider.addEventListener("input", () => {
+      intervalValue.textContent = intervalSlider.value;
+    });
+
+    // 読み上げ機能
+    let words = [];
+    let shuffled = [];
+    let index = 0;
+    let isPaused = false;
+    let autoPlay = false;
+
+    function loadWords() {
+      const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
+      words = [];
+
+      Object.values(data).forEach(list => {
+        words.push(...list);
+      });
+
+      shuffleWords();
     }
 
-    const word = remainingWords.shift();
-    speak(word);
-
-    document.getElementById("displayWord").textContent = word;
-    document.getElementById("remainingCount").textContent =
-        `残り: ${remainingWords.length} 個`;
-}
-
-// シャッフルしてやり直す
-function resetShuffle() {
-    updateWordList();
-}
-
-// 読み上げ
-function speak(text) {
-    const uttr = new SpeechSynthesisUtterance(text);
-    uttr.lang = "en-US";
-    speechSynthesis.speak(uttr);
-}
-
-// シャッフル関数
-function shuffleArray(arr) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
+    function shuffleWords() {
+      shuffled = [...words];
+      for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      index = 0;
+      updateRemaining();
+      currentWord.textContent = "---";
     }
-    return a;
-}
-</script>
+
+    function updateRemaining() {
+      remainingCount.textContent = "残り：" + (shuffled.length - index);
+    }
+
+    function speakWord(word) {
+      const uttr = new SpeechSynthesisUtterance(word);
+      uttr.rate = parseFloat(rateSlider.value);
+      speechSynthesis.speak(uttr);
+    }
+
+    nextWordBtn.addEventListener("click", () => {
+      if (index >= shuffled.length) return;
+
+      const word = shuffled[index];
+      currentWord.textContent = word;
+      speakWord(word);
+
+      index++;
+      updateRemaining();
+    });
+
+    // ポーズ
+    pauseButton.addEventListener("click", () => {
+      isPaused = !isPaused;
+      pauseButton.textContent = isPaused ? "▶ 再開" : "⏸ ポーズ";
+      if (isPaused) speechSynthesis.pause();
+      else speechSynthesis.resume();
+    });
+
+    // 自動再生
+    autoPlayToggle.addEventListener("click", () => {
+      autoPlay = !autoPlay;
+      if (autoPlay) {
+        autoPlayToggle.textContent = "自動再生 ON";
+        autoPlayToggle.classList.add("auto-on");
+        autoPlayToggle.classList.remove("auto-off");
+        autoPlayLoop();
+      } else {
+        autoPlayToggle.textContent = "自動再生 OFF";
+        autoPlayToggle.classList.add("auto-off");
+        autoPlayToggle.classList.remove("auto-on");
+      }
+    });
+
+    function autoPlayLoop() {
+      if (!autoPlay || isPaused) return;
+
+      nextWordBtn.click();
+
+      if (index < shuffled.length) {
+        setTimeout(autoPlayLoop, intervalSlider.value * 1000);
+      }
+    }
+
+    shuffleResetBtn.addEventListener("click", shuffleWords);
+
+    loadWords();
+  </script>
 
 </body>
 </html>
