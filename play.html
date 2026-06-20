@@ -59,24 +59,31 @@
       display: block;
     }
 
-    /* ジャンル選択 */
-    .genre-select {
+    /* ジャンルアイコン */
+    .genre-icons {
       display: flex;
-      justify-content: center;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 15px;
       margin-top: 10px;
-      background: #fff;
-      padding: 10px;
-      border-radius: 10px;
-      width: 90%;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
-    .genre-item {
-      font-size: 18px;
+    .genre {
+      width: 90px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .genre img {
+      width: 70px;
+      height: 70px;
+    }
+
+    .genre.selected {
+      border: 3px solid #ffcc66;
+      border-radius: 10px;
+      padding: 5px;
+      background: #fff;
     }
 
     /* 読み上げタブの上部ボタン */
@@ -166,14 +173,32 @@
   <!-- 読み上げタブ -->
   <div id="readTab" class="tab-content active">
 
-    <!-- 🔥 ジャンル選択（復活） -->
-    <div class="genre-select">
-      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Number" checked> Number</label>
-      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Animal" checked> Animal</label>
-      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Fruit" checked> Fruit</label>
-      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Color" checked> Color</label>
-      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Insect" checked> Insect</label>
-      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Other" checked> Other</label>
+    <!-- ジャンル選択（アイコン） -->
+    <div class="genre-icons">
+      <div class="genre selected" data-genre="Number">
+        <img src="images/number_icon.png"><p>Number</p>
+      </div>
+      <div class="genre selected" data-genre="Animal">
+        <img src="images/animal_icon.png"><p>Animal</p>
+      </div>
+      <div class="genre selected" data-genre="Fruit">
+        <img src="images/fruit_icon.png"><p>Fruit</p>
+      </div>
+      <div class="genre selected" data-genre="Color">
+        <img src="images/color_icon.png"><p>Color</p>
+      </div>
+      <div class="genre selected" data-genre="Insect">
+        <img src="images/insect_icon.png"><p>Insect</p>
+      </div>
+      <div class="genre selected" data-genre="Other">
+        <img src="images/other_icon.png"><p>Other</p>
+      </div>
+      <div class="genre selected" data-genre="Food">
+        <img src="images/food_icon.png"><p>Food</p>
+      </div>
+      <div class="genre selected" data-genre="Body">
+        <img src="images/body_icon.png"><p>Body</p>
+      </div>
     </div>
 
     <div class="reading-header">
@@ -212,12 +237,11 @@
   </div>
 
   <script>
-    // ホームへ戻る
+    // 画面遷移
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
 
-    // 単語編集へ
     editButton.addEventListener("click", () => {
       window.location.href = "edit.html";
     });
@@ -249,14 +273,22 @@
     let isPaused = false;
     let autoPlay = false;
 
+    // ジャンル選択（アイコン）
+    document.querySelectorAll(".genre").forEach(g => {
+      g.addEventListener("click", () => {
+        g.classList.toggle("selected");
+        loadWords();
+      });
+    });
+
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
       words = [];
 
-      // 🔥 チェックされたジャンルだけ読み込む
-      const checkedGenres = [...document.querySelectorAll(".genreCheck:checked")].map(c => c.value);
+      const selectedGenres = [...document.querySelectorAll(".genre.selected")]
+        .map(g => g.dataset.genre);
 
-      checkedGenres.forEach(genre => {
+      selectedGenres.forEach(genre => {
         if (data[genre]) words.push(...data[genre]);
       });
 

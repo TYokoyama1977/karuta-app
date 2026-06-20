@@ -8,60 +8,44 @@
   <style>
     body {
       font-family: "Arial", sans-serif;
-      text-align: center;
       background: #f7f7f7;
       margin: 0;
       padding: 0;
+      text-align: center;
     }
 
     h1 {
-      margin-top: 30px;
+      margin-top: 20px;
       font-size: 28px;
       color: #333;
     }
 
-    .menu-container {
-      margin-top: 40px;
+    .menu {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
     }
 
     .menu-btn {
-      display: block;
-      width: 70%;
-      max-width: 300px;
-      margin: 20px auto;
-      padding: 25px;
-      font-size: 22px;
-      border-radius: 50px;
+      width: 250px;
+      padding: 15px;
+      font-size: 20px;
+      border-radius: 12px;
       border: none;
       background: #ffcc66;
-      color: #333;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      cursor: pointer;
     }
 
     .menu-btn:hover {
       background: #ffdd88;
-      cursor: pointer;
     }
 
-    .contact-btn {
+    .version {
       margin-top: 30px;
-      font-size: 18px;
-      padding: 12px 20px;
-      border-radius: 8px;
-      border: none;
-      background: #66aaff;
-      color: white;
-    }
-
-    .contact-btn:hover {
-      background: #88bbff;
-      cursor: pointer;
-    }
-
-    .version-text {
-      margin-top: 40px;
       font-size: 14px;
-      color: #555;
+      color: #666;
     }
   </style>
 </head>
@@ -70,28 +54,35 @@
 
   <h1>英語かるたアプリ</h1>
 
-  <div class="menu-container">
-    <button class="menu-btn" onclick="location.href='play.html'">🔊 読み上げ</button>
-    <button class="menu-btn" onclick="location.href='edit.html'">✏️ 単語編集</button>
+  <div class="menu">
+    <button class="menu-btn" onclick="openPlay()">🔊 読み上げ</button>
+    <button class="menu-btn" onclick="openEdit()">✏️ 単語編集</button>
+    <button class="menu-btn" onclick="openIllustration()">🖼️ イラスト集</button>
+    <button class="menu-btn" onclick="openContactForm()">📮 お問い合わせ</button>
   </div>
 
-  <!-- お問い合わせボタン -->
-  <button class="contact-btn" onclick="openContactForm()">📮 お問い合わせ</button>
-
-  <!-- バージョン表示 -->
-  <p id="versionDisplay" class="version-text"></p>
+  <p class="version" id="versionText">Version: 1.0.0</p>
 
   <script>
-    const APP_VERSION = "v1.0.0"; // ← 必要に応じて更新
-    document.getElementById("versionDisplay").textContent =
-      "現在のバージョン：" + APP_VERSION;
+    function openPlay() {
+      window.location.href = "play.html";
+    }
+
+    function openEdit() {
+      window.location.href = "edit.html";
+    }
+
+    function openIllustration() {
+      window.location.href = "illustration.html";
+    }
 
     function openContactForm() {
-      window.open(
-        "https://docs.google.com/forms/d/e/1FAIpQLSfm4dHjCd3lNRaGQ_RKvO1gnrQYrf8wK0lYfmZq0Ma8IDemRQ/viewform?usp=publish-editor",
-        "_blank"
-      );
+      window.open("https://docs.google.com/forms/d/e/1FAIpQLSfm4dHjCd3lNRaGQ_RKvO1gnrQYrf8wK0lYfmZq0Ma8IDemRQ/viewform?usp=publish-editor");
     }
+
+    // バージョン管理（自動更新）
+    let version = localStorage.getItem("appVersion") || "1.0.0";
+    document.getElementById("versionText").textContent = "Version: " + version;
   </script>
 
 </body>
