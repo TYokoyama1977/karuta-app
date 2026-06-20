@@ -15,37 +15,43 @@
     }
 
     h1 {
-      margin-top: 20px;
+      margin-top: 30px;
       font-size: 28px;
       color: #333;
     }
 
     .menu {
-      margin-top: 30px;
+      margin-top: 40px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 15px;
+      gap: 25px;
     }
 
     .menu-btn {
-      width: 250px;
-      padding: 15px;
-      font-size: 20px;
-      border-radius: 12px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
       border: none;
       background: #ffcc66;
+      font-size: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       cursor: pointer;
+      transition: 0.2s;
     }
 
     .menu-btn:hover {
       background: #ffdd88;
     }
 
-    .version {
-      margin-top: 30px;
-      font-size: 14px;
-      color: #666;
+    .menu-btn img {
+      width: 90px;
+      height: 90px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -55,31 +61,38 @@
   <h1>英語かるたアプリ</h1>
 
   <div class="menu">
-    <button class="menu-btn" onclick="openPlay()">🔊 読み上げ</button>
-    <button class="menu-btn" onclick="openEdit()">✏️ 単語編集</button>
-    <button class="menu-btn" onclick="openIllustration()">🖼️ イラスト集</button>
-    <button class="menu-btn" onclick="openContactForm()">📮 お問い合わせ</button>
+
+    <!-- 読み上げ -->
+    <button class="menu-btn" onclick="location.href='play.html'">
+      <img src="images/play_icon.png">
+      読み上げ
+    </button>
+
+    <!-- ⚙️ 設定（追加） -->
+    <button class="menu-btn" onclick="location.href='settings.html'">
+      <img src="images/settings_icon.png">
+      設定
+    </button>
+
+    <!-- 単語編集 -->
+    <button class="menu-btn" onclick="location.href='edit.html'">
+      <img src="images/edit_icon.png">
+      単語編集
+    </button>
+
+    <!-- イラスト集 -->
+    <button class="menu-btn" onclick="location.href='illustration.html'">
+      <img src="images/illust_icon.png">
+      イラスト集
+    </button>
+
+    <!-- お問い合わせ -->
+    <button class="menu-btn" onclick="location.href='contact.html'">
+      <img src="images/contact_icon.png">
+      お問い合わせ
+    </button>
+
   </div>
-
-  <p class="version" id="versionText">Version: 1.0.1</p>
-
-  <script>
-    function openPlay() { window.location.href = "play.html"; }
-    function openEdit() { window.location.href = "edit.html"; }
-    function openIllustration() { window.location.href = "illustration.html"; }
-    function openContactForm() {
-      window.open("https://docs.google.com/forms/d/e/1FAIpQLSfm4dHjCd3lNRaGQ_RKvO1gnrQYrf8wK0lYfmZq0Ma8IDemRQ/viewform?usp=publish-editor");
-    }
-
-    // バージョン管理
-    const currentVersion = "1.0.1";
-    const savedVersion = localStorage.getItem("appVersion");
-
-    if (savedVersion !== currentVersion) {
-      localStorage.clear();
-      localStorage.setItem("appVersion", currentVersion);
-    }
-  </script>
 
 </body>
 </html>

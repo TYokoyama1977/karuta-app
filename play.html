@@ -22,7 +22,7 @@
       align-items: center;
     }
 
-    .home-btn, .edit-btn {
+    .home-btn, .edit-btn, .settings-btn {
       font-size: 18px;
       padding: 8px 14px;
       border-radius: 8px;
@@ -30,33 +30,10 @@
       background: #eee;
     }
 
-    /* タブ */
-    .tab-buttons {
-      display: flex;
-      justify-content: center;
+    h2 {
       margin-top: 10px;
-    }
-
-    .tab-btn {
-      padding: 12px 20px;
-      margin: 0 5px;
-      border: none;
-      border-radius: 8px;
-      background: #ddd;
-      font-size: 18px;
-    }
-
-    .tab-btn.active {
-      background: #ffcc66;
-    }
-
-    .tab-content {
-      display: none;
-      margin-top: 20px;
-    }
-
-    .tab-content.active {
-      display: block;
+      font-size: 20px;
+      color: #444;
     }
 
     /* ジャンルアイコン */
@@ -69,9 +46,12 @@
     }
 
     .genre {
-      width: 90px;
+      width: 100px;
       text-align: center;
       cursor: pointer;
+      padding: 5px;
+      border-radius: 10px;
+      transition: 0.2s;
     }
 
     .genre img {
@@ -79,47 +59,24 @@
       height: 70px;
     }
 
+    /* 選択状態の視覚効果 */
     .genre.selected {
-      border: 3px solid #ffcc66;
-      border-radius: 10px;
-      padding: 5px;
-      background: #fff;
+      border: 3px solid #ffcc33;
+      background: #fff7cc;
     }
 
-    /* 読み上げタブの上部ボタン */
-    .reading-header {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 10px;
+    .genre input[type="checkbox"] {
+      margin-top: 5px;
+      transform: scale(1.3);
     }
 
-    .top-btn {
-      font-size: 18px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      background: #eee;
-    }
-
-    #autoPlayToggle.auto-on {
-      background: #4CAF50;
-      color: white;
-    }
-
-    #autoPlayToggle.auto-off {
-      background: #aaa;
-      color: white;
-    }
-
-    /* 単語表示 */
+    /* 読み上げ部分 */
     #currentWord {
       font-size: 40px;
       margin-top: 30px;
       color: #333;
     }
 
-    /* ボタン */
     .main-btn {
       margin-top: 20px;
       padding: 20px 40px;
@@ -133,25 +90,23 @@
       background: #ffdd88;
     }
 
-    /* 設定タブ */
-    .settings {
-      margin-top: 20px;
-      background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      width: 85%;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-
-    .setting-item {
-      margin-top: 10px;
+    .top-btn {
       font-size: 18px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: #eee;
+      margin: 5px;
     }
 
-    .setting-item input[type=range] {
-      width: 70%;
+    #autoPlayToggle.auto-on {
+      background: #4CAF50;
+      color: white;
+    }
+
+    #autoPlayToggle.auto-off {
+      background: #aaa;
+      color: white;
     }
   </style>
 </head>
@@ -160,84 +115,33 @@
 
   <!-- 上部ヘッダー -->
   <div class="play-header">
-    <button id="homeButton" class="home-btn">🏠 ホームに戻る</button>
-    <button id="editButton" class="edit-btn">✏️ 単語編集へ</button>
+    <button id="homeButton" class="home-btn">🏠 ホーム</button>
+    <button id="editButton" class="edit-btn">✏️ 単語編集</button>
+    <button id="settingsButton" class="settings-btn">⚙️ 設定</button>
   </div>
 
-  <!-- タブ切り替え -->
-  <div class="tab-buttons">
-    <button class="tab-btn active" data-tab="readTab">🔊 読み上げ</button>
-    <button class="tab-btn" data-tab="settingTab">⚙️ 設定</button>
+  <h2>ジャンルを選択してください</h2>
+
+  <!-- ジャンル選択（チェックボックス方式） -->
+  <div class="genre-icons" id="genreArea"></div>
+
+  <div class="reading-header">
+    <button id="pauseButton" class="top-btn">⏸ ポーズ</button>
+    <button id="autoPlayToggle" class="top-btn auto-off">自動再生 OFF</button>
   </div>
 
-  <!-- 読み上げタブ -->
-  <div id="readTab" class="tab-content active">
+  <div id="currentWord">---</div>
 
-    <!-- ジャンル選択（順番修正済み） -->
-    <div class="genre-icons">
-      <div class="genre selected" data-genre="Number">
-        <img src="images/number_icon.png"><p>Number</p>
-      </div>
-      <div class="genre selected" data-genre="Animal">
-        <img src="images/animal_icon.png"><p>Animal</p>
-      </div>
-      <div class="genre selected" data-genre="Color">
-        <img src="images/color_icon.png"><p>Color</p>
-      </div>
-      <div class="genre selected" data-genre="Food">
-        <img src="images/food_icon.png"><p>Food</p>
-      </div>
-      <div class="genre selected" data-genre="Fruit">
-        <img src="images/fruit_icon.png"><p>Fruit</p>
-      </div>
-      <div class="genre selected" data-genre="Body">
-        <img src="images/body_icon.png"><p>Body</p>
-      </div>
-      <div class="genre selected" data-genre="Insect">
-        <img src="images/insect_icon.png"><p>Insect</p>
-      </div>
-      <div class="genre selected" data-genre="Other">
-        <img src="images/other_icon.png"><p>Other</p>
-      </div>
-    </div>
+  <button id="nextWordBtn" class="main-btn">次の単語</button>
 
-    <div class="reading-header">
-      <button id="pauseButton" class="top-btn">⏸ ポーズ</button>
-      <button id="autoPlayToggle" class="top-btn auto-off">自動再生 OFF</button>
-    </div>
+  <p id="remainingCount">残り：0</p>
 
-    <div id="currentWord">---</div>
-
-    <button id="nextWordBtn" class="main-btn">次の単語</button>
-
-    <p id="remainingCount">残り：0</p>
-
-    <button id="shuffleResetBtn" class="main-btn">🔄 シャッフルして最初から</button>
-  </div>
-
-  <!-- 設定タブ -->
-  <div id="settingTab" class="tab-content">
-
-    <div class="settings">
-      <h3>読み上げ設定</h3>
-
-      <div class="setting-item">
-        <label>読み上げ速度: </label>
-        <span id="rateValue">1</span>
-        <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
-      </div>
-
-      <div class="setting-item">
-        <label>読み上げ間隔（秒）: </label>
-        <span id="intervalValue">6</span>
-        <input type="range" id="intervalSlider" min="1" max="10" step="1" value="6">
-      </div>
-    </div>
-
-  </div>
+  <button id="shuffleResetBtn" class="main-btn">🔄 シャッフルして最初から</button>
 
   <script>
-    // 画面遷移
+    /* -------------------------
+       画面遷移
+    ------------------------- */
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
@@ -246,50 +150,69 @@
       window.location.href = "edit.html";
     });
 
-    // タブ切り替え
-    document.querySelectorAll(".tab-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
+    settingsButton.addEventListener("click", () => {
+      window.location.href = "settings.html";
+    });
 
-        document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
-        document.getElementById(btn.dataset.tab).classList.add("active");
+    /* -------------------------
+       設定値の読み込み
+    ------------------------- */
+    const settings = JSON.parse(localStorage.getItem("settings") || "{}");
+    const readRate = settings.rate || 1;
+    const readInterval = settings.interval || 6;
+    let autoPlay = settings.autoPlay || false;
+
+    /* -------------------------
+       ジャンル一覧
+    ------------------------- */
+    const genres = [
+      "Number", "Animal", "Color", "Food",
+      "Fruit", "Body", "Insect", "Other"
+    ];
+
+    const genreArea = document.getElementById("genreArea");
+
+    genres.forEach(g => {
+      const div = document.createElement("div");
+      div.className = "genre selected";
+      div.dataset.genre = g;
+
+      div.innerHTML = `
+        <img src="images/${g.toLowerCase()}_icon.png">
+        <p>${g}</p>
+        <input type="checkbox" checked>
+      `;
+
+      div.addEventListener("click", (e) => {
+        if (e.target.tagName !== "INPUT") {
+          const cb = div.querySelector("input");
+          cb.checked = !cb.checked;
+        }
+        div.classList.toggle("selected", div.querySelector("input").checked);
+        loadWords();
       });
+
+      genreArea.appendChild(div);
     });
 
-    // 読み上げ設定
-    rateSlider.addEventListener("input", () => {
-      rateValue.textContent = rateSlider.value;
-    });
-
-    intervalSlider.addEventListener("input", () => {
-      intervalValue.textContent = intervalSlider.value;
-    });
-
-    // 読み上げ機能
+    /* -------------------------
+       単語データ読み込み
+    ------------------------- */
     let words = [];
     let shuffled = [];
     let index = 0;
     let isPaused = false;
-    let autoPlay = false;
-
-    // ジャンル選択（アイコン）
-    document.querySelectorAll(".genre").forEach(g => {
-      g.addEventListener("click", () => {
-        g.classList.toggle("selected");
-        loadWords();
-      });
-    });
 
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
       words = [];
 
-      const selectedGenres = [...document.querySelectorAll(".genre.selected")]
-        .map(g => g.dataset.genre);
-
-      selectedGenres.forEach(genre => {
-        if (data[genre]) words.push(...data[genre]);
+      document.querySelectorAll(".genre").forEach(g => {
+        const cb = g.querySelector("input");
+        if (cb.checked) {
+          const genre = g.dataset.genre;
+          if (data[genre]) words.push(...data[genre]);
+        }
       });
 
       shuffleWords();
@@ -310,9 +233,12 @@
       remainingCount.textContent = "残り：" + (shuffled.length - index);
     }
 
+    /* -------------------------
+       読み上げ
+    ------------------------- */
     function speakWord(word) {
       const uttr = new SpeechSynthesisUtterance(word);
-      uttr.rate = parseFloat(rateSlider.value);
+      uttr.rate = readRate;
       speechSynthesis.speak(uttr);
     }
 
@@ -327,7 +253,7 @@
       updateRemaining();
     });
 
-    // ポーズ
+    /* ポーズ */
     pauseButton.addEventListener("click", () => {
       isPaused = !isPaused;
       pauseButton.textContent = isPaused ? "▶ 再開" : "⏸ ポーズ";
@@ -335,19 +261,25 @@
       else speechSynthesis.resume();
     });
 
-    // 自動再生
-    autoPlayToggle.addEventListener("click", () => {
-      autoPlay = !autoPlay;
+    /* 自動再生 */
+    const autoBtn = document.getElementById("autoPlayToggle");
+    function updateAutoBtn() {
       if (autoPlay) {
-        autoPlayToggle.textContent = "自動再生 ON";
-        autoPlayToggle.classList.add("auto-on");
-        autoPlayToggle.classList.remove("auto-off");
-        autoPlayLoop();
+        autoBtn.textContent = "自動再生 ON";
+        autoBtn.classList.add("auto-on");
+        autoBtn.classList.remove("auto-off");
       } else {
-        autoPlayToggle.textContent = "自動再生 OFF";
-        autoPlayToggle.classList.add("auto-off");
-        autoPlayToggle.classList.remove("auto-on");
+        autoBtn.textContent = "自動再生 OFF";
+        autoBtn.classList.add("auto-off");
+        autoBtn.classList.remove("auto-on");
       }
+    }
+    updateAutoBtn();
+
+    autoBtn.addEventListener("click", () => {
+      autoPlay = !autoPlay;
+      updateAutoBtn();
+      if (autoPlay) autoPlayLoop();
     });
 
     function autoPlayLoop() {
@@ -356,13 +288,13 @@
       nextWordBtn.click();
 
       if (index < shuffled.length) {
-        setTimeout(autoPlayLoop, intervalSlider.value * 1000);
+        setTimeout(autoPlayLoop, readInterval * 1000);
       }
     }
 
     shuffleResetBtn.addEventListener("click", loadWords);
 
-    // 初回読み込み
+    /* 初回読み込み */
     loadWords();
   </script>
 
