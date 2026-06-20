@@ -14,13 +14,15 @@
       text-align: center;
     }
 
-    /* ホームボタン（edit.html と統一） */
+    /* 上部ヘッダー */
     .play-header {
       padding: 10px;
-      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .home-btn {
+    .home-btn, .edit-btn {
       font-size: 18px;
       padding: 8px 14px;
       border-radius: 8px;
@@ -55,6 +57,26 @@
 
     .tab-content.active {
       display: block;
+    }
+
+    /* ジャンル選択 */
+    .genre-select {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 10px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .genre-item {
+      font-size: 18px;
     }
 
     /* 読み上げタブの上部ボタン */
@@ -129,9 +151,10 @@
 
 <body>
 
-  <!-- ホームボタン -->
+  <!-- 上部ヘッダー -->
   <div class="play-header">
     <button id="homeButton" class="home-btn">🏠 ホームに戻る</button>
+    <button id="editButton" class="edit-btn">✏️ 単語編集へ</button>
   </div>
 
   <!-- タブ切り替え -->
@@ -142,6 +165,16 @@
 
   <!-- 読み上げタブ -->
   <div id="readTab" class="tab-content active">
+
+    <!-- 🔥 ジャンル選択（復活） -->
+    <div class="genre-select">
+      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Number" checked> Number</label>
+      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Animal" checked> Animal</label>
+      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Fruit" checked> Fruit</label>
+      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Color" checked> Color</label>
+      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Insect" checked> Insect</label>
+      <label class="genre-item"><input type="checkbox" class="genreCheck" value="Other" checked> Other</label>
+    </div>
 
     <div class="reading-header">
       <button id="pauseButton" class="top-btn">⏸ ポーズ</button>
@@ -180,8 +213,13 @@
 
   <script>
     // ホームへ戻る
-    document.getElementById("homeButton").addEventListener("click", () => {
+    homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
+    });
+
+    // 単語編集へ
+    editButton.addEventListener("click", () => {
+      window.location.href = "edit.html";
     });
 
     // タブ切り替え
@@ -215,8 +253,11 @@
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
       words = [];
 
-      Object.values(data).forEach(list => {
-        words.push(...list);
+      // 🔥 チェックされたジャンルだけ読み込む
+      const checkedGenres = [...document.querySelectorAll(".genreCheck:checked")].map(c => c.value);
+
+      checkedGenres.forEach(genre => {
+        if (data[genre]) words.push(...data[genre]);
       });
 
       shuffleWords();
@@ -287,8 +328,9 @@
       }
     }
 
-    shuffleResetBtn.addEventListener("click", shuffleWords);
+    shuffleResetBtn.addEventListener("click", loadWords);
 
+    // 初回読み込み
     loadWords();
   </script>
 
