@@ -14,7 +14,7 @@
       text-align: center;
     }
 
-    /* ホームボタン（play.html と統一） */
+    /* ホームボタン */
     .edit-header {
       padding: 10px;
       text-align: left;
@@ -138,7 +138,7 @@
     <button id="addBtn">追加</button>
   </div>
 
-  <!-- 注意文（あなたの要望） -->
+  <!-- 注意文 -->
   <p class="note">
     ※単語登録にて正誤判定はしません。<br>
     ※間違って登録した場合は削除して再度正しい単語を登録してください。
@@ -148,45 +148,60 @@
   <div id="wordList" class="word-list"></div>
 
   <script>
-    let currentGenre = "Number";
+    /* -------------------------
+       バージョン管理 + 初期値
+    ------------------------- */
 
-    // データ読み込み（破損時は自動修復）
-    function loadData() {
-      let data = localStorage.getItem("wordsData");
-      if (!data) {
-        return {
-          Number: ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"],
-          Animal: [],
-          Fruit: [],
-          Color: [],
-          Insect: [],
-          Other: []
-        };
-      }
+    const STORAGE_KEY = "wordsData";
+    const VERSION_KEY = "dataVersion";
+    const APP_VERSION = "1.0.0"; // ← バージョンを上げれば初期化される
+
+    const INITIAL_DATA = {
+      Number: ["one","two","three","four","five","six","seven","eight","nine","ten"],
+
+      Animal: ["dog","cat","lion","tiger","elephant","giraffe","monkey","rabbit","bear","gorilla"],
+
+      Fruit: ["orange","apple","strawberry","pineapple","banana","peach","grape","watermelon","cherry"],
+
+      Color: ["red","blue","yellow","green","orange","purple","pink","brown","black","white"],
+
+      Insect: ["ant","bee","butterfly","beetle","dragonfly","grasshopper","ladybug","mosquito","fly","spider"],
+
+      Other: ["car","bus","train","airplane","boat","house","chair","table","book","pen"]
+    };
+
+    function loadDataWithVersion() {
+      let savedVersion = localStorage.getItem(VERSION_KEY);
+      let data = null;
 
       try {
-        return JSON.parse(data);
+        data = JSON.parse(localStorage.getItem(STORAGE_KEY));
       } catch {
-        alert("データが破損していたため修復しました。");
-        return {
-          Number: [],
-          Animal: [],
-          Fruit: [],
-          Color: [],
-          Insect: [],
-          Other: []
-        };
+        console.warn("データ破損のため初期化します");
       }
+
+      // ★ バージョンが違う or データが無い → 初期化
+      if (!data || savedVersion !== APP_VERSION) {
+        console.log("初期データを再生成します（バージョン更新）");
+
+        data = JSON.parse(JSON.stringify(INITIAL_DATA));
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(VERSION_KEY, APP_VERSION);
+      }
+
+      return data;
     }
 
-    let wordsData = loadData();
+    let wordsData = loadDataWithVersion();
 
-    // 保存
-    function saveData() {
-      localStorage.setItem("wordsData", JSON.stringify(wordsData));
-    }
 
-    // ジャンル切り替え
+    /* -------------------------
+       ジャンル切り替え
+    ------------------------- */
+
+    let currentGenre = "Number";
+
     document.querySelectorAll(".genre-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".genre-btn").forEach(b => b.classList.remove("active"));
@@ -199,7 +214,11 @@
       });
     });
 
-    // 単語追加
+
+    /* -------------------------
+       単語追加
+    ------------------------- */
+
     addBtn.addEventListener("click", () => {
       const word = wordInput.value.trim();
       if (!word) return;
@@ -216,7 +235,20 @@
       wordInput.value = "";
     });
 
-    // 単語リスト表示
+
+    /* -------------------------
+       保存
+    ------------------------- */
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(wordsData));
+    }
+
+
+    /* -------------------------
+       単語リスト表示
+    ------------------------- */
+
     function renderList() {
       wordList.innerHTML = "";
 
