@@ -63,11 +63,16 @@
   </section>
 
   <script>
+    /* ------------------------------
+       バージョン管理（自動更新）
+    ------------------------------ */
     const STORAGE_KEY = "words";
+    const VERSION_KEY = "version";
+    const APP_VERSION = "1.0.0";
 
-    // ★ localStorage の自動初期化
     function loadStorage() {
       let data = null;
+      let savedVersion = localStorage.getItem(VERSION_KEY);
 
       try {
         data = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -75,8 +80,10 @@
         console.warn("localStorage が壊れていたため初期化します");
       }
 
-      // データが無い or 壊れている場合は初期化
-      if (!data || typeof data !== "object") {
+      // ★ バージョンが違う or データが無い → 初期化
+      if (!data || savedVersion !== APP_VERSION) {
+        console.log("edit.html: データバージョンが古いため再初期化します");
+
         data = {
           number: ["one","two","three","four","five","six","seven","eight","nine","ten"],
           animal: ["dog","cat","rabbit","lion","elephant","giraffe","bear","monkey","horse","sheep"],
@@ -85,22 +92,21 @@
           insect: ["butterfly","ant","bee","ladybug","beetle","cicada","dragonfly","grasshopper"],
           other: ["car","bus","table","chair","house","clock","train","food","drink"]
         };
+
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(VERSION_KEY, APP_VERSION);
       }
 
-      // カテゴリが欠けていたら補完
-      const categories = ["number","animal","fruit","color","insect","other"];
-      categories.forEach(cat => {
-        if (!Array.isArray(data[cat])) data[cat] = [];
-      });
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       return data;
     }
 
     function saveStorage(data) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
+
+    /* ------------------------------
+       UI 操作
+    ------------------------------ */
 
     const categorySelect = document.getElementById("categorySelect");
     const loadWordsBtn = document.getElementById("loadWordsBtn");

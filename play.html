@@ -203,6 +203,39 @@
   </div>
 
   <script>
+    /* ------------------------------
+       バージョン管理（自動更新）
+    ------------------------------ */
+    const STORAGE_KEY = "words";
+    const VERSION_KEY = "version";
+    const APP_VERSION = "1.0.0";
+
+    function ensureLatestVersion() {
+      const savedVersion = localStorage.getItem(VERSION_KEY);
+
+      if (savedVersion !== APP_VERSION) {
+        console.log("play.html: データバージョンが古いため再初期化します");
+
+        const data = {
+          number: ["one","two","three","four","five","six","seven","eight","nine","ten"],
+          animal: ["dog","cat","rabbit","lion","elephant","giraffe","bear","monkey","horse","sheep"],
+          fruit: ["orange","apple","strawberry","pineapple","banana","peach","grape","watermelon","cherry"],
+          color: ["black","white","red","blue","yellow","green","pink","purple","brown","orange"],
+          insect: ["butterfly","ant","bee","ladybug","beetle","cicada","dragonfly","grasshopper"],
+          other: ["car","bus","table","chair","house","clock","train","food","drink"]
+        };
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(VERSION_KEY, APP_VERSION);
+      }
+    }
+
+    ensureLatestVersion();
+
+    /* ------------------------------
+       読み上げ機能
+    ------------------------------ */
+
     const playButton = document.getElementById("playButton");
     const nextButton = document.getElementById("nextButton");
     const currentWord = document.getElementById("currentWord");
@@ -231,7 +264,7 @@
     });
 
     function getWordsByGenre(genre) {
-      const data = JSON.parse(localStorage.getItem("words")) || {};
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
       return data[genre] || [];
     }
 
@@ -275,5 +308,6 @@
 
     nextButton.addEventListener("click", speakWord);
   </script>
+
 </body>
 </html>
