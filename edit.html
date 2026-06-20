@@ -137,7 +137,7 @@
 
   <h1>単語編集</h1>
 
-  <!-- ジャンル選択（アイコン） -->
+  <!-- ジャンル選択（順番修正済み） -->
   <div class="genre-icons">
     <div class="genre selected" data-genre="Number">
       <img src="images/number_icon.png"><p>Number</p>
@@ -145,23 +145,23 @@
     <div class="genre" data-genre="Animal">
       <img src="images/animal_icon.png"><p>Animal</p>
     </div>
+    <div class="genre" data-genre="Color">
+      <img src="images/color_icon.png"><p>Color</p>
+    </div>
+    <div class="genre" data-genre="Food">
+      <img src="images/food_icon.png"><p>Food</p>
+    </div>
     <div class="genre" data-genre="Fruit">
       <img src="images/fruit_icon.png"><p>Fruit</p>
     </div>
-    <div class="genre" data-genre="Color">
-      <img src="images/color_icon.png"><p>Color</p>
+    <div class="genre" data-genre="Body">
+      <img src="images/body_icon.png"><p>Body</p>
     </div>
     <div class="genre" data-genre="Insect">
       <img src="images/insect_icon.png"><p>Insect</p>
     </div>
     <div class="genre" data-genre="Other">
       <img src="images/other_icon.png"><p>Other</p>
-    </div>
-    <div class="genre" data-genre="Food">
-      <img src="images/food_icon.png"><p>Food</p>
-    </div>
-    <div class="genre" data-genre="Body">
-      <img src="images/body_icon.png"><p>Body</p>
     </div>
   </div>
 
@@ -172,7 +172,7 @@
     <button id="addWordBtn">追加</button>
   </div>
 
-  <p class="save-info">※ 各ジャンル 最大20個まで保存されます（自動保存）</p>
+  <p class="save-info">※ 各ジャンル 最大20個まで保存されます</p>
 
   <script>
     // 画面遷移
@@ -184,7 +184,7 @@
       window.location.href = "play.html";
     });
 
-    // 初期データ（1回目だけ使われる）
+    // 初期データ
     const defaultWordsData = {
       Number: [
         "one","two","three","four","five","six","seven","eight",
@@ -193,38 +193,30 @@
       Animal: [
         "dog","cat","bird","fish","rabbit","bear","lion","horse"
       ],
+      Color: [
+        "red","blue","yellow","green","black","white","pink","purple"
+      ],
+      Food: [
+        "bread","rice","milk","egg","soup","cake","cheese","juice"
+      ],
       Fruit: [
         "apple","banana","orange","grape","peach","lemon","melon","strawberry"
       ],
-      Color: [
-        "red","blue","yellow","green","black","white","pink","purple"
+      Body: [
+        "head","hand","foot","eye","ear","nose","mouth","hair"
       ],
       Insect: [
         "ant","bee","butterfly","beetle","spider","dragonfly","ladybug","grasshopper"
       ],
       Other: [
         "car","house","book","chair","clock","cup","ball","star"
-      ],
-      Food: [
-        "bread","rice","milk","egg","soup","cake","cheese","juice"
-      ],
-      Body: [
-        "head","hand","foot","eye","ear","nose","mouth","hair"
       ]
     };
 
-    // localStorage から読み込み or 初期化
+    // localStorage 読み込み
     let wordsData = JSON.parse(localStorage.getItem("wordsData") || "null");
     if (!wordsData) {
       wordsData = defaultWordsData;
-      localStorage.setItem("wordsData", JSON.stringify(wordsData));
-    } else {
-      // 新ジャンル追加などに備えてマージ
-      for (const key in defaultWordsData) {
-        if (!wordsData[key]) {
-          wordsData[key] = defaultWordsData[key];
-        }
-      }
       localStorage.setItem("wordsData", JSON.stringify(wordsData));
     }
 

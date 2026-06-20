@@ -61,28 +61,24 @@
     <button class="menu-btn" onclick="openContactForm()">📮 お問い合わせ</button>
   </div>
 
-  <p class="version" id="versionText">Version: 1.0.0</p>
+  <p class="version" id="versionText">Version: 1.0.1</p>
 
   <script>
-    function openPlay() {
-      window.location.href = "play.html";
-    }
-
-    function openEdit() {
-      window.location.href = "edit.html";
-    }
-
-    function openIllustration() {
-      window.location.href = "illustration.html";
-    }
-
+    function openPlay() { window.location.href = "play.html"; }
+    function openEdit() { window.location.href = "edit.html"; }
+    function openIllustration() { window.location.href = "illustration.html"; }
     function openContactForm() {
       window.open("https://docs.google.com/forms/d/e/1FAIpQLSfm4dHjCd3lNRaGQ_RKvO1gnrQYrf8wK0lYfmZq0Ma8IDemRQ/viewform?usp=publish-editor");
     }
 
-    // バージョン管理（自動更新）
-    let version = localStorage.getItem("appVersion") || "1.0.0";
-    document.getElementById("versionText").textContent = "Version: " + version;
+    // バージョン管理
+    const currentVersion = "1.0.1";
+    const savedVersion = localStorage.getItem("appVersion");
+
+    if (savedVersion !== currentVersion) {
+      localStorage.clear();
+      localStorage.setItem("appVersion", currentVersion);
+    }
   </script>
 
 </body>
