@@ -4,42 +4,131 @@
     <meta charset="UTF-8">
     <title>読み上げ</title>
     <style>
-        body { font-family: Arial; padding: 20px; }
-        .genreBox { margin-bottom: 10px; }
-        #displayWord { font-size: 40px; margin-top: 20px; font-weight: bold; }
+        body {
+            font-family: "Arial Rounded MT Bold", Arial;
+            padding: 20px;
+            background: #fff7e6;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 3px solid #ffa64d;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            background: #ffe0b3;
+            border-radius: 10px 10px 0 0;
+            margin-right: 5px;
+        }
+
+        .tab.active {
+            background: #ffb84d;
+            font-weight: bold;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        #displayWord {
+            font-size: 48px;
+            text-align: center;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .next-btn {
+            background: #4da6ff;
+            color: white;
+        }
+
+        .shuffle-btn {
+            background: #ff8c42;
+            color: white;
+        }
+
+        .genreBox label {
+            display: block;
+            margin: 5px 0;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
 
 <h2>読み上げ</h2>
 
-<div class="genreBox">
-    <label><input type="checkbox" value="number" onchange="updateWordList()"> Number</label>
-    <label><input type="checkbox" value="animal" onchange="updateWordList()"> Animal</label>
-    <label><input type="checkbox" value="fruit" onchange="updateWordList()"> Fruit</label>
-    <label><input type="checkbox" value="color" onchange="updateWordList()"> Color</label>
-    <label><input type="checkbox" value="insect" onchange="updateWordList()"> Insect</label>
-    <label><input type="checkbox" value="other" onchange="updateWordList()"> Other</label>
+<div class="tabs">
+    <div class="tab active" onclick="switchTab('readTab')">🔊 読み上げ</div>
+    <div class="tab" onclick="switchTab('settingTab')">⚙️ 設定</div>
 </div>
 
-<div id="wordCount">選択中の単語数: 0 個</div>
-<div id="remainingCount">残り: 0 個</div>
+<!-- 読み上げタブ -->
+<div id="readTab" class="content active">
+    <div id="wordCount">選択中の単語数: 0 個</div>
+    <div id="remainingCount">残り: 0 個</div>
 
-<button onclick="nextWord()">次の単語を読み上げ</button>
+    <button class="next-btn" onclick="nextWord()">次の単語を読み上げ</button>
+    <button class="shuffle-btn" onclick="resetShuffle()">🔁 もう一度シャッフル</button>
 
-<div id="displayWord">---</div>
+    <div id="displayWord">---</div>
+</div>
 
-<br><br>
+<!-- 設定タブ -->
+<div id="settingTab" class="content">
+    <h3>ジャンル選択</h3>
+
+    <div class="genreBox">
+        <label><input type="checkbox" value="number" onchange="updateWordList()"> Number</label>
+        <label><input type="checkbox" value="animal" onchange="updateWordList()"> Animal</label>
+        <label><input type="checkbox" value="fruit" onchange="updateWordList()"> Fruit</label>
+        <label><input type="checkbox" value="color" onchange="updateWordList()"> Color</label>
+        <label><input type="checkbox" value="insect" onchange="updateWordList()"> Insect</label>
+        <label><input type="checkbox" value="other" onchange="updateWordList()"> Other</label>
+    </div>
+</div>
+
+<br>
 <a href="index.html">ホームに戻る</a>
 
 <script>
 let words = JSON.parse(localStorage.getItem("words"));
 let remainingWords = [];
 
+// タブ切り替え
+function switchTab(tabId) {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".content").forEach(c => c.classList.remove("active"));
+
+    event.target.classList.add("active");
+    document.getElementById(tabId).classList.add("active");
+}
+
+// 選択ジャンル取得
 function getSelectedGenres() {
     return [...document.querySelectorAll("input[type=checkbox]:checked")].map(cb => cb.value);
 }
 
+// 単語リスト更新
 function updateWordList() {
     const selected = getSelectedGenres();
     let allWords = [];
@@ -53,8 +142,11 @@ function updateWordList() {
 
     document.getElementById("remainingCount").textContent =
         `残り: ${remainingWords.length} 個`;
+
+    document.getElementById("displayWord").textContent = "---";
 }
 
+// 次の単語
 function nextWord() {
     if (remainingWords.length === 0) {
         speak("No more words");
@@ -66,17 +158,23 @@ function nextWord() {
     speak(word);
 
     document.getElementById("displayWord").textContent = word;
-
     document.getElementById("remainingCount").textContent =
         `残り: ${remainingWords.length} 個`;
 }
 
+// シャッフルしてやり直す
+function resetShuffle() {
+    updateWordList();
+}
+
+// 読み上げ
 function speak(text) {
     const uttr = new SpeechSynthesisUtterance(text);
     uttr.lang = "en-US";
     speechSynthesis.speak(uttr);
 }
 
+// シャッフル関数
 function shuffleArray(arr) {
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {

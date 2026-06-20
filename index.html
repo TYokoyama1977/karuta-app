@@ -1,27 +1,68 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>英語かるたアプリ</title>
-  <style>
-    body { font-family: system-ui, sans-serif; text-align: center; padding: 20px; }
-    a { display: block; margin: 10px; font-size: 20px; }
-    #versionInfo { margin-top: 20px; color: #555; font-size: 14px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>英語かるたアプリ</title>
+    <style>
+        body {
+            font-family: "Arial Rounded MT Bold", Arial;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #fceabb, #f8b500);
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 40px;
+            color: #444;
+            text-shadow: 1px 1px 2px #fff;
+        }
+
+        .menu-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .menu-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: none;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+            transition: 0.2s;
+        }
+
+        .menu-btn:hover {
+            transform: scale(1.08);
+        }
+
+        .play-btn {
+            background: #4da6ff;
+        }
+
+        .edit-btn {
+            background: #ff8c42;
+        }
+    </style>
 </head>
 <body>
 
-  <h1>英語かるたアプリ</h1>
+<h1>英語かるたアプリ</h1>
 
-  <a href="play.html">読み上げ</a>
-  <a href="edit.html">単語編集</a>
+<div class="menu-container">
+    <button class="menu-btn play-btn" onclick="location.href='play.html'">
+        🎤<br>読み上げ
+    </button>
 
-  <div id="versionInfo"></div>
-
-  <script>
-    const APP_VERSION = "1.0.0";
-    document.getElementById("versionInfo").textContent = "Version: " + APP_VERSION;
-  </script>
+    <button class="menu-btn edit-btn" onclick="location.href='edit.html'">
+        ✏️<br>単語編集
+    </button>
+</div>
 
 </body>
 </html>
