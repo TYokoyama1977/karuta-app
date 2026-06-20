@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>英語かるたアプリ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
     body {
       font-family: "Arial", sans-serif;
@@ -13,86 +12,54 @@
       padding: 0;
       text-align: center;
     }
-
     h1 {
       margin-top: 30px;
       font-size: 28px;
       color: #333;
     }
-
     .menu {
-      margin-top: 40px;
+      margin-top: 30px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 25px;
+      gap: 15px;
     }
-
-    .menu-btn {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
+    .menu button {
+      width: 260px;
+      padding: 14px;
+      font-size: 20px;
+      border-radius: 10px;
       border: none;
       background: #ffcc66;
-      font-size: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       cursor: pointer;
-      transition: 0.2s;
     }
-
-    .menu-btn:hover {
+    .menu button:hover {
       background: #ffdd88;
     }
-
-    .menu-btn img {
-      width: 90px;
-      height: 90px;
-      margin-bottom: 10px;
+    footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #666;
+      padding-bottom: 20px;
     }
   </style>
 </head>
-
 <body>
 
   <h1>英語かるたアプリ</h1>
 
   <div class="menu">
-
-    <!-- 読み上げ -->
-    <button class="menu-btn" onclick="location.href='play.html'">
-      <img src="images/play_icon.png">
-      読み上げ
-    </button>
-
-    <!-- ⚙️ 設定（追加） -->
-    <button class="menu-btn" onclick="location.href='settings.html'">
-      <img src="images/settings_icon.png">
-      設定
-    </button>
-
-    <!-- 単語編集 -->
-    <button class="menu-btn" onclick="location.href='edit.html'">
-      <img src="images/edit_icon.png">
-      単語編集
-    </button>
-
-    <!-- イラスト集 -->
-    <button class="menu-btn" onclick="location.href='illustration.html'">
-      <img src="images/illust_icon.png">
-      イラスト集
-    </button>
-
-    <!-- お問い合わせ -->
-    <button class="menu-btn" onclick="location.href='contact.html'">
-      <img src="images/contact_icon.png">
-      お問い合わせ
-    </button>
-
+    <button onclick="location.href='play.html'">🔊 読み上げ</button>
+    <button onclick="location.href='settings.html'">⚙️ 設定</button>
+    <button onclick="location.href='edit.html'">✏️ 単語編集</button>
+    <button onclick="location.href='illustration.html'">🖼 イラスト集</button>
+    <button onclick="location.href='contact.html'">📩 お問い合わせ</button>
+    <button onclick="location.href='terms.html'">📃 利用規約</button>
   </div>
+
+  <footer>
+    © 2026 Studio OZ
+  </footer>
 
 </body>
 </html>
