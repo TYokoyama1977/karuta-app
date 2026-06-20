@@ -23,12 +23,12 @@
     <label>
       カテゴリ:
       <select id="categorySelect">
-        <option value="animal">animal</option>
-        <option value="fluit">fluit</option>
-        <option value="color">color</option>
-        <option value="other">other</option>
-        <option value="insect">insect</option>
-        <option value="number">number</option>
+        <option value="number">Number</option>
+        <option value="animal">Animal</option>
+        <option value="fruit">Fruit</option>
+        <option value="color">Color</option>
+        <option value="insect">Insect</option>
+        <option value="other">Other</option>
       </select>
     </label>
     <button id="loadWordsBtn">このカテゴリの単語を読み込む</button>
@@ -78,18 +78,18 @@
       // データが無い or 壊れている場合は初期化
       if (!data || typeof data !== "object") {
         data = {
+          number: [],
           animal: ["dog", "cat"],
-          fluit: [],
+          fruit: [],
           color: [],
-          other: [],
           insect: [],
-          number: []
+          other: []
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       }
 
       // カテゴリが欠けていたら補完
-      const categories = ["animal", "fluit", "color", "other", "insect", "number"];
+      const categories = ["number", "animal", "fruit", "color", "insect", "other"];
       categories.forEach(cat => {
         if (!Array.isArray(data[cat])) data[cat] = [];
       });

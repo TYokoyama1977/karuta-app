@@ -13,7 +13,6 @@
       text-align: center;
     }
 
-    /* ヘッダー */
     header {
       background-color: #ffcc66;
       color: #333;
@@ -36,7 +35,6 @@
       cursor: pointer;
     }
 
-    /* アイコン表示 */
     .genre-selection {
       margin-top: 20px;
     }
@@ -58,6 +56,13 @@
       width: 100px;
     }
 
+    .genre-label {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
     .genre img {
       width: 80px;
       height: 80px;
@@ -76,7 +81,6 @@
       cursor: pointer;
     }
 
-    /* 読み上げ設定 */
     .settings {
       margin-top: 20px;
       background: #fff;
@@ -97,7 +101,6 @@
       width: 60%;
     }
 
-    /* ボタン */
     .controls {
       margin-top: 30px;
     }
@@ -118,7 +121,6 @@
       background-color: #55aa88;
     }
 
-    /* 現在の単語表示 */
     #currentWord {
       font-size: 28px;
       margin-top: 10px;
@@ -130,43 +132,47 @@
 </head>
 <body>
 
-  <!-- ヘッダー -->
   <header>
     <div>読み上げ</div>
     <button onclick="location.href='index.html'">ホームに戻る</button>
   </header>
 
-  <!-- アイコン表示（チェックボックス付き） -->
   <div class="genre-selection">
     <h2>ジャンルを選択</h2>
     <div class="genre-icons">
 
-      <div class="genre" data-genre="animal">
-        <img src="images/animal_icon.png" alt="Animal">
-        <input type="checkbox" class="genreCheck" value="animal">
-      </div>
-
       <div class="genre" data-genre="number">
+        <div class="genre-label">Number</div>
         <img src="images/number_icon.png" alt="Number">
         <input type="checkbox" class="genreCheck" value="number">
       </div>
 
+      <div class="genre" data-genre="animal">
+        <div class="genre-label">Animal</div>
+        <img src="images/animal_icon.png" alt="Animal">
+        <input type="checkbox" class="genreCheck" value="animal">
+      </div>
+
       <div class="genre" data-genre="fruit">
+        <div class="genre-label">Fruit</div>
         <img src="images/fruit_icon.png" alt="Fruit">
         <input type="checkbox" class="genreCheck" value="fruit">
       </div>
 
       <div class="genre" data-genre="color">
+        <div class="genre-label">Color</div>
         <img src="images/color_icon.png" alt="Color">
         <input type="checkbox" class="genreCheck" value="color">
       </div>
 
       <div class="genre" data-genre="insect">
+        <div class="genre-label">Insect</div>
         <img src="images/insect_icon.png" alt="Insect">
         <input type="checkbox" class="genreCheck" value="insect">
       </div>
 
       <div class="genre" data-genre="other">
+        <div class="genre-label">Other</div>
         <img src="images/other_icon.png" alt="Other">
         <input type="checkbox" class="genreCheck" value="other">
       </div>
@@ -174,7 +180,6 @@
     </div>
   </div>
 
-  <!-- 読み上げ設定 -->
   <div class="settings">
     <h3>読み上げ設定</h3>
 
@@ -191,14 +196,9 @@
     </div>
   </div>
 
-  <!-- ボタン -->
   <div class="controls">
     <button id="playButton">自動再生 ON</button>
-
-    <!-- ★ 修正：ボタン名を変更 -->
     <button id="nextButton">次の単語を読み上げ</button>
-
-    <!-- ★ 読み上げ中の単語表示 -->
     <div id="currentWord"></div>
   </div>
 
@@ -215,7 +215,6 @@
     let autoPlay = false;
     let timer = null;
 
-    // スライダー表示更新
     rateSlider.addEventListener("input", () => {
       rateValue.textContent = rateSlider.value;
     });
@@ -224,7 +223,6 @@
       intervalValue.textContent = intervalSlider.value;
     });
 
-    // アイコンをクリックしたらチェックを切り替える
     document.querySelectorAll(".genre").forEach(box => {
       box.addEventListener("click", () => {
         const checkbox = box.querySelector("input[type='checkbox']");
@@ -232,13 +230,11 @@
       });
     });
 
-    // localStorage から単語を取得
     function getWordsByGenre(genre) {
       const data = JSON.parse(localStorage.getItem("words")) || {};
       return data[genre] || [];
     }
 
-    // チェックされたジャンルからランダム単語を取得
     function getRandomWord() {
       const checked = [...document.querySelectorAll(".genreCheck:checked")].map(c => c.value);
       if (checked.length === 0) return null;
@@ -253,12 +249,10 @@
       return allWords[Math.floor(Math.random() * allWords.length)];
     }
 
-    // 読み上げ
     function speakWord() {
       const word = getRandomWord();
       if (!word) return;
 
-      // ★ 読み上げ中の単語を表示
       currentWord.textContent = word;
 
       const uttr = new SpeechSynthesisUtterance(word);
@@ -266,7 +260,6 @@
       speechSynthesis.speak(uttr);
     }
 
-    // 自動再生 ON/OFF
     playButton.addEventListener("click", () => {
       autoPlay = !autoPlay;
 
@@ -280,7 +273,6 @@
       }
     });
 
-    // 次の単語
     nextButton.addEventListener("click", speakWord);
   </script>
 </body>
