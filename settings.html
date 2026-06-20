@@ -2,163 +2,54 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>設定 - 英語かるたアプリ</title>
+  <title>設定 - 読み上げかるた</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
-    body {
-      font-family: "Arial", sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-
-    .settings-header {
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { font-size: 26px; text-align: center; }
+    .page-header { text-align: left; margin-bottom: 10px; }
     .home-btn {
-      font-size: 18px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      background: #eee;
+      font-size: 18px; padding: 8px 14px;
+      border-radius: 8px; border: none;
+      background: #eee; cursor: pointer;
     }
-
-    h1 {
-      margin-top: 10px;
-      font-size: 24px;
-    }
-
-    .settings-box {
-      background: #fff;
-      width: 90%;
-      max-width: 500px;
-      margin: 20px auto;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      text-align: left;
-    }
+    .home-btn:hover { background: #ddd; }
 
     .setting-item {
-      margin-bottom: 20px;
-    }
-
-    .setting-item label {
+      margin: 20px 0;
       font-size: 18px;
-      display: block;
-      margin-bottom: 5px;
     }
-
-    .setting-item input[type="range"] {
+    input[type=range] {
       width: 100%;
-    }
-
-    .save-btn {
-      width: 80%;
-      padding: 12px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      background: #4CAF50;
-      color: white;
-      margin-top: 20px;
-    }
-
-    .save-msg {
-      margin-top: 15px;
-      font-size: 16px;
-      color: #333;
     }
   </style>
 </head>
-
 <body>
 
-  <div class="settings-header">
-    <button id="homeButton" class="home-btn">🏠 ホームに戻る</button>
-  </div>
+<div class="page-header">
+  <button class="home-btn" onclick="location.href='index.html'">🏠 ホームへ戻る</button>
+</div>
 
-  <h1>設定</h1>
+<h1>設定</h1>
 
-  <div class="settings-box">
+<div class="setting-item">
+  読み上げ速度： <span id="speedValue"></span>
+  <input type="range" id="speed" min="0.5" max="2" step="0.1">
+</div>
 
-    <div class="setting-item">
-      <label>読み上げ速度： <span id="rateValue">1</span></label>
-      <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
-    </div>
+<div class="setting-item">
+  読み上げ間隔（秒）： <span id="intervalValue"></span>
+  <input type="range" id="interval" min="1" max="10" step="1">
+</div>
 
-    <div class="setting-item">
-      <label>読み上げ間隔（秒）： <span id="intervalValue">6</span></label>
-      <input type="range" id="intervalSlider" min="1" max="10" step="1" value="6">
-    </div>
+<div class="setting-item">
+  <label>
+    <input type="checkbox" id="autoPlay">
+    自動再生を最初から ON にする
+  </label>
+</div>
 
-    <div class="setting-item">
-      <label>
-        <input type="checkbox" id="autoPlayCheck">
-        自動再生を最初から ON にする
-      </label>
-    </div>
-
-    <button id="saveButton" class="save-btn">保存する</button>
-
-    <div id="saveMsg" class="save-msg"></div>
-
-  </div>
-
-  <script>
-    /* -------------------------
-       画面遷移
-    ------------------------- */
-    homeButton.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-
-    /* -------------------------
-       設定読み込み
-    ------------------------- */
-    const settings = JSON.parse(localStorage.getItem("settings") || "{}");
-
-    const rateSlider = document.getElementById("rateSlider");
-    const intervalSlider = document.getElementById("intervalSlider");
-    const autoPlayCheck = document.getElementById("autoPlayCheck");
-
-    rateSlider.value = settings.rate || 1;
-    intervalSlider.value = settings.interval || 6;
-    autoPlayCheck.checked = settings.autoPlay || false;
-
-    rateValue.textContent = rateSlider.value;
-    intervalValue.textContent = intervalSlider.value;
-
-    rateSlider.addEventListener("input", () => {
-      rateValue.textContent = rateSlider.value;
-    });
-
-    intervalSlider.addEventListener("input", () => {
-      intervalValue.textContent = intervalSlider.value;
-    });
-
-    /* -------------------------
-       保存処理
-    ------------------------- */
-    saveButton.addEventListener("click", () => {
-      const newSettings = {
-        rate: parseFloat(rateSlider.value),
-        interval: parseInt(intervalSlider.value),
-        autoPlay: autoPlayCheck.checked
-      };
-
-      localStorage.setItem("settings", JSON.stringify(newSettings));
-
-      saveMsg.textContent = "保存しました！";
-      setTimeout(() => saveMsg.textContent = "", 2000);
-    });
-  </script>
+<script src="settings.js"></script>
 
 </body>
 </html>

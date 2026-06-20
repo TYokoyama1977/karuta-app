@@ -2,11 +2,11 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>英語かるたアプリ</title>
+  <title>読み上げかるた</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: "Arial", sans-serif;
+      font-family: "Comic Sans MS", "Chalkboard SE", "Arial Rounded MT Bold", sans-serif;
       background: #f7f7f7;
       margin: 0;
       padding: 0;
@@ -14,7 +14,7 @@
     }
     h1 {
       margin-top: 10px;
-      font-size: 28px;
+      font-size: 32px;
       color: #333;
     }
     .menu {
@@ -47,39 +47,31 @@
   <script>
     function openContactForm() {
       alert("お問い合わせフォームは別の画面（タブ）で開きます。書き終わったら、その画面を閉じてホームに戻ってください。");
-      window.open("https://docs.google.com/forms/あなたのフォームID/viewform", "_blank");
+      window.open("https://forms.gle/Z7jwYWgerrxvZAfSA", "_blank");
     }
   </script>
 </head>
 <body>
 
-  <!-- ロゴ（画像名は必要に応じて変更） -->
   <img src="images/logo.png" alt="Studio OZ ロゴ"
        style="width:180px; margin-top:20px; margin-bottom:10px;">
 
-  <h1>英語かるたアプリ</h1>
+  <h1>読み上げかるた</h1>
 
   <div class="menu">
     <button onclick="location.href='play.html'">🔊 読み上げ</button>
     <button onclick="location.href='settings.html'">⚙️ 設定</button>
     <button onclick="location.href='edit.html'">✏️ 単語編集</button>
     <button onclick="location.href='illustration.html'">🖼️ イラスト集</button>
-
     <button onclick="openContactForm()">📮 お問い合わせ</button>
-
-    <!-- 子ども向けのやさしい説明文 -->
-    <p style="font-size:12px; color:#666; margin-top:5px;">
-      ※ お問い合わせフォームは <strong>別の画面（タブ）</strong> で開きます。<br>
-      　書き終わったら、その画面を <strong>閉じるとホームに戻れます。</strong>
-    </p>
-
+    <button onclick="location.href='help.html'">❓ ヘルプ</button>
     <button onclick="location.href='terms.html'">📃 利用規約</button>
     <button onclick="location.href='privacy.html'">🔒 プライバシーポリシー</button>
   </div>
 
   <footer>
     © 2026 Studio OZ<br>
-    Version: 1.0.3
+    Version: 1.0.5
   </footer>
 
 </body>

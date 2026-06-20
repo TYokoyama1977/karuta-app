@@ -35,6 +35,12 @@
       font-size: 24px;
     }
 
+    h2 {
+      margin-top: 10px;
+      font-size: 20px;
+      color: #444;
+    }
+
     /* ジャンルアイコン */
     .genre-icons {
       display: flex;
@@ -45,9 +51,13 @@
     }
 
     .genre {
-      width: 90px;
+      width: 100px;
       text-align: center;
       cursor: pointer;
+      padding: 5px;
+      border-radius: 10px;
+      transition: 0.2s;
+      background: #fff;
     }
 
     .genre img {
@@ -55,11 +65,15 @@
       height: 70px;
     }
 
+    /* 選択状態の視覚効果 */
     .genre.selected {
-      border: 3px solid #ffcc66;
-      border-radius: 10px;
-      padding: 5px;
-      background: #fff;
+      border: 3px solid #ffcc33;
+      background: #fff7cc;
+    }
+
+    .genre input[type="checkbox"] {
+      margin-top: 5px;
+      transform: scale(1.3);
     }
 
     /* 単語リスト */
@@ -136,34 +150,10 @@
   </div>
 
   <h1>単語編集</h1>
+  <h2>ジャンルを選択してください</h2>
 
-  <!-- ジャンル選択（順番修正済み） -->
-  <div class="genre-icons">
-    <div class="genre selected" data-genre="Number">
-      <img src="images/number_icon.png"><p>Number</p>
-    </div>
-    <div class="genre" data-genre="Animal">
-      <img src="images/animal_icon.png"><p>Animal</p>
-    </div>
-    <div class="genre" data-genre="Color">
-      <img src="images/color_icon.png"><p>Color</p>
-    </div>
-    <div class="genre" data-genre="Food">
-      <img src="images/food_icon.png"><p>Food</p>
-    </div>
-    <div class="genre" data-genre="Fruit">
-      <img src="images/fruit_icon.png"><p>Fruit</p>
-    </div>
-    <div class="genre" data-genre="Body">
-      <img src="images/body_icon.png"><p>Body</p>
-    </div>
-    <div class="genre" data-genre="Insect">
-      <img src="images/insect_icon.png"><p>Insect</p>
-    </div>
-    <div class="genre" data-genre="Other">
-      <img src="images/other_icon.png"><p>Other</p>
-    </div>
-  </div>
+  <!-- ジャンル選択（チェックボックス方式） -->
+  <div class="genre-icons" id="genreArea"></div>
 
   <div class="word-list" id="wordList"></div>
 
@@ -175,7 +165,9 @@
   <p class="save-info">※ 各ジャンル 最大20個まで保存されます</p>
 
   <script>
-    // 画面遷移
+    /* -------------------------
+       画面遷移
+    ------------------------- */
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
@@ -184,62 +176,87 @@
       window.location.href = "play.html";
     });
 
-    // 初期データ
+    /* -------------------------
+       初期データ
+    ------------------------- */
     const defaultWordsData = {
       Number: [
         "one","two","three","four","five","six","seven","eight",
         "nine","ten","eleven","twelve"
       ],
-      Animal: [
-        "dog","cat","bird","fish","rabbit","bear","lion","horse"
-      ],
-      Color: [
-        "red","blue","yellow","green","black","white","pink","purple"
-      ],
-      Food: [
-        "bread","rice","milk","egg","soup","cake","cheese","juice"
-      ],
-      Fruit: [
-        "apple","banana","orange","grape","peach","lemon","melon","strawberry"
-      ],
-      Body: [
-        "head","hand","foot","eye","ear","nose","mouth","hair"
-      ],
-      Insect: [
-        "ant","bee","butterfly","beetle","spider","dragonfly","ladybug","grasshopper"
-      ],
-      Other: [
-        "car","house","book","chair","clock","cup","ball","star"
-      ]
+      Animal: ["dog","cat","bird","fish","rabbit","bear","lion","horse"],
+      Color: ["red","blue","yellow","green","black","white","pink","purple"],
+      Food: ["bread","rice","milk","egg","soup","cake","cheese","juice"],
+      Fruit: ["apple","banana","orange","grape","peach","lemon","melon","strawberry"],
+      Body: ["head","hand","foot","eye","ear","nose","mouth","hair"],
+      Insect: ["ant","bee","butterfly","beetle","spider","dragonfly","ladybug","grasshopper"],
+      Other: ["car","house","book","chair","clock","cup","ball","star"]
     };
 
-    // localStorage 読み込み
     let wordsData = JSON.parse(localStorage.getItem("wordsData") || "null");
     if (!wordsData) {
       wordsData = defaultWordsData;
       localStorage.setItem("wordsData", JSON.stringify(wordsData));
     }
 
+    /* -------------------------
+       ジャンル選択 UI
+    ------------------------- */
+    const genres = [
+      "Number", "Animal", "Color", "Food",
+      "Fruit", "Body", "Insect", "Other"
+    ];
+
+    const genreArea = document.getElementById("genreArea");
     let currentGenre = "Number";
 
-    const genreElems = document.querySelectorAll(".genre");
+    genres.forEach(g => {
+      const div = document.createElement("div");
+      div.className = "genre";
+      div.dataset.genre = g;
+
+      div.innerHTML = `
+        <img src="images/${g.toLowerCase()}_icon.png">
+        <p>${g}</p>
+        <input type="checkbox">
+      `;
+
+      div.addEventListener("click", (e) => {
+        if (e.target.tagName !== "INPUT") {
+          const cb = div.querySelector("input");
+          cb.checked = true;
+        }
+
+        document.querySelectorAll(".genre").forEach(x => {
+          x.classList.remove("selected");
+          x.querySelector("input").checked = false;
+        });
+
+        div.classList.add("selected");
+        div.querySelector("input").checked = true;
+
+        currentGenre = g;
+        renderWords();
+      });
+
+      genreArea.appendChild(div);
+    });
+
+    /* 初期選択 */
+    document.querySelector(".genre").classList.add("selected");
+    document.querySelector(".genre input").checked = true;
+
+    /* -------------------------
+       単語リスト表示
+    ------------------------- */
     const wordList = document.getElementById("wordList");
     const newWordInput = document.getElementById("newWordInput");
     const addWordBtn = document.getElementById("addWordBtn");
 
-    // ジャンル切り替え
-    genreElems.forEach(g => {
-      g.addEventListener("click", () => {
-        genreElems.forEach(x => x.classList.remove("selected"));
-        g.classList.add("selected");
-        currentGenre = g.dataset.genre;
-        renderWords();
-      });
-    });
-
     function renderWords() {
       wordList.innerHTML = "";
       const list = wordsData[currentGenre] || [];
+
       list.forEach((w, idx) => {
         const div = document.createElement("div");
         div.className = "word-item";
@@ -273,20 +290,23 @@
     addWordBtn.addEventListener("click", () => {
       const val = newWordInput.value.trim();
       if (!val) return;
-      if (!wordsData[currentGenre]) wordsData[currentGenre] = [];
+
       if (wordsData[currentGenre].length >= 20) {
         alert("このジャンルは20個までです。");
         return;
       }
+
       wordsData[currentGenre].push(val);
       saveData();
       newWordInput.value = "";
       renderWords();
     });
 
-    // 初期表示
+    /* 初期表示 */
     renderWords();
   </script>
-
+ <footer>
+    © 2026 Studio OZ
+  </footer>
 </body>
 </html>

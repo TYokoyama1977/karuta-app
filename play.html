@@ -2,301 +2,58 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>読み上げ - 英語かるたアプリ</title>
+  <title>読み上げ - 読み上げかるた</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
-    body {
-      font-family: "Arial", sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 0;
-      text-align: center;
+    body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+    h1 { font-size: 26px; margin-bottom: 10px; }
+    .page-header { text-align: left; margin-bottom: 10px; }
+    .home-btn {
+      font-size: 18px; padding: 8px 14px;
+      border-radius: 8px; border: none;
+      background: #eee; cursor: pointer;
     }
+    .home-btn:hover { background: #ddd; }
 
-    /* 上部ヘッダー */
-    .play-header {
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .home-btn, .edit-btn, .settings-btn {
-      font-size: 18px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      background: #eee;
-    }
-
-    h2 {
-      margin-top: 10px;
-      font-size: 20px;
-      color: #444;
-    }
-
-    /* ジャンルアイコン */
-    .genre-icons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 10px;
-    }
-
-    .genre {
-      width: 100px;
-      text-align: center;
-      cursor: pointer;
-      padding: 5px;
-      border-radius: 10px;
-      transition: 0.2s;
-    }
-
-    .genre img {
-      width: 70px;
-      height: 70px;
-    }
-
-    /* 選択状態の視覚効果 */
-    .genre.selected {
-      border: 3px solid #ffcc33;
-      background: #fff7cc;
-    }
-
-    .genre input[type="checkbox"] {
-      margin-top: 5px;
-      transform: scale(1.3);
-    }
-
-    /* 読み上げ部分 */
-    #currentWord {
+    .word-box {
+      margin: 20px auto;
       font-size: 40px;
-      margin-top: 30px;
-      color: #333;
+      font-weight: bold;
+      padding: 20px;
+      border-radius: 12px;
+      background: #fff3cd;
+      width: 80%;
     }
 
-    .main-btn {
-      margin-top: 20px;
-      padding: 20px 40px;
-      font-size: 22px;
-      border-radius: 50px;
+    .controls button {
+      font-size: 20px;
+      padding: 12px 20px;
+      margin: 10px;
+      border-radius: 10px;
       border: none;
       background: #ffcc66;
+      cursor: pointer;
     }
+    .controls button:hover { background: #ffdd88; }
 
-    .main-btn:hover {
-      background: #ffdd88;
-    }
-
-    .top-btn {
-      font-size: 18px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      background: #eee;
-      margin: 5px;
-    }
-
-    #autoPlayToggle.auto-on {
-      background: #4CAF50;
-      color: white;
-    }
-
-    #autoPlayToggle.auto-off {
-      background: #aaa;
-      color: white;
-    }
   </style>
 </head>
-
 <body>
 
-  <!-- 上部ヘッダー -->
-  <div class="play-header">
-    <button id="homeButton" class="home-btn">🏠 ホーム</button>
-    <button id="editButton" class="edit-btn">✏️ 単語編集</button>
-    <button id="settingsButton" class="settings-btn">⚙️ 設定</button>
-  </div>
+<div class="page-header">
+  <button class="home-btn" onclick="location.href='index.html'">🏠 ホームへ戻る</button>
+</div>
 
-  <h2>ジャンルを選択してください</h2>
+<h1>読み上げ</h1>
 
-  <!-- ジャンル選択（チェックボックス方式） -->
-  <div class="genre-icons" id="genreArea"></div>
+<div class="word-box" id="currentWord">---</div>
 
-  <div class="reading-header">
-    <button id="pauseButton" class="top-btn">⏸ ポーズ</button>
-    <button id="autoPlayToggle" class="top-btn auto-off">自動再生 OFF</button>
-  </div>
+<div class="controls">
+  <button onclick="nextWord()">▶ 次の単語</button>
+  <button onclick="toggleAutoPlay()">⏱ 自動再生</button>
+</div>
 
-  <div id="currentWord">---</div>
-
-  <button id="nextWordBtn" class="main-btn">次の単語</button>
-
-  <p id="remainingCount">残り：0</p>
-
-  <button id="shuffleResetBtn" class="main-btn">🔄 シャッフルして最初から</button>
-
-  <script>
-    /* -------------------------
-       画面遷移
-    ------------------------- */
-    homeButton.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-
-    editButton.addEventListener("click", () => {
-      window.location.href = "edit.html";
-    });
-
-    settingsButton.addEventListener("click", () => {
-      window.location.href = "settings.html";
-    });
-
-    /* -------------------------
-       設定値の読み込み
-    ------------------------- */
-    const settings = JSON.parse(localStorage.getItem("settings") || "{}");
-    const readRate = settings.rate || 1;
-    const readInterval = settings.interval || 6;
-    let autoPlay = settings.autoPlay || false;
-
-    /* -------------------------
-       ジャンル一覧
-    ------------------------- */
-    const genres = [
-      "Number", "Animal", "Color", "Food",
-      "Fruit", "Body", "Insect", "Other"
-    ];
-
-    const genreArea = document.getElementById("genreArea");
-
-    genres.forEach(g => {
-      const div = document.createElement("div");
-      div.className = "genre selected";
-      div.dataset.genre = g;
-
-      div.innerHTML = `
-        <img src="images/${g.toLowerCase()}_icon.png">
-        <p>${g}</p>
-        <input type="checkbox" checked>
-      `;
-
-      div.addEventListener("click", (e) => {
-        if (e.target.tagName !== "INPUT") {
-          const cb = div.querySelector("input");
-          cb.checked = !cb.checked;
-        }
-        div.classList.toggle("selected", div.querySelector("input").checked);
-        loadWords();
-      });
-
-      genreArea.appendChild(div);
-    });
-
-    /* -------------------------
-       単語データ読み込み
-    ------------------------- */
-    let words = [];
-    let shuffled = [];
-    let index = 0;
-    let isPaused = false;
-
-    function loadWords() {
-      const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
-      words = [];
-
-      document.querySelectorAll(".genre").forEach(g => {
-        const cb = g.querySelector("input");
-        if (cb.checked) {
-          const genre = g.dataset.genre;
-          if (data[genre]) words.push(...data[genre]);
-        }
-      });
-
-      shuffleWords();
-    }
-
-    function shuffleWords() {
-      shuffled = [...words];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      index = 0;
-      updateRemaining();
-      currentWord.textContent = "---";
-    }
-
-    function updateRemaining() {
-      remainingCount.textContent = "残り：" + (shuffled.length - index);
-    }
-
-    /* -------------------------
-       読み上げ
-    ------------------------- */
-    function speakWord(word) {
-      const uttr = new SpeechSynthesisUtterance(word);
-      uttr.rate = readRate;
-      speechSynthesis.speak(uttr);
-    }
-
-    nextWordBtn.addEventListener("click", () => {
-      if (index >= shuffled.length) return;
-
-      const word = shuffled[index];
-      currentWord.textContent = word;
-      speakWord(word);
-
-      index++;
-      updateRemaining();
-    });
-
-    /* ポーズ */
-    pauseButton.addEventListener("click", () => {
-      isPaused = !isPaused;
-      pauseButton.textContent = isPaused ? "▶ 再開" : "⏸ ポーズ";
-      if (isPaused) speechSynthesis.pause();
-      else speechSynthesis.resume();
-    });
-
-    /* 自動再生 */
-    const autoBtn = document.getElementById("autoPlayToggle");
-    function updateAutoBtn() {
-      if (autoPlay) {
-        autoBtn.textContent = "自動再生 ON";
-        autoBtn.classList.add("auto-on");
-        autoBtn.classList.remove("auto-off");
-      } else {
-        autoBtn.textContent = "自動再生 OFF";
-        autoBtn.classList.add("auto-off");
-        autoBtn.classList.remove("auto-on");
-      }
-    }
-    updateAutoBtn();
-
-    autoBtn.addEventListener("click", () => {
-      autoPlay = !autoPlay;
-      updateAutoBtn();
-      if (autoPlay) autoPlayLoop();
-    });
-
-    function autoPlayLoop() {
-      if (!autoPlay || isPaused) return;
-
-      nextWordBtn.click();
-
-      if (index < shuffled.length) {
-        setTimeout(autoPlayLoop, readInterval * 1000);
-      }
-    }
-
-    shuffleResetBtn.addEventListener("click", loadWords);
-
-    /* 初回読み込み */
-    loadWords();
-  </script>
+<script src="play.js"></script>
 
 </body>
 </html>
