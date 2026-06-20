@@ -43,10 +43,17 @@
       padding-bottom: 20px;
     }
   </style>
+
+  <script>
+    function openContactForm() {
+      alert("お問い合わせフォームは別の画面（タブ）で開きます。書き終わったら、その画面を閉じてホームに戻ってください。");
+      window.open("https://docs.google.com/forms/あなたのフォームID/viewform", "_blank");
+    }
+  </script>
 </head>
 <body>
 
-  <!-- ロゴ（あなたが生成した画像名に変更してOK） -->
+  <!-- ロゴ（画像名は必要に応じて変更） -->
   <img src="images/logo.png" alt="Studio OZ ロゴ"
        style="width:180px; margin-top:20px; margin-bottom:10px;">
 
@@ -57,7 +64,15 @@
     <button onclick="location.href='settings.html'">⚙️ 設定</button>
     <button onclick="location.href='edit.html'">✏️ 単語編集</button>
     <button onclick="location.href='illustration.html'">🖼️ イラスト集</button>
-    <button onclick="location.href='contact.html'">📮 お問い合わせ</button>
+
+    <button onclick="openContactForm()">📮 お問い合わせ</button>
+
+    <!-- 子ども向けのやさしい説明文 -->
+    <p style="font-size:12px; color:#666; margin-top:5px;">
+      ※ お問い合わせフォームは <strong>別の画面（タブ）</strong> で開きます。<br>
+      　書き終わったら、その画面を <strong>閉じるとホームに戻れます。</strong>
+    </p>
+
     <button onclick="location.href='terms.html'">📃 利用規約</button>
     <button onclick="location.href='privacy.html'">🔒 プライバシーポリシー</button>
   </div>
