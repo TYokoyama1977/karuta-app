@@ -36,7 +36,7 @@
 
   <!-- 単語一覧 -->
   <section>
-    <h2>単語一覧</h2>
+    <h2>単語一覧（単語登録最大20個）</h2>
     <table>
       <thead>
         <tr>
@@ -78,18 +78,18 @@
       // データが無い or 壊れている場合は初期化
       if (!data || typeof data !== "object") {
         data = {
-          number: [],
-          animal: ["dog", "cat"],
-          fruit: [],
-          color: [],
-          insect: [],
-          other: []
+          number: ["one","two","three","four","five","six","seven","eight","nine","ten"],
+          animal: ["dog","cat","rabbit","lion","elephant","giraffe","bear","monkey","horse","sheep"],
+          fruit: ["orange","apple","strawberry","pineapple","banana","peach","grape","watermelon","cherry"],
+          color: ["black","white","red","blue","yellow","green","pink","purple","brown","orange"],
+          insect: ["butterfly","ant","bee","ladybug","beetle","cicada","dragonfly","grasshopper"],
+          other: ["car","bus","table","chair","house","clock","train","food","drink"]
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       }
 
       // カテゴリが欠けていたら補完
-      const categories = ["number", "animal", "fruit", "color", "insect", "other"];
+      const categories = ["number","animal","fruit","color","insect","other"];
       categories.forEach(cat => {
         if (!Array.isArray(data[cat])) data[cat] = [];
       });
@@ -162,6 +162,12 @@
       }
 
       const index = editingIndexInput.value;
+
+      // ★ 20個制限チェック（新規追加のときだけ）
+      if (index === "" && words.length >= 20) {
+        alert("21個目は登録できません");
+        return;
+      }
 
       if (index === "") {
         words.push(word);
