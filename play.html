@@ -1,313 +1,91 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>読み上げ</title>
-  <style>
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background-color: #fff8e7;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-
-    header {
-      background-color: #ffcc66;
-      color: #333;
-      padding: 15px;
-      font-size: 24px;
-      font-weight: bold;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-
-    header button {
-      background-color: #66cc99;
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      font-size: 14px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .genre-selection {
-      margin-top: 20px;
-    }
-
-    .genre-icons {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 25px;
-      margin-top: 10px;
-    }
-
-    .genre {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.2s;
-      width: 100px;
-    }
-
-    .genre-label {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: #333;
-    }
-
-    .genre img {
-      width: 80px;
-      height: 80px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      background-color: #fff;
-    }
-
-    .genre:hover {
-      transform: scale(1.1);
-    }
-
-    .genre input[type="checkbox"] {
-      margin-top: 8px;
-      transform: scale(1.5);
-      cursor: pointer;
-    }
-
-    .settings {
-      margin-top: 20px;
-      background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      width: 80%;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-
-    .setting-item {
-      margin-top: 10px;
-      font-size: 16px;
-    }
-
-    .setting-item input[type=range] {
-      width: 60%;
-    }
-
-    .controls {
-      margin-top: 30px;
-    }
-
-    button {
-      background-color: #66cc99;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      margin: 5px;
-    }
-
-    button:hover {
-      background-color: #55aa88;
-    }
-
-    #currentWord {
-      font-size: 28px;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #333;
-      min-height: 40px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>読み上げ</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .genreBox { margin-bottom: 10px; }
+        #displayWord { font-size: 40px; margin-top: 20px; font-weight: bold; }
+    </style>
 </head>
 <body>
 
-  <header>
-    <div>読み上げ</div>
-    <button onclick="location.href='index.html'">ホームに戻る</button>
-  </header>
+<h2>読み上げ</h2>
 
-  <div class="genre-selection">
-    <h2>ジャンルを選択</h2>
-    <div class="genre-icons">
+<div class="genreBox">
+    <label><input type="checkbox" value="number" onchange="updateWordList()"> Number</label>
+    <label><input type="checkbox" value="animal" onchange="updateWordList()"> Animal</label>
+    <label><input type="checkbox" value="fruit" onchange="updateWordList()"> Fruit</label>
+    <label><input type="checkbox" value="color" onchange="updateWordList()"> Color</label>
+    <label><input type="checkbox" value="insect" onchange="updateWordList()"> Insect</label>
+    <label><input type="checkbox" value="other" onchange="updateWordList()"> Other</label>
+</div>
 
-      <div class="genre" data-genre="number">
-        <div class="genre-label">Number</div>
-        <img src="images/number_icon.png" alt="Number">
-        <input type="checkbox" class="genreCheck" value="number">
-      </div>
+<div id="wordCount">選択中の単語数: 0 個</div>
+<div id="remainingCount">残り: 0 個</div>
 
-      <div class="genre" data-genre="animal">
-        <div class="genre-label">Animal</div>
-        <img src="images/animal_icon.png" alt="Animal">
-        <input type="checkbox" class="genreCheck" value="animal">
-      </div>
+<button onclick="nextWord()">次の単語を読み上げ</button>
 
-      <div class="genre" data-genre="fruit">
-        <div class="genre-label">Fruit</div>
-        <img src="images/fruit_icon.png" alt="Fruit">
-        <input type="checkbox" class="genreCheck" value="fruit">
-      </div>
+<div id="displayWord">---</div>
 
-      <div class="genre" data-genre="color">
-        <div class="genre-label">Color</div>
-        <img src="images/color_icon.png" alt="Color">
-        <input type="checkbox" class="genreCheck" value="color">
-      </div>
+<br><br>
+<a href="index.html">ホームに戻る</a>
 
-      <div class="genre" data-genre="insect">
-        <div class="genre-label">Insect</div>
-        <img src="images/insect_icon.png" alt="Insect">
-        <input type="checkbox" class="genreCheck" value="insect">
-      </div>
+<script>
+let words = JSON.parse(localStorage.getItem("words"));
+let remainingWords = [];
 
-      <div class="genre" data-genre="other">
-        <div class="genre-label">Other</div>
-        <img src="images/other_icon.png" alt="Other">
-        <input type="checkbox" class="genreCheck" value="other">
-      </div>
+function getSelectedGenres() {
+    return [...document.querySelectorAll("input[type=checkbox]:checked")].map(cb => cb.value);
+}
 
-    </div>
-  </div>
+function updateWordList() {
+    const selected = getSelectedGenres();
+    let allWords = [];
 
-  <div class="settings">
-    <h3>読み上げ設定</h3>
+    selected.forEach(g => allWords = allWords.concat(words[g]));
 
-    <div class="setting-item">
-      <label>読み上げ速度: </label>
-      <span id="rateValue">1</span>
-      <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
-    </div>
+    remainingWords = shuffleArray(allWords);
 
-    <div class="setting-item">
-      <label>読み上げ間隔（秒）: </label>
-      <span id="intervalValue">6</span>
-      <input type="range" id="intervalSlider" min="1" max="10" step="1" value="6">
-    </div>
-  </div>
+    document.getElementById("wordCount").textContent =
+        `選択中の単語数: ${allWords.length} 個`;
 
-  <div class="controls">
-    <button id="playButton">自動再生 ON</button>
-    <button id="nextButton">次の単語を読み上げ</button>
-    <div id="currentWord"></div>
-  </div>
+    document.getElementById("remainingCount").textContent =
+        `残り: ${remainingWords.length} 個`;
+}
 
-  <script>
-    /* ------------------------------
-       バージョン管理（自動更新）
-    ------------------------------ */
-    const STORAGE_KEY = "words";
-    const VERSION_KEY = "version";
-    const APP_VERSION = "1.0.0";
-
-    function ensureLatestVersion() {
-      const savedVersion = localStorage.getItem(VERSION_KEY);
-
-      if (savedVersion !== APP_VERSION) {
-        console.log("play.html: データバージョンが古いため再初期化します");
-
-        const data = {
-          number: ["one","two","three","four","five","six","seven","eight","nine","ten"],
-          animal: ["dog","cat","rabbit","lion","elephant","giraffe","bear","monkey","horse","sheep"],
-          fruit: ["orange","apple","strawberry","pineapple","banana","peach","grape","watermelon","cherry"],
-          color: ["black","white","red","blue","yellow","green","pink","purple","brown","orange"],
-          insect: ["butterfly","ant","bee","ladybug","beetle","cicada","dragonfly","grasshopper"],
-          other: ["car","bus","table","chair","house","clock","train","food","drink"]
-        };
-
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        localStorage.setItem(VERSION_KEY, APP_VERSION);
-      }
+function nextWord() {
+    if (remainingWords.length === 0) {
+        speak("No more words");
+        document.getElementById("displayWord").textContent = "終了";
+        return;
     }
 
-    ensureLatestVersion();
+    const word = remainingWords.shift();
+    speak(word);
 
-    /* ------------------------------
-       読み上げ機能
-    ------------------------------ */
+    document.getElementById("displayWord").textContent = word;
 
-    const playButton = document.getElementById("playButton");
-    const nextButton = document.getElementById("nextButton");
-    const currentWord = document.getElementById("currentWord");
+    document.getElementById("remainingCount").textContent =
+        `残り: ${remainingWords.length} 個`;
+}
 
-    const rateSlider = document.getElementById("rateSlider");
-    const intervalSlider = document.getElementById("intervalSlider");
-    const rateValue = document.getElementById("rateValue");
-    const intervalValue = document.getElementById("intervalValue");
+function speak(text) {
+    const uttr = new SpeechSynthesisUtterance(text);
+    uttr.lang = "en-US";
+    speechSynthesis.speak(uttr);
+}
 
-    let autoPlay = false;
-    let timer = null;
-
-    rateSlider.addEventListener("input", () => {
-      rateValue.textContent = rateSlider.value;
-    });
-
-    intervalSlider.addEventListener("input", () => {
-      intervalValue.textContent = intervalSlider.value;
-    });
-
-    document.querySelectorAll(".genre").forEach(box => {
-      box.addEventListener("click", () => {
-        const checkbox = box.querySelector("input[type='checkbox']");
-        checkbox.checked = !checkbox.checked;
-      });
-    });
-
-    function getWordsByGenre(genre) {
-      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-      return data[genre] || [];
+function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
     }
-
-    function getRandomWord() {
-      const checked = [...document.querySelectorAll(".genreCheck:checked")].map(c => c.value);
-      if (checked.length === 0) return null;
-
-      let allWords = [];
-      checked.forEach(g => {
-        allWords = allWords.concat(getWordsByGenre(g));
-      });
-
-      if (allWords.length === 0) return null;
-
-      return allWords[Math.floor(Math.random() * allWords.length)];
-    }
-
-    function speakWord() {
-      const word = getRandomWord();
-      if (!word) return;
-
-      currentWord.textContent = word;
-
-      const uttr = new SpeechSynthesisUtterance(word);
-      uttr.rate = parseFloat(rateSlider.value);
-      speechSynthesis.speak(uttr);
-    }
-
-    playButton.addEventListener("click", () => {
-      autoPlay = !autoPlay;
-
-      playButton.textContent = autoPlay ? "自動再生 OFF" : "自動再生 ON";
-      playButton.style.backgroundColor = autoPlay ? "#66cc99" : "#aaa";
-
-      if (autoPlay) {
-        timer = setInterval(speakWord, intervalSlider.value * 1000);
-      } else {
-        clearInterval(timer);
-      }
-    });
-
-    nextButton.addEventListener("click", speakWord);
-  </script>
+    return a;
+}
+</script>
 
 </body>
 </html>

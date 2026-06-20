@@ -1,208 +1,138 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>単語編集</title>
-  <style>
-    body { font-family: system-ui, sans-serif; padding: 16px; }
-    h1 { margin-bottom: 8px; }
-    label { display: block; margin-top: 8px; }
-    input, select, button { margin-top: 4px; }
-    table { border-collapse: collapse; margin-top: 16px; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 4px 8px; text-align: left; }
-    .row-actions button { margin-right: 4px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>単語編集</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        td { border-bottom: 1px solid #ccc; padding: 6px; }
+        button { padding: 5px 10px; }
+    </style>
 </head>
 <body>
-  <h1>単語編集</h1>
-  <a href="index.html">ホームに戻る</a>
 
-  <!-- カテゴリ選択 -->
-  <section>
-    <h2>カテゴリ選択</h2>
-    <label>
-      カテゴリ:
-      <select id="categorySelect">
-        <option value="number">Number</option>
-        <option value="animal">Animal</option>
-        <option value="fruit">Fruit</option>
-        <option value="color">Color</option>
-        <option value="insect">Insect</option>
-        <option value="other">Other</option>
-      </select>
-    </label>
-    <button id="loadWordsBtn">このカテゴリの単語を読み込む</button>
-  </section>
+<h2>単語編集（最大20個）</h2>
 
-  <!-- 単語一覧 -->
-  <section>
-    <h2>単語一覧（単語登録最大20個）</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>英単語</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody id="wordsTableBody"></tbody>
-    </table>
-  </section>
+<select id="genreSelect" onchange="renderWordList()">
+    <option value="number">Number</option>
+    <option value="animal">Animal</option>
+    <option value="fruit">Fruit</option>
+    <option value="color">Color</option>
+    <option value="insect">Insect</option>
+    <option value="other">Other</option>
+</select>
 
-  <!-- 単語追加・編集フォーム -->
-  <section>
-    <h2>単語追加 / 編集</h2>
-    <input type="hidden" id="editingIndex" />
+<div id="wordList"></div>
 
-    <label>
-      英単語:
-      <input type="text" id="wordInput" />
-    </label>
+<input type="text" id="newWord" placeholder="単語を入力">
+<button onclick="addWord()">追加</button>
 
-    <button id="saveWordBtn">保存</button>
-    <button id="cancelEditBtn">編集キャンセル</button>
-  </section>
+<br><br>
+<a href="index.html">ホームに戻る</a>
 
-  <script>
-    /* ------------------------------
-       バージョン管理（自動更新）
-    ------------------------------ */
-    const STORAGE_KEY = "words";
-    const VERSION_KEY = "version";
-    const APP_VERSION = "1.0.0";
+<script>
+const APP_VERSION = "1.0.0";
 
-    function loadStorage() {
-      let data = null;
-      let savedVersion = localStorage.getItem(VERSION_KEY);
+const initialWords = {
+    number: ["one","two","three","four","five","six","seven","eight","nine","ten"],
+    animal: ["dog","cat","rabbit","lion","elephant","giraffe","bear","monkey","horse","sheep","gorilla"],
+    fruit: ["orange","apple","strawberry","pineapple","banana","peach","grape","watermelon","cherry"],
+    color: ["black","white","red","blue","yellow","green","pink","purple","brown","orange"],
+    insect: ["butterfly","ant","bee","ladybug","beetle","cicada","dragonfly","grasshopper"],
+    other: ["car","bus","table","chair","house","clock","train","food","drink"]
+};
 
-      try {
-        data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      } catch (e) {
-        console.warn("localStorage が壊れていたため初期化します");
-      }
+let words = {};
 
-      // ★ バージョンが違う or データが無い → 初期化
-      if (!data || savedVersion !== APP_VERSION) {
-        console.log("edit.html: データバージョンが古いため再初期化します");
+function loadData() {
+    const saved = JSON.parse(localStorage.getItem("words"));
+    const savedVersion = localStorage.getItem("version");
 
-        data = {
-          number: ["one","two","three","four","five","six","seven","eight","nine","ten"],
-          animal: ["dog","cat","rabbit","lion","elephant","giraffe","bear","monkey","horse","sheep"],
-          fruit: ["orange","apple","strawberry","pineapple","banana","peach","grape","watermelon","cherry"],
-          color: ["black","white","red","blue","yellow","green","pink","purple","brown","orange"],
-          insect: ["butterfly","ant","bee","ladybug","beetle","cicada","dragonfly","grasshopper"],
-          other: ["car","bus","table","chair","house","clock","train","food","drink"]
-        };
-
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        localStorage.setItem(VERSION_KEY, APP_VERSION);
-      }
-
-      return data;
+    if (!saved || savedVersion !== APP_VERSION) {
+        words = JSON.parse(JSON.stringify(initialWords));
+        localStorage.setItem("words", JSON.stringify(words));
+        localStorage.setItem("version", APP_VERSION);
+    } else {
+        words = saved;
     }
 
-    function saveStorage(data) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    // 誤字修正
+    if (words.animal) {
+        const idx = words.animal.indexOf("golira");
+        if (idx !== -1) {
+            words.animal[idx] = "gorilla";
+            localStorage.setItem("words", JSON.stringify(words));
+        }
     }
+}
 
-    /* ------------------------------
-       UI 操作
-    ------------------------------ */
+function renderWordList() {
+    const listArea = document.getElementById("wordList");
+    listArea.innerHTML = "";
 
-    const categorySelect = document.getElementById("categorySelect");
-    const loadWordsBtn = document.getElementById("loadWordsBtn");
-    const wordsTableBody = document.getElementById("wordsTableBody");
-    const editingIndexInput = document.getElementById("editingIndex");
-    const wordInput = document.getElementById("wordInput");
-    const saveWordBtn = document.getElementById("saveWordBtn");
-    const cancelEditBtn = document.getElementById("cancelEditBtn");
+    const genre = document.getElementById("genreSelect").value;
+    const list = words[genre];
 
-    function loadWords() {
-      const category = categorySelect.value;
-      const data = loadStorage();
-      const words = data[category];
+    const countText = document.createElement("div");
+    countText.textContent = `現在 ${list.length} / 20 個`;
+    countText.style.fontWeight = "bold";
+    listArea.appendChild(countText);
 
-      if (words.length === 0) {
-        wordsTableBody.innerHTML = '<tr><td colspan="2">単語がありません。</td></tr>';
-        return;
-      }
+    const table = document.createElement("table");
 
-      wordsTableBody.innerHTML = "";
-      words.forEach((word, index) => {
-        const tr = document.createElement("tr");
+    list.forEach((word, index) => {
+        const row = document.createElement("tr");
 
-        tr.innerHTML = `
-          <td>${word}</td>
-          <td class="row-actions">
-            <button onclick="startEdit(${index})">編集</button>
-            <button onclick="deleteWord(${index})">削除</button>
-          </td>
-        `;
+        const noCell = document.createElement("td");
+        noCell.textContent = index + 1;
+        row.appendChild(noCell);
 
-        wordsTableBody.appendChild(tr);
-      });
-    }
+        const wordCell = document.createElement("td");
+        wordCell.textContent = word;
+        row.appendChild(wordCell);
 
-    function startEdit(index) {
-      const category = categorySelect.value;
-      const data = loadStorage();
-      const words = data[category];
+        const actionCell = document.createElement("td");
 
-      editingIndexInput.value = index;
-      wordInput.value = words[index];
-    }
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "削除";
+        delBtn.onclick = () => deleteWord(genre, index);
 
-    function clearForm() {
-      editingIndexInput.value = "";
-      wordInput.value = "";
-    }
+        actionCell.appendChild(delBtn);
+        row.appendChild(actionCell);
 
-    function saveWord() {
-      const category = categorySelect.value;
-      const data = loadStorage();
-      const words = data[category];
+        table.appendChild(row);
+    });
 
-      const word = wordInput.value.trim();
-      if (!word) {
-        alert("英単語を入力してください。");
-        return;
-      }
+    listArea.appendChild(table);
+}
 
-      const index = editingIndexInput.value;
+function addWord() {
+    const genre = document.getElementById("genreSelect").value;
+    const newWord = document.getElementById("newWord").value.trim();
 
-      // ★ 20個制限チェック（新規追加のときだけ）
-      if (index === "" && words.length >= 20) {
+    if (!newWord) return;
+
+    if (words[genre].length >= 20) {
         alert("21個目は登録できません");
         return;
-      }
-
-      if (index === "") {
-        words.push(word);
-      } else {
-        words[index] = word;
-      }
-
-      saveStorage(data);
-      clearForm();
-      loadWords();
     }
 
-    function deleteWord(index) {
-      const category = categorySelect.value;
-      const data = loadStorage();
-      const words = data[category];
+    words[genre].push(newWord);
+    localStorage.setItem("words", JSON.stringify(words));
+    document.getElementById("newWord").value = "";
+    renderWordList();
+}
 
-      if (!confirm("この単語を削除しますか？")) return;
+function deleteWord(genre, index) {
+    words[genre].splice(index, 1);
+    localStorage.setItem("words", JSON.stringify(words));
+    renderWordList();
+}
 
-      words.splice(index, 1);
-      saveStorage(data);
-      loadWords();
-    }
+loadData();
+renderWordList();
+</script>
 
-    loadWordsBtn.addEventListener("click", loadWords);
-    saveWordBtn.addEventListener("click", saveWord);
-    cancelEditBtn.addEventListener("click", clearForm);
-
-    loadWords();
-  </script>
 </body>
 </html>
