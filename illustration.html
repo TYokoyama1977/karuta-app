@@ -175,7 +175,12 @@
 
         /* ★ イラスト画像を読み込む（img/word.png） */
         const img = document.createElement("img");
-        img.src = `img/${word}.png`;
+        +        /* Animal ジャンルの画像だけ images/animal に切り替え */
++        if (key === "Animal" && ["dog","cat","bird","rabbit","lion","bear"].includes(word)) {
++          img.src = `images/animal/${word}.png`;
++        } else {
++          img.src = `img/${word}.png`;
++        }
         img.alt = word;
 
         const w = document.createElement("div");
