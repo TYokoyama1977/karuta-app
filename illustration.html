@@ -64,22 +64,23 @@
       display: block;
     }
 
-    /* ★ カルタカード（9cm × 6cm） */
+    /* ★ 2×5（10枚）カルタカード配置：境界ゼロ・枠線太め */
     .card-grid {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto 20px auto;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(2, 9cm); /* 横2枚 */
+      grid-template-rows: repeat(5, 6cm);    /* 縦5枚 */
+      width: 18cm;
+      height: 30cm;
+      margin: 0 auto;
+      padding: 0;
     }
 
     .card {
       width: 9cm;
       height: 6cm;
-      border: 2px solid #000;
-      border-radius: 8px;
-      margin: 6px;
+      border: 3px solid #000; /* ← 枠線太め */
+      border-radius: 0;
+      margin: 0; /* ← 境界ゼロ（カード同士がピッタリ） */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -97,8 +98,12 @@
       font-size: 22px;
     }
 
-    /* ★ 印刷時はメニューを非表示にする */
+    /* ★ 印刷時は A4 横向きに固定し、メニュー非表示 */
     @media print {
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
       .illust-header,
       .nav,
       h1 {
@@ -106,9 +111,6 @@
       }
       body {
         margin: 0;
-      }
-      .page {
-        page-break-after: always;
       }
     }
   </style>
