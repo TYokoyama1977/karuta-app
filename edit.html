@@ -155,12 +155,15 @@
   <!-- ジャンル選択（チェックボックス方式） -->
   <div class="genre-icons" id="genreArea"></div>
 
-  <div class="word-list" id="wordList"></div>
-
+  <!-- ★ 追加：単語追加フォームをジャンル選択の直後へ移動 -->
   <div class="add-area">
     <input type="text" id="newWordInput" placeholder="単語を追加">
     <button id="addWordBtn">追加</button>
   </div>
+
+  <div class="word-list" id="wordList"></div>
+
+
 
   <p class="save-info">※ 各ジャンル 最大20個まで保存されます</p>
 
@@ -261,8 +264,21 @@
         const div = document.createElement("div");
         div.className = "word-item";
 
+        /* ★ 追加：連番表示 */
+        const numSpan = document.createElement("span");
+        numSpan.textContent = (idx + 1) + ". ";
+        numSpan.style.marginRight = "8px";
+        numSpan.style.fontWeight = "bold";
+
         const input = document.createElement("input");
         input.value = w;
+
+        /* ★ 追加：編集不可にする */
+        input.readOnly = true;
+        input.style.background = "#eee";
+        input.style.cursor = "default";
+
+
         input.addEventListener("change", () => {
           wordsData[currentGenre][idx] = input.value.trim();
           saveData();
@@ -277,6 +293,8 @@
           renderWords();
         });
 
+ 
+        div.appendChild(numSpan);  /* ★ 追加：番号を左側に追加 */
         div.appendChild(input);
         div.appendChild(delBtn);
         wordList.appendChild(div);
