@@ -72,7 +72,7 @@
 
     /* 読み上げ部分 */
     #currentWord {
-      font-size: 40px;
+      font-size: 80px;
       margin-top: 30px;
       color: #333;
     }
@@ -124,6 +124,10 @@
 
   <!-- ジャンル選択（チェックボックス方式） -->
   <div class="genre-icons" id="genreArea"></div>
+  <div style="margin-top:10px;">
+    <button id="checkAllBtn" class="top-btn">全ジャンルチェック</button>
+    <button id="clearCheckBtn" class="top-btn">チェッククリア</button>
+  </div>
 
   <div class="reading-header">
     <button id="pauseButton" class="top-btn">⏸ ポーズ</button>
@@ -136,6 +140,7 @@
   <div id="currentWord">---</div>
 
   <button id="nextWordBtn" class="main-btn">次の単語</button>
+  <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ スタート</button>
 
   <p id="remainingCount">残り：0</p>
 
@@ -177,13 +182,13 @@
 
     genres.forEach(g => {
       const div = document.createElement("div");
-      div.className = "genre selected";
+      div.className = "genre";   /* ← デフォルトはチェックなし */
       div.dataset.genre = g;
 
       div.innerHTML = `
         <img src="images/${g.toLowerCase()}_icon.png">
         <p>${g}</p>
-        <input type="checkbox" checked>
+        <input type="checkbox">
       `;
 
       div.addEventListener("click", (e) => {
@@ -196,6 +201,25 @@
       });
 
       genreArea.appendChild(div);
+    });
+
+    /* ★ genres.forEach の外へ移動（最小変更） */
+    document.getElementById("checkAllBtn").addEventListener("click", () => {
+      document.querySelectorAll(".genre").forEach(g => {
+        const cb = g.querySelector("input");
+        cb.checked = true;
+        g.classList.add("selected");
+      });
+      loadWords();
+    });
+
+    document.getElementById("clearCheckBtn").addEventListener("click", () => {
+      document.querySelectorAll(".genre").forEach(g => {
+        const cb = g.querySelector("input");
+        cb.checked = false;
+        g.classList.remove("selected");
+      });
+      loadWords();
     });
 
     /* -------------------------
@@ -242,6 +266,14 @@
     function speakWord(word) {
       const uttr = new SpeechSynthesisUtterance(word);
       uttr.rate = readRate;
+      const voices = speechSynthesis.getVoices();
+      const v = settings.voice || "female";
+      uttr.voice = voices.find(vv =>
+        (v === "male" && vv.name.toLowerCase().includes("male")) ||
+        (v === "female" && vv.name.toLowerCase().includes("female")) ||
+        (v === "boy" && vv.name.toLowerCase().includes("boy")) ||
+        (v === "girl" && vv.name.toLowerCase().includes("girl"))
+      ) || null;
       speechSynthesis.speak(uttr);
     }
 
@@ -302,7 +334,6 @@
       localStorage.setItem("settings", JSON.stringify(settings));
     });
 
-
     function autoPlayLoop() {
       if (!autoPlay || isPaused) return;
 
@@ -315,9 +346,18 @@
 
     shuffleResetBtn.addEventListener("click", loadWords);
 
+    /* ★ startBtn のイベントリスナー（正しい位置へ移動） */
+    startBtn.addEventListener("click", () => {
+      if (shuffled.length === 0) return;
+      index = 0;
+      nextWordBtn.click();
+      if (autoPlay) autoPlayLoop();
+    });
+
     /* 初回読み込み */
     loadWords();
   </script>
+
   <footer>
     © 2026 Studio OZ
   </footer>
