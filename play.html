@@ -265,12 +265,21 @@
       updateRemaining();
     });
 
+    /* ▼▼▼ 修正箇所（最小変更） ▼▼▼ */
     pauseButton.addEventListener("click", () => {
       isPaused = !isPaused;
       pauseButton.textContent = isPaused ? "▶ 再開" : "⏸ ポーズ";
-      if (isPaused) speechSynthesis.pause();
-      else speechSynthesis.resume();
+
+      if (isPaused) {
+        speechSynthesis.cancel();
+      } else {
+        const current = currentWord.textContent;
+        if (current && current !== "---") {
+          speakWord(current);
+        }
+      }
     });
+    /* ▲▲▲ 修正箇所ここまで ▲▲▲ */
 
     const autoBtn = document.getElementById("autoPlayToggle");
     function updateAutoBtn() {
