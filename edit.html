@@ -65,12 +65,6 @@
       height: 70px;
     }
 
-    /* Number と Insect を非表示にする */
-    .genre[data-genre="Number"],
-    .genre[data-genre="Insect"] {
-      display: none;
-    }
-
     /* 選択状態の視覚効果 */
     .genre.selected {
       border: 3px solid #ffcc33;
@@ -168,7 +162,6 @@
     <button id="addWordBtn">追加</button>
   </div>
 
-  <!-- 説明文をここへ移動 -->
   <p class="save-info">※ 各ジャンル 最大20個まで保存されます</p>
 
   <div class="word-list" id="wordList"></div>
@@ -189,16 +182,11 @@
        初期データ
     ------------------------- */
     const defaultWordsData = {
-      Number: [
-        "one","two","three","four","five","six","seven","eight",
-        "nine","ten","eleven","twelve"
-      ],
-      Animal: ["dog","cat","bird","fish","rabbit","bear","lion","horse"],
+      Animal: ["dog","cat","bird","fish","rabbit","bear","lion","horse","elephant","zebra"],
       Color: ["red","blue","yellow","green","black","white","pink","purple"],
       Food: ["bread","rice","milk","egg","soup","cake","cheese","juice"],
       Fruit: ["apple","banana","orange","grape","peach","lemon","melon","strawberry"],
       Body: ["head","hand","foot","eye","ear","nose","mouth","hair"],
-      Insect: ["ant","bee","butterfly","beetle","spider","dragonfly","ladybug","grasshopper"],
       Other: ["car","house","book","chair","clock","cup","ball","star"]
     };
 
@@ -212,12 +200,12 @@
        ジャンル選択 UI
     ------------------------- */
     const genres = [
-      "Number", "Animal", "Color", "Food",
-      "Fruit", "Body", "Insect", "Other"
+      "Animal", "Color", "Food",
+      "Fruit", "Body", "Other"
     ];
 
     const genreArea = document.getElementById("genreArea");
-    let currentGenre = "Number";
+    let currentGenre = "Animal";
 
     genres.forEach(g => {
       const div = document.createElement("div");
