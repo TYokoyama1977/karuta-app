@@ -20,31 +20,15 @@
 
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(3, 200px);
-      grid-template-rows: repeat(3, 300px);
-      width: 600px;
-      height: 900px;
+      grid-template-columns: repeat(3, 192px);
+      grid-template-rows: repeat(3, 285px);
+      width: 576px;
+      height: 855px;
       margin: 0 auto;
       padding: 0;
 
-      /* 正しい点線格子（縦200px・横300px） */
-      background-image:
-        repeating-linear-gradient(
-          to bottom,
-          #000 0 2px,
-          transparent 2px 6px
-        ),
-        repeating-linear-gradient(
-          to right,
-          #000 0 2px,
-          transparent 2px 6px
-        );
-      background-size:
-        200px 100%,
-        100% 300px;
-      background-position:
-        0 0,
-        0 0;
+      /* カード同士の間に余白を入れる（②案） */
+      gap: 12px;
     }
 
     .card {
