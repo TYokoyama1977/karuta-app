@@ -14,8 +14,9 @@
     }
     h1 {
       margin-top: 10px;
-      font-size: 32px;
-      color: #333;
+      font-size: 40px;
+      color: #444;
+      font-family: "Yomogi", "Kosugi Maru", "Comic Sans MS", sans-serif;
     }
     .menu {
       margin-top: 30px;
@@ -53,8 +54,7 @@
 </head>
 <body>
 
-  <img src="images/logo.png" alt="Studio OZ ロゴ"
-       style="width:180px; margin-top:20px; margin-bottom:10px;">
+  <!-- 上部ロゴは削除（フッターへ移動） -->
 
   <h1>読み上げかるた</h1>
 
@@ -64,13 +64,16 @@
     <button onclick="location.href='edit.html'">✏️ 単語編集</button>
     <button onclick="location.href='illustration.html'">🖼️ イラスト集</button>
     <button onclick="openContactForm()">📮 お問い合わせ</button>
-    <button onclick="location.href='terms_of_use.html'">❓ ヘルプ</button>
+    <button onclick="location.href='help.html'">❓ ヘルプ</button>
     <button onclick="location.href='terms.html'">📃 利用規約</button>
     <button onclick="location.href='privacy.html'">🔒 プライバシーポリシー</button>
   </div>
 
   <footer>
-    © 2026 Studio OZ<br>
+    <div style="display:flex; justify-content:center; align-items:center; gap:10px;">
+      <span>© 2026 Studio OZ</span>
+      <img src="images/logo.png" alt="Studio OZ ロゴ" style="height:30px;">
+    </div>
     Version: 1.0.5
   </footer>
 
