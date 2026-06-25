@@ -50,10 +50,14 @@
 
   <div class="illust-header">
     <button class="home-btn" onclick="goHome()">🏠 ホームに戻る</button>
-    <span>ジャンルを選んで印刷ページへ</span>
+    <!-- 説明文削除 -->
   </div>
 
   <h1>イラスト集</h1>
+
+  <div style="font-size:16px; margin-bottom:10px;">
+    初期登録されている英単語のイラストを印刷することできます。
+  </div>
 
   <div class="nav" id="nav"></div>
 
@@ -70,13 +74,11 @@
     }
 
     const data = {
-      "Number": ["one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve"],
       "Animal": ["dog","cat","bird","fish","rabbit","bear","lion","horse"],
       "Color": ["red","blue","yellow","green","black","white","pink","purple"],
       "Food": ["bread","rice","milk","egg","soup","cake","cheese","juice"],
       "Fruit": ["apple","banana","orange","grape","peach","lemon","melon","strawberry"],
       "Body": ["head","hand","foot","eye","ear","nose","mouth","hair"],
-      "Insect": ["ant","bee","butterfly","beetle","spider","dragonfly","ladybug","grasshopper"],
       "Other": ["car","house","book","chair","clock","cup","ball","star"]
     };
 
