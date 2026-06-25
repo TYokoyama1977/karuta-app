@@ -88,6 +88,10 @@
 
   <div class="settings-box">
 
+    <button id="resetWordsButton" class="save-btn" style="background:#d9534f;margin-bottom:20px;">
+      単語帳データをリセットする
+    </button>
+
     <div class="setting-item">
       <label>読み上げ速度： <span id="rateValue">1</span></label>
       <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
@@ -105,7 +109,6 @@
       </label>
     </div>
 
-
     <div class="setting-item">
       <label>声の種類：</label>
       <select id="voiceSelect">
@@ -115,7 +118,6 @@
         <option value="girl">女の子</option>
       </select>
     </div>
-
 
     <button id="saveButton" class="save-btn">保存する</button>
 
@@ -141,7 +143,6 @@
     const autoPlayCheck = document.getElementById("autoPlayCheck");
     const voiceSelect = document.getElementById("voiceSelect");
 
-    /* ★ 修正：保存済みの設定値を正しく反映 */
     rateSlider.value = (settings.rate !== undefined) ? settings.rate : 1;
     intervalSlider.value = (settings.interval !== undefined) ? settings.interval : 6;
 
@@ -168,13 +169,22 @@
         interval: parseInt(intervalSlider.value),
         autoPlay: autoPlayCheck.checked,
         voice: voiceSelect.value
-
       };
 
       localStorage.setItem("settings", JSON.stringify(newSettings));
 
       saveMsg.textContent = "保存しました！";
       setTimeout(() => saveMsg.textContent = "", 2000);
+    });
+
+    /* -------------------------
+       単語帳データリセット
+    ------------------------- */
+    resetWordsButton.addEventListener("click", () => {
+      if (confirm("単語帳データを初期状態に戻しますか？")) {
+        localStorage.removeItem("wordsData");
+        alert("単語帳データを初期化しました！");
+      }
     });
   </script>
 
