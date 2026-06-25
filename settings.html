@@ -82,15 +82,12 @@
 
   <div class="settings-header">
     <button id="homeButton" class="home-btn">🏠 ホームに戻る</button>
+    <button id="playButton" class="home-btn">🔊 読み上げへ</button>
   </div>
 
   <h1>設定</h1>
 
   <div class="settings-box">
-
-    <button id="resetWordsButton" class="save-btn" style="background:#d9534f;margin-bottom:20px;">
-      単語帳データをリセットする
-    </button>
 
     <div class="setting-item">
       <label>読み上げ速度： <span id="rateValue">1</span></label>
@@ -120,22 +117,27 @@
     </div>
 
     <button id="saveButton" class="save-btn">保存する</button>
-
     <div id="saveMsg" class="save-msg"></div>
+
+    <button id="resetWordsButton" class="save-btn" style="background:#d9534f;margin-top:20px;">
+      単語帳データをリセットする
+    </button>
+
+    <p style="margin-top:10px; font-size:14px; color:#555;">
+      ※リセットすると初期登録されていた各ジャンル単語10個に戻ります。
+    </p>
 
   </div>
 
   <script>
-    /* -------------------------
-       画面遷移
-    ------------------------- */
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
 
-    /* -------------------------
-       設定読み込み
-    ------------------------- */
+    playButton.addEventListener("click", () => {
+      window.location.href = "play.html";
+    });
+
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 
     const rateSlider = document.getElementById("rateSlider");
@@ -160,9 +162,6 @@
       intervalValue.textContent = intervalSlider.value;
     });
 
-    /* -------------------------
-       保存処理
-    ------------------------- */
     saveButton.addEventListener("click", () => {
       const newSettings = {
         rate: parseFloat(rateSlider.value),
@@ -177,9 +176,6 @@
       setTimeout(() => saveMsg.textContent = "", 2000);
     });
 
-    /* -------------------------
-       単語帳データリセット
-    ------------------------- */
     resetWordsButton.addEventListener("click", () => {
       if (confirm("単語帳データを初期状態に戻しますか？")) {
         localStorage.removeItem("wordsData");
