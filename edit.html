@@ -14,7 +14,6 @@
       text-align: center;
     }
 
-    /* 上部ヘッダー */
     .edit-header {
       padding: 10px;
       display: flex;
@@ -41,7 +40,6 @@
       color: #444;
     }
 
-    /* ジャンルアイコン */
     .genre-icons {
       display: flex;
       flex-wrap: wrap;
@@ -65,7 +63,6 @@
       height: 70px;
     }
 
-    /* 選択状態の視覚効果 */
     .genre.selected {
       border: 3px solid #ffcc33;
       background: #fff7cc;
@@ -76,7 +73,6 @@
       transform: scale(1.3);
     }
 
-    /* 単語リスト（2列） */
     .word-list {
       margin-top: 20px;
       width: 90%;
@@ -167,9 +163,6 @@
   <div class="word-list" id="wordList"></div>
 
   <script>
-    /* -------------------------
-       画面遷移
-    ------------------------- */
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
@@ -178,16 +171,13 @@
       window.location.href = "play.html";
     });
 
-    /* -------------------------
-       初期データ
-    ------------------------- */
     const defaultWordsData = {
       Animal: ["dog","cat","bird","fish","rabbit","bear","lion","horse","elephant","zebra"],
-      Color: ["red","blue","yellow","green","black","white","pink","purple"],
-      Food: ["bread","rice","milk","egg","soup","cake","cheese","juice"],
-      Fruit: ["apple","banana","orange","grape","peach","lemon","melon","strawberry"],
-      Body: ["head","hand","foot","eye","ear","nose","mouth","hair"],
-      Other: ["car","house","book","chair","clock","cup","ball","star"]
+      Color: ["red","blue","yellow","green","black","white","pink","purple","brown","gray"],
+      Food: ["bread","rice","milk","egg","soup","cake","cheese","juice","hamburger","cake"],
+      Fruit: ["apple","banana","orange","grape","peach","lemon","melon","strawberry","kiwi","watermelon"],
+      Body: ["head","hand","foot","eye","ear","nose","mouth","hair","elbow","knee"],
+      Other: ["car","house","book","chair","clock","cup","ball","star","table","chopsticks"]
     };
 
     let wordsData = JSON.parse(localStorage.getItem("wordsData") || "null");
@@ -196,9 +186,6 @@
       localStorage.setItem("wordsData", JSON.stringify(wordsData));
     }
 
-    /* -------------------------
-       ジャンル選択 UI
-    ------------------------- */
     const genres = [
       "Animal", "Color", "Food",
       "Fruit", "Body", "Other"
@@ -242,9 +229,6 @@
     document.querySelector(".genre").classList.add("selected");
     document.querySelector(".genre input").checked = true;
 
-    /* -------------------------
-       単語リスト表示
-    ------------------------- */
     const wordList = document.getElementById("wordList");
     const newWordInput = document.getElementById("newWordInput");
     const addWordBtn = document.getElementById("addWordBtn");
