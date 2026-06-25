@@ -27,22 +27,24 @@
       margin: 0 auto;
       padding: 0;
 
-      /* 点線の格子を描く */
-      background:
-        repeating-linear-gradient(
-          to right,
-          #000 0,
-          #000 2px,
-          transparent 2px,
-          transparent 200px
-        ),
+      /* 正しい点線格子（縦200px・横300px） */
+      background-image:
         repeating-linear-gradient(
           to bottom,
-          #000 0,
-          #000 2px,
-          transparent 2px,
-          transparent 300px
+          #000 0 2px,
+          transparent 2px 6px
+        ),
+        repeating-linear-gradient(
+          to right,
+          #000 0 2px,
+          transparent 2px 6px
         );
+      background-size:
+        200px 100%,
+        100% 300px;
+      background-position:
+        0 0,
+        0 0;
     }
 
     .card {
@@ -63,12 +65,34 @@
       object-fit: contain;
     }
 
+    /* ボタン配置 */
+    .nav-buttons {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 999;
+    }
+
+    .nav-buttons button {
+      padding: 8px 14px;
+      font-size: 14px;
+      border: 1px solid #333;
+      background: #fff;
+      cursor: pointer;
+    }
+
     @media print {
       @page {
         size: A4 portrait;
         margin: 0;
       }
       h1 {
+        display: none;
+      }
+      .nav-buttons {
         display: none;
       }
       body {
@@ -81,6 +105,11 @@
   </style>
 </head>
 <body>
+
+  <div class="nav-buttons">
+    <button onclick="location.href='index.html'">ホームに戻る</button>
+    <button onclick="history.back()">1つ前に戻る</button>
+  </div>
 
   <h1 id="title"></h1>
 
