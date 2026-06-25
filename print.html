@@ -107,7 +107,7 @@
 
     const data = {
       "Number": ["one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve"],
-      "Animal": ["dog","cat","bird","fish","rabbit","bear","lion","horse"],
+      "Animal": ["dog","cat","bird","fish","rabbit","bear","lion","horse","elephant","zebra"],
       "Color": ["red","blue","yellow","green","black","white","pink","purple"],
       "Food": ["bread","rice","milk","egg","soup","cake","cheese","juice"],
       "Fruit": ["apple","banana","orange","grape","peach","lemon","melon","strawberry"],
@@ -126,7 +126,7 @@
 
       const img = document.createElement("img");
 
-      if (genre === "Animal" && ["dog","cat","bird","rabbit","lion","bear"].includes(word)) {
+      if (genre === "Animal" && ["dog","cat","bird","rabbit","lion","bear","elephant","zebra"].includes(word)) {
         img.src = `images/animal/${word}.png`;
       } else {
         img.src = `img/${word}.png`;
