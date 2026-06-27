@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>読み上げかるた</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Potta+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Potta+One&family=Yomogi&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: "Comic Sans MS", "Chalkboard SE", "Arial Rounded MT Bold", sans-serif;
@@ -18,10 +18,12 @@
       font-size: 40px;
       font-family: "Potta One", "Yomogi", "Kosugi Maru", "Comic Sans MS", sans-serif;
       background: linear-gradient(90deg,
-        #ff6ec4, #ff9a44, #f3ff4e, #4eff8b, #4ecbff, #b07bff
+        #ff6ec4, #ff9a44, #ffd400, #4eff8b, #4ecbff, #b07bff
       );
       -webkit-background-clip: text;
       color: transparent;
+      -webkit-text-stroke: 2px #000;
+      text-shadow: 0 0 8px rgba(255,255,255,0.8);
     }
     .menu {
       margin-top: 30px;
@@ -34,6 +36,7 @@
       width: 260px;
       padding: 14px;
       font-size: 20px;
+      font-family: "Yomogi", "Comic Sans MS", sans-serif;
       border-radius: 10px;
       border: none;
       background: #ffcc66;

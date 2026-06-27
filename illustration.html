@@ -50,7 +50,6 @@
 
   <div class="illust-header">
     <button class="home-btn" onclick="goHome()">🏠 ホームに戻る</button>
-    <!-- 説明文削除 -->
   </div>
 
   <h1>イラスト集</h1>
@@ -61,7 +60,6 @@
 
   <div class="nav" id="nav"></div>
 
-  <!-- ★ 印刷方法のヘルプリンクを追加 -->
   <div style="margin-top: 12px;">
     <a href="help.html" style="font-size: 16px; text-decoration: underline; cursor: pointer;">
       印刷方法のヘルプ
@@ -89,7 +87,7 @@
       const btn = document.createElement("button");
       btn.textContent = key;
       btn.addEventListener("click", () => {
-        window.location.href = `print.html?genre=${encodeURIComponent(key)}`;
+        window.location.href = `${key.toLowerCase()}-viewer.html`;
       });
       nav.appendChild(btn);
     });
