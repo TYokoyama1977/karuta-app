@@ -256,14 +256,27 @@
       const uttr = new SpeechSynthesisUtterance(word);
       uttr.rate = Number(rateInput.value);
 
-      const voices = speechSynthesis.getVoices();
+      let voices = speechSynthesis.getVoices();
       const v = settings.voice || "female";
-      uttr.voice = voices.find(vv =>
-        (v === "male" && vv.name.toLowerCase().includes("male")) ||
-        (v === "female" && vv.name.toLowerCase().includes("female")) ||
-        (v === "boy" && vv.name.toLowerCase().includes("boy")) ||
-        (v === "girl" && vv.name.toLowerCase().includes("girl"))
-      ) || null;
+
+      if (!voices || voices.length === 0) {
+        speechSynthesis.onvoiceschanged = () => {
+          voices = speechSynthesis.getVoices();
+          uttr.voice = voices.find(vv =>
+            (v === "male" && vv.name.toLowerCase().includes("male")) ||
+            (v === "female" && vv.name.toLowerCase().includes("female")) ||
+            (v === "boy" && vv.name.toLowerCase().includes("boy")) ||
+            (v === "girl" && vv.name.toLowerCase().includes("girl"))
+          ) || null;
+        };
+      } else {
+        uttr.voice = voices.find(vv =>
+          (v === "male" && vv.name.toLowerCase().includes("male")) ||
+          (v === "female" && vv.name.toLowerCase().includes("female")) ||
+          (v === "boy" && vv.name.toLowerCase().includes("boy")) ||
+          (v === "girl" && vv.name.toLowerCase().includes("girl"))
+        ) || null;
+      }
 
       speechSynthesis.speak(uttr);
     }
@@ -329,7 +342,6 @@
       localStorage.setItem("settings", JSON.stringify(settings));
     });
 
-    /* ▼▼▼ 速度 ▲▼ ボタン処理 ▼▼▼ */
     document.getElementById("rateUp").addEventListener("click", () => {
       rateInput.value = Math.min(3, Number(rateInput.value) + 0.1).toFixed(1);
       settings.rate = Number(rateInput.value);
@@ -342,7 +354,6 @@
       localStorage.setItem("settings", JSON.stringify(settings));
     });
 
-    /* ▼▼▼ 間隔 ▲▼ ボタン処理 ▼▼▼ */
     document.getElementById("intervalUp").addEventListener("click", () => {
       intervalInput.value = Math.min(20, Number(intervalInput.value) + 1);
       settings.interval = Number(intervalInput.value);
