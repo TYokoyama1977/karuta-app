@@ -380,8 +380,18 @@
 
     startBtn.addEventListener("click", () => {
       if (shuffled.length === 0) return;
-      index = 0;
-      nextWordBtn.click();
+
+      const current = currentWord.textContent;
+
+      if (!current || current === "---") {
+        // まだ単語が表示されていない場合は、最初の単語から開始
+        index = 0;
+        nextWordBtn.click();
+      } else {
+        // 表示されている単語をそのまま読み上げる
+        speakWord(current);
+      }
+
       if (autoPlay) autoPlayLoop();
     });
 
