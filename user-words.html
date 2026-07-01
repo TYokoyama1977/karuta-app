@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ユーザー追加単語 - 読み上げかるた</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+    body {
+        font-family: "Yu Gothic", sans-serif;
+        margin: 20px;
+        background: #fdfdfd;
+    }
+
+    /* 上部ナビ */
+    .nav {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .nav button {
+        padding: 10px 15px;
+        font-size: 16px;
+        border: none;
+        background: #4CAF50;
+        color: white;
+        border-radius: 6px;
+    }
+
+    /* 追加フォーム */
+    #newWord {
+        width: 60%;
+        padding: 10px;
+        font-size: 18px;
+    }
+    #addBtn {
+        padding: 10px 15px;
+        font-size: 18px;
+        margin-left: 5px;
+        background: #2196F3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+    }
+
+    /* 単語一覧 */
+    #wordList {
+        margin-top: 20px;
+        padding-left: 0;
+    }
+    #wordList li {
+        list-style: none;
+        padding: 8px;
+        font-size: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* 読み上げ表示 */
+    #displayWord {
+        margin-top: 30px;
+        font-size: 40px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    /* 読み上げボタン */
+    .play-buttons {
+        margin-top: 20px;
+        text-align: center;
+    }
+    .play-buttons button {
+        padding: 12px 20px;
+        font-size: 20px;
+        margin: 5px;
+        border: none;
+        background: #FF9800;
+        color: white;
+        border-radius: 6px;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>ユーザー追加単語の読み上げ</h2>
+
+<!-- 上部ナビ -->
+<div class="nav">
+    <button onclick="location.href='index.html'">ホーム</button>
+    <button onclick="location.href='play.html'">収録単語</button>
+    <button onclick="readNext()">読み上げ</button>
+</div>
+
+<!-- 追加フォーム -->
+<input id="newWord" placeholder="単語を追加">
+<button id="addBtn" onclick="addWord()">追加</button>
+
+<!-- 単語一覧 -->
+<ul id="wordList"></ul>
+
+<!-- 読み上げ表示 -->
+<div id="displayWord">---</div>
+
+<!-- 読み上げ操作 -->
+<div class="play-buttons">
+    <button onclick="readNext()">▶ 次の単語</button>
+    <button onclick="resetShuffle()">🔁 シャッフル</button>
+</div>
+
+<script>
+    let userWords = JSON.parse(localStorage.getItem("userWords") || "[]");
+    let remaining = [];
+
+    function save() {
+        localStorage.setItem("userWords", JSON.stringify(userWords));
+    }
+
+    function addWord() {
+        const w = document.getElementById("newWord").value.trim();
+        if (!w) return;
+        userWords.push(w);
+        save();
+        renderList();
+        document.getElementById("newWord").value = "";
+        resetShuffle();
+    }
+
+    function renderList() {
+        const ul = document.getElementById("wordList");
+        ul.innerHTML = "";
+        userWords.forEach((w) => {
+            const li = document.createElement("li");
+            li.textContent = w;
+            ul.appendChild(li);
+        });
+    }
+
+    function resetShuffle() {
+        remaining = [...userWords];
+        shuffle(remaining);
+        document.getElementById("displayWord").textContent = "---";
+    }
+
+    function readNext() {
+        if (remaining.length === 0) return;
+        const word = remaining.shift();
+        document.getElementById("displayWord").textContent = word;
+        playAudio(word);
+    }
+
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    function playAudio(word) {
+        const audio = new Audio(`audio/${word}.mp3`);
+        audio.play();
+    }
+
+    renderList();
+    resetShuffle();
+</script>
+
+</body>
+</html>
