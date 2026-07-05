@@ -222,6 +222,8 @@
     let index = 0;
     let isPaused = false;
 
+    let audioPlayer = null;
+
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
       words = [];
@@ -252,15 +254,13 @@
       remainingCount.textContent = "残り：" + (shuffled.length - index);
     }
 
-    /* ★★★ ここを mp3 再生に変更 ★★★ */
     function speakWord(word) {
-      // 旧：SpeechSynthesisUtterance は使用しない
-      // const uttr = new SpeechSynthesisUtterance(word);
-      // uttr.rate = Number(rateInput.value);
-      // speechSynthesis.speak(uttr);
-
-      const audio = new Audio(`sound/${word.toLowerCase()}.mp3`);
-      audio.play();
+      if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+      }
+      audioPlayer = new Audio(`sound/${word.toLowerCase()}.mp3`);
+      audioPlayer.play();
     }
 
     nextWordBtn.addEventListener("click", () => {
@@ -279,8 +279,7 @@
       pauseButton.textContent = isPaused ? "▶ 再開" : "⏸ ポーズ";
 
       if (isPaused) {
-        // mp3 の停止
-        // （Audio は stop がないため、再生中の音を止める必要がある場合は別管理が必要）
+        if (audioPlayer) audioPlayer.pause();
       } else {
         const current = currentWord.textContent;
         if (current && current !== "---") {
