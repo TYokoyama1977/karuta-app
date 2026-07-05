@@ -141,7 +141,11 @@
     </span>
   </div>
 
-  <div id="currentWord">---</div>
+  <!-- ★ 英単語表示・非表示ボタンを右側に追加 -->
+  <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
+    <div id="currentWord">---</div>
+    <button id="toggleWordBtn" class="top-btn">👁 表示</button>
+  </div>
 
   <button id="nextWordBtn" class="main-btn">次の単語</button>
   <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ スタート</button>
@@ -269,7 +273,7 @@
       const word = shuffled[index];
       currentWord.textContent = word;
 
-      setTimeout(() => speakWord(word), 3000);  // ★ 3秒後に再生
+      setTimeout(() => speakWord(word), 3000);
 
       index++;
       updateRemaining();
@@ -286,7 +290,7 @@
         if (current && current !== "---") {
           speakWord(current);
         }
-        if (autoPlay) autoPlayLoop();   // ★ 自動再生を再開
+        if (autoPlay) autoPlayLoop();
       }
     });
 
@@ -360,7 +364,11 @@
       }
     }
 
-    shuffleResetBtn.addEventListener("click", loadWords);
+    shuffleResetBtn.addEventListener("click", () => {
+      loadWords();
+      currentWord.textContent = "---";
+      index = 0;
+    });
 
     startBtn.addEventListener("click", () => {
       if (shuffled.length === 0) return;
@@ -378,6 +386,16 @@
     });
 
     loadWords();
+
+    /* ★ 英単語表示・非表示切り替え */
+    const toggleWordBtn = document.getElementById("toggleWordBtn");
+    let wordVisible = true;
+
+    toggleWordBtn.addEventListener("click", () => {
+      wordVisible = !wordVisible;
+      currentWord.style.visibility = wordVisible ? "visible" : "hidden";
+      toggleWordBtn.textContent = wordVisible ? "👁 表示" : "👁 非表示";
+    });
   </script>
 
   <footer>
