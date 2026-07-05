@@ -268,7 +268,8 @@
 
       const word = shuffled[index];
       currentWord.textContent = word;
-      speakWord(word);
+
+      setTimeout(() => speakWord(word), 3000);  // ★ 3秒後に再生
 
       index++;
       updateRemaining();
@@ -285,6 +286,7 @@
         if (current && current !== "---") {
           speakWord(current);
         }
+        if (autoPlay) autoPlayLoop();   // ★ 自動再生を再開
       }
     });
 
