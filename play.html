@@ -382,7 +382,9 @@
         speakWord(current);
       }
 
-      if (autoPlay) autoPlayLoop();
+      if (autoPlay) {
+        setTimeout(autoPlayLoop, Number(intervalInput.value) * 1000);
+      }
     });
 
     loadWords();
