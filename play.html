@@ -267,6 +267,7 @@
       audioPlayer.play();
     }
 
+    /* ★ 手動操作は 3 秒後に読み上げる */
     nextWordBtn.addEventListener("click", () => {
       if (index >= shuffled.length) return;
 
@@ -288,7 +289,7 @@
       } else {
         const current = currentWord.textContent;
         if (current && current !== "---") {
-          speakWord(current);
+          setTimeout(() => speakWord(current), 3000);
         }
         if (autoPlay) autoPlayLoop();
       }
@@ -354,10 +355,17 @@
       localStorage.setItem("settings", JSON.stringify(settings));
     });
 
+    /* ★ 自動再生は即時読み上げる（3秒遅延なし） */
     function autoPlayLoop() {
       if (!autoPlay || isPaused) return;
 
-      nextWordBtn.click();
+      if (index < shuffled.length) {
+        const word = shuffled[index];
+        currentWord.textContent = word;
+        speakWord(word);   // ★ 即時再生
+        index++;
+        updateRemaining();
+      }
 
       if (index < shuffled.length) {
         setTimeout(autoPlayLoop, Number(intervalInput.value) * 1000);
@@ -377,9 +385,13 @@
 
       if (!current || current === "---") {
         index = 0;
-        nextWordBtn.click();
+        const word = shuffled[index];
+        currentWord.textContent = word;
+        setTimeout(() => speakWord(word), 3000);
+        index++;
+        updateRemaining();
       } else {
-        speakWord(current);
+        setTimeout(() => speakWord(current), 3000);
       }
 
       if (autoPlay) {
