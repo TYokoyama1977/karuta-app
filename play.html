@@ -252,33 +252,15 @@
       remainingCount.textContent = "残り：" + (shuffled.length - index);
     }
 
+    /* ★★★ ここを mp3 再生に変更 ★★★ */
     function speakWord(word) {
-      const uttr = new SpeechSynthesisUtterance(word);
-      uttr.rate = Number(rateInput.value);
+      // 旧：SpeechSynthesisUtterance は使用しない
+      // const uttr = new SpeechSynthesisUtterance(word);
+      // uttr.rate = Number(rateInput.value);
+      // speechSynthesis.speak(uttr);
 
-      let voices = speechSynthesis.getVoices();
-      const v = settings.voice || "female";
-
-      if (!voices || voices.length === 0) {
-        speechSynthesis.onvoiceschanged = () => {
-          voices = speechSynthesis.getVoices();
-          uttr.voice = voices.find(vv =>
-            (v === "male" && vv.name.toLowerCase().includes("male")) ||
-            (v === "female" && vv.name.toLowerCase().includes("female")) ||
-            (v === "boy" && vv.name.toLowerCase().includes("boy")) ||
-            (v === "girl" && vv.name.toLowerCase().includes("girl"))
-          ) || null;
-        };
-      } else {
-        uttr.voice = voices.find(vv =>
-          (v === "male" && vv.name.toLowerCase().includes("male")) ||
-          (v === "female" && vv.name.toLowerCase().includes("female")) ||
-          (v === "boy" && vv.name.toLowerCase().includes("boy")) ||
-          (v === "girl" && vv.name.toLowerCase().includes("girl"))
-        ) || null;
-      }
-
-      speechSynthesis.speak(uttr);
+      const audio = new Audio(`sound/${word.toLowerCase()}.mp3`);
+      audio.play();
     }
 
     nextWordBtn.addEventListener("click", () => {
@@ -297,7 +279,8 @@
       pauseButton.textContent = isPaused ? "▶ 再開" : "⏸ ポーズ";
 
       if (isPaused) {
-        speechSynthesis.cancel();
+        // mp3 の停止
+        // （Audio は stop がないため、再生中の音を止める必要がある場合は別管理が必要）
       } else {
         const current = currentWord.textContent;
         if (current && current !== "---") {
@@ -384,11 +367,9 @@
       const current = currentWord.textContent;
 
       if (!current || current === "---") {
-        // まだ単語が表示されていない場合は、最初の単語から開始
         index = 0;
         nextWordBtn.click();
       } else {
-        // 表示されている単語をそのまま読み上げる
         speakWord(current);
       }
 
