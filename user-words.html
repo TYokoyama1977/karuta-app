@@ -17,7 +17,7 @@
     .play-header {
       padding: 10px;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
     }
     .play-header button {
@@ -34,14 +34,31 @@
       font-size: 28px;
     }
 
-    /* 読み上げ UI */
-    #displayWord {
+    /* 単語表示欄 */
+    #displayArea {
       margin-top: 20px;
-      font-size: 32px;
-      font-weight: bold;
-      min-height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
     }
 
+    #displayWord {
+      font-size: 64px;
+      font-weight: bold;
+      min-height: 70px;
+    }
+
+    #toggleDisplayBtn {
+      font-size: 18px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: #ffcc66;
+      cursor: pointer;
+    }
+
+    /* 読み上げ操作 */
     .read-controls {
       margin-top: 15px;
       display: flex;
@@ -77,27 +94,28 @@
       cursor: pointer;
     }
 
-    /* 単語一覧 */
+    /* 単語一覧（2列） */
     .word-list {
       margin-top: 20px;
       width: 90%;
       margin-left: auto;
       margin-right: auto;
-      max-width: 500px;
+      max-width: 600px;
       text-align: left;
       display: grid;
-      grid-template-columns: repeat(1, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
     }
 
     .word-item {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       background: #fff;
       padding: 8px 10px;
       border-radius: 6px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      gap: 10px;
     }
 
     .delete-btn {
@@ -107,6 +125,7 @@
       border-radius: 6px;
       padding: 4px 8px;
       cursor: pointer;
+      margin-left: auto;
     }
   </style>
 </head>
@@ -115,17 +134,18 @@
 
   <div class="play-header">
     <button onclick="location.href='index.html'">🏠 ホーム</button>
-    <button onclick="location.href='edit.html'">✏️ 単語一覧</button>
   </div>
 
   <h1>ユーザー追加単語</h1>
 
-  <!-- 読み上げ単語表示 -->
-  <div id="displayWord"></div>
+  <!-- 単語表示欄（右に表示/非表示ボタン） -->
+  <div id="displayArea">
+    <div id="displayWord"></div>
+    <button id="toggleDisplayBtn">表示/非表示</button>
+  </div>
 
   <!-- 読み上げ操作 -->
   <div class="read-controls">
-    <button id="toggleDisplayBtn">表示/非表示</button>
     <button id="nextWordBtn">次の単語</button>
     <button id="startBtn">スタート</button>
     <button id="pauseBtn">ポーズ</button>
@@ -142,7 +162,7 @@
 
   <p style="font-size:14px; color:#555;">※ 最大20個まで保存できます</p>
 
-  <!-- 単語一覧 -->
+  <!-- 単語一覧（2列） -->
   <div class="word-list" id="wordList"></div>
 
   <script>
@@ -152,7 +172,7 @@
     const newWordInput = document.getElementById("newWordInput");
     const addWordBtn = document.getElementById("addWordBtn");
 
-    let speakList = [];  // チェックされた単語だけ入る
+    let speakList = [];
     let currentIndex = 0;
     let isDisplayVisible = true;
     let isPaused = false;
@@ -168,13 +188,16 @@
         const div = document.createElement("div");
         div.className = "word-item";
 
-        const label = document.createElement("label");
-        label.textContent = (idx + 1) + ". " + w;
-
         const cb = document.createElement("input");
         cb.type = "checkbox";
         cb.style.transform = "scale(1.3)";
         cb.onchange = updateSpeakList;
+
+        const numSpan = document.createElement("span");
+        numSpan.textContent = (idx + 1) + ". ";
+
+        const textSpan = document.createElement("span");
+        textSpan.textContent = w;
 
         const delBtn = document.createElement("button");
         delBtn.textContent = "削除";
@@ -185,8 +208,9 @@
           renderWords();
         };
 
-        div.appendChild(label);
         div.appendChild(cb);
+        div.appendChild(numSpan);
+        div.appendChild(textSpan);
         div.appendChild(delBtn);
 
         wordList.appendChild(div);
@@ -225,7 +249,6 @@
       renderWords();
     });
 
-    // 読み上げ
     function speak(text) {
       const utter = new SpeechSynthesisUtterance(text);
       speechSynthesis.speak(utter);
