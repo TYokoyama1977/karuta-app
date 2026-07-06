@@ -21,7 +21,7 @@
       align-items: center;
     }
 
-    .home-btn, .edit-btn, .settings-btn {
+    .home-btn, .edit-btn {
       font-size: 18px;
       padding: 8px 14px;
       border-radius: 8px;
@@ -140,7 +140,6 @@
     </span>
   </div>
 
-  <!-- ★ 英単語表示・非表示ボタンを右側に追加 -->
   <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
     <div id="currentWord">---</div>
     <button id="toggleWordBtn" class="top-btn">👁 表示</button>
@@ -148,7 +147,9 @@
 
   <button id="nextWordBtn" class="main-btn">次の単語</button>
   <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ スタート</button>
-  <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏸ ポーズ</button>
+
+  <!-- ★ 停止ボタン（停止専用） -->
+  <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
 
   <p id="remainingCount">残り：0</p>
 
@@ -163,18 +164,12 @@
       window.location.href = "edit.html";
     });
 
-    /* ❌ settingsButton は存在しないため削除済み */
-
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
     const readRate = settings.rate || 1;
     const readInterval = settings.interval || 6;
     let autoPlay = settings.autoPlay || false;
 
-    const genres = [
-      "Animal", "Color", "Food",
-      "Fruit", "Body", "Other"
-    ];
-
+    const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
     const genreArea = document.getElementById("genreArea");
 
     genres.forEach(g => {
@@ -276,19 +271,14 @@
       updateRemaining();
     });
 
+    /* ★ 停止ボタン（停止専用） */
     pauseButton.addEventListener("click", () => {
-      isPaused = !isPaused;
-      pauseButton.textContent = isPaused ? "▶ 再開" : "⏸ ポーズ";
+      isPaused = true;
 
-      if (isPaused) {
-        if (audioPlayer) audioPlayer.pause();
-      } else {
-        const current = currentWord.textContent;
-        if (current && current !== "---") {
-          speakWord(current);
-        }
-        if (autoPlay) autoPlayLoop();
-      }
+      if (audioPlayer) audioPlayer.pause();
+
+      pauseButton.style.background = "#ff4444";
+      pauseButton.textContent = "⏹ 停止中";
     });
 
     const autoBtn = document.getElementById("autoPlayToggle");
@@ -370,6 +360,11 @@
     startBtn.addEventListener("click", () => {
       if (shuffled.length === 0) return;
 
+      isPaused = false;
+
+      pauseButton.style.background = "#ff9999";
+      pauseButton.textContent = "⏹ 停止";
+
       const current = currentWord.textContent;
 
       if (!current || current === "---") {
@@ -386,7 +381,6 @@
 
     loadWords();
 
-    /* ★ 英単語表示・非表示切り替え */
     const toggleWordBtn = document.getElementById("toggleWordBtn");
     let wordVisible = true;
 
