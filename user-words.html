@@ -14,7 +14,6 @@
       text-align: center;
     }
 
-    /* play.html と同じヘッダー */
     .play-header {
       padding: 10px;
       display: flex;
@@ -35,17 +34,24 @@
       font-size: 28px;
     }
 
-    /* play.html の操作ボタン */
-    .control-buttons {
+    /* 読み上げ UI */
+    #displayWord {
       margin-top: 20px;
+      font-size: 32px;
+      font-weight: bold;
+      min-height: 40px;
+    }
+
+    .read-controls {
+      margin-top: 15px;
       display: flex;
       justify-content: center;
-      gap: 15px;
+      gap: 10px;
     }
-    .control-buttons button {
-      font-size: 20px;
-      padding: 10px 18px;
-      border-radius: 10px;
+    .read-controls button {
+      font-size: 18px;
+      padding: 8px 14px;
+      border-radius: 8px;
       border: none;
       background: #ffcc66;
       cursor: pointer;
@@ -80,7 +86,7 @@
       max-width: 500px;
       text-align: left;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(1, 1fr);
       gap: 10px;
     }
 
@@ -92,11 +98,6 @@
       padding: 8px 10px;
       border-radius: 6px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .word-item span {
-      font-weight: bold;
-      margin-right: 8px;
     }
 
     .delete-btn {
@@ -112,7 +113,6 @@
 
 <body>
 
-  <!-- play.html と同じヘッダー（設定ボタンなし） -->
   <div class="play-header">
     <button onclick="location.href='index.html'">🏠 ホーム</button>
     <button onclick="location.href='edit.html'">✏️ 単語一覧</button>
@@ -120,11 +120,19 @@
 
   <h1>ユーザー追加単語</h1>
 
-  <!-- play.html の操作ボタン（ジャンル関連は削除） -->
-  <div class="control-buttons">
-    <button id="shuffleBtn">🔀 シャッフル</button>
-    <button id="restartBtn">⏮ 最初から</button>
+  <!-- 読み上げ単語表示 -->
+  <div id="displayWord"></div>
+
+  <!-- 読み上げ操作 -->
+  <div class="read-controls">
+    <button id="toggleDisplayBtn">表示/非表示</button>
+    <button id="nextWordBtn">次の単語</button>
+    <button id="startBtn">スタート</button>
+    <button id="pauseBtn">ポーズ</button>
+    <button id="resumeBtn">再開</button>
   </div>
+
+  <p id="remainingCount" style="font-size:16px; margin-top:10px;">残り: 0 個</p>
 
   <!-- 単語追加欄 -->
   <div class="add-area">
@@ -138,12 +146,16 @@
   <div class="word-list" id="wordList"></div>
 
   <script>
-    // localStorage 読み込み
     let userWords = JSON.parse(localStorage.getItem("userWords") || "[]");
 
     const wordList = document.getElementById("wordList");
     const newWordInput = document.getElementById("newWordInput");
     const addWordBtn = document.getElementById("addWordBtn");
+
+    let speakList = [];  // チェックされた単語だけ入る
+    let currentIndex = 0;
+    let isDisplayVisible = true;
+    let isPaused = false;
 
     function saveWords() {
       localStorage.setItem("userWords", JSON.stringify(userWords));
@@ -156,11 +168,13 @@
         const div = document.createElement("div");
         div.className = "word-item";
 
-        const numSpan = document.createElement("span");
-        numSpan.textContent = (idx + 1) + ". ";
+        const label = document.createElement("label");
+        label.textContent = (idx + 1) + ". " + w;
 
-        const textSpan = document.createElement("span");
-        textSpan.textContent = w;
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.style.transform = "scale(1.3)";
+        cb.onchange = updateSpeakList;
 
         const delBtn = document.createElement("button");
         delBtn.textContent = "削除";
@@ -171,12 +185,29 @@
           renderWords();
         };
 
-        div.appendChild(numSpan);
-        div.appendChild(textSpan);
+        div.appendChild(label);
+        div.appendChild(cb);
         div.appendChild(delBtn);
 
         wordList.appendChild(div);
       });
+
+      updateSpeakList();
+    }
+
+    function updateSpeakList() {
+      const items = document.querySelectorAll(".word-item");
+      speakList = [];
+
+      items.forEach((item, idx) => {
+        const cb = item.querySelector("input[type='checkbox']");
+        if (cb.checked) {
+          speakList.push(userWords[idx]);
+        }
+      });
+
+      document.getElementById("remainingCount").textContent =
+        "残り: " + speakList.length + " 個";
     }
 
     addWordBtn.addEventListener("click", () => {
@@ -194,18 +225,69 @@
       renderWords();
     });
 
-    // シャッフル
-    document.getElementById("shuffleBtn").onclick = () => {
-      userWords.sort(() => Math.random() - 0.5);
-      saveWords();
-      renderWords();
+    // 読み上げ
+    function speak(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utter);
+    }
+
+    document.getElementById("toggleDisplayBtn").onclick = () => {
+      isDisplayVisible = !isDisplayVisible;
+      document.getElementById("displayWord").style.visibility =
+        isDisplayVisible ? "visible" : "hidden";
     };
 
-    // 最初から
-    document.getElementById("restartBtn").onclick = () => {
-      renderWords();
-      alert("最初から表示します。");
+    document.getElementById("nextWordBtn").onclick = () => {
+      if (currentIndex >= speakList.length) {
+        alert("これ以上単語がありません");
+        return;
+      }
+      const word = speakList[currentIndex];
+      document.getElementById("displayWord").textContent = word;
+      speak(word);
+      currentIndex++;
+      updateRemaining();
     };
+
+    document.getElementById("startBtn").onclick = () => {
+      if (speakList.length === 0) {
+        alert("チェックされた単語がありません");
+        return;
+      }
+      currentIndex = 0;
+      nextAuto();
+    };
+
+    function nextAuto() {
+      if (currentIndex >= speakList.length) return;
+
+      const word = speakList[currentIndex];
+      document.getElementById("displayWord").textContent = word;
+      speak(word);
+      currentIndex++;
+      updateRemaining();
+
+      if (!isPaused) {
+        setTimeout(nextAuto, 2000);
+      }
+    }
+
+    document.getElementById("pauseBtn").onclick = () => {
+      isPaused = true;
+      speechSynthesis.pause();
+    };
+
+    document.getElementById("resumeBtn").onclick = () => {
+      isPaused = false;
+      speechSynthesis.resume();
+      nextAuto();
+    };
+
+    function updateRemaining() {
+      const remain = speakList.length - currentIndex;
+      document.getElementById("remainingCount").textContent =
+        "残り: " + remain + " 個";
+    }
 
     renderWords();
   </script>
