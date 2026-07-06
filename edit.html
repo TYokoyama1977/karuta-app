@@ -87,7 +87,7 @@
 
     .word-item {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       background: #fff;
       padding: 8px 10px;
@@ -100,43 +100,8 @@
       width: 70%;
       font-size: 16px;
       padding: 4px;
-    }
-
-    .delete-btn {
-      border: none;
-      background: #ff6666;
-      color: white;
-      border-radius: 6px;
-      padding: 4px 8px;
-      cursor: pointer;
-    }
-
-    .add-area {
-      margin-top: 15px;
-    }
-
-    .add-area input {
-      font-size: 16px;
-      padding: 6px;
-      width: 60%;
-      max-width: 250px;
-    }
-
-    .add-area button {
-      font-size: 16px;
-      padding: 6px 10px;
-      margin-left: 5px;
-      border-radius: 6px;
-      border: none;
-      background: #4CAF50;
-      color: white;
-      cursor: pointer;
-    }
-
-    .save-info {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #555;
+      background: #eee;
+      cursor: default;
     }
   </style>
 </head>
@@ -148,17 +113,10 @@
     <button id="playButton" class="play-btn">🔊 読み上げへ</button>
   </div>
 
-  <h1>単語編集</h1>
+  <h1>単語一覧</h1>
   <h2>ジャンルを選択してください</h2>
 
   <div class="genre-icons" id="genreArea"></div>
-
-  <div class="add-area">
-    <input type="text" id="newWordInput" placeholder="単語を追加">
-    <button id="addWordBtn">追加</button>
-  </div>
-
-  <p class="save-info">※ 各ジャンル 最大20個まで保存されます</p>
 
   <div class="word-list" id="wordList"></div>
 
@@ -180,11 +138,7 @@
       Other: ["car","house","book","chair","clock","cup","ball","star","table","chopsticks"]
     };
 
-    let wordsData = JSON.parse(localStorage.getItem("wordsData") || "null");
-    if (!wordsData) {
-      wordsData = defaultWordsData;
-      localStorage.setItem("wordsData", JSON.stringify(wordsData));
-    }
+    let wordsData = defaultWordsData;
 
     const genres = [
       "Animal", "Color", "Food",
@@ -230,8 +184,6 @@
     document.querySelector(".genre input").checked = true;
 
     const wordList = document.getElementById("wordList");
-    const newWordInput = document.getElementById("newWordInput");
-    const addWordBtn = document.getElementById("addWordBtn");
 
     function renderWords() {
       wordList.innerHTML = "";
@@ -248,50 +200,13 @@
 
         const input = document.createElement("input");
         input.value = w;
-
         input.readOnly = true;
-        input.style.background = "#eee";
-        input.style.cursor = "default";
-
-        input.addEventListener("change", () => {
-          wordsData[currentGenre][idx] = input.value.trim();
-          saveData();
-        });
-
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "削除";
-        delBtn.className = "delete-btn";
-        delBtn.addEventListener("click", () => {
-          wordsData[currentGenre].splice(idx, 1);
-          saveData();
-          renderWords();
-        });
 
         div.appendChild(numSpan);
         div.appendChild(input);
-        div.appendChild(delBtn);
         wordList.appendChild(div);
       });
     }
-
-    function saveData() {
-      localStorage.setItem("wordsData", JSON.stringify(wordsData));
-    }
-
-    addWordBtn.addEventListener("click", () => {
-      const val = newWordInput.value.trim();
-      if (!val) return;
-
-      if (wordsData[currentGenre].length >= 20) {
-        alert("このジャンルは20個までです。");
-        return;
-      }
-
-      wordsData[currentGenre].push(val);
-      saveData();
-      newWordInput.value = "";
-      renderWords();
-    });
 
     renderWords();
   </script>
