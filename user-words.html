@@ -1,168 +1,218 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>ユーザー追加単語 - 読み上げかるた</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>ユーザー追加単語 - 読み上げかるた</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+  <style>
     body {
-        font-family: "Yu Gothic", sans-serif;
-        margin: 20px;
-        background: #fdfdfd;
+      font-family: "Arial", sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      text-align: center;
     }
 
-    /* 上部ナビ */
-    .nav {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
+    /* play.html と同じヘッダー */
+    .play-header {
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .nav button {
-        padding: 10px 15px;
-        font-size: 16px;
-        border: none;
-        background: #4CAF50;
-        color: white;
-        border-radius: 6px;
+    .play-header button {
+      font-size: 18px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: #eee;
+      cursor: pointer;
     }
 
-    /* 追加フォーム */
-    #newWord {
-        width: 60%;
-        padding: 10px;
-        font-size: 18px;
+    h1 {
+      margin-top: 10px;
+      font-size: 28px;
     }
-    #addBtn {
-        padding: 10px 15px;
-        font-size: 18px;
-        margin-left: 5px;
-        background: #2196F3;
-        color: white;
-        border: none;
-        border-radius: 6px;
+
+    /* play.html の操作ボタン */
+    .control-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .control-buttons button {
+      font-size: 20px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: none;
+      background: #ffcc66;
+      cursor: pointer;
+    }
+
+    /* 単語追加欄 */
+    .add-area {
+      margin-top: 25px;
+    }
+    .add-area input {
+      font-size: 18px;
+      padding: 8px;
+      width: 60%;
+      max-width: 250px;
+    }
+    .add-area button {
+      font-size: 18px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
     }
 
     /* 単語一覧 */
-    #wordList {
-        margin-top: 20px;
-        padding-left: 0;
-    }
-    #wordList li {
-        list-style: none;
-        padding: 8px;
-        font-size: 20px;
-        border-bottom: 1px solid #ddd;
-    }
-
-    /* 読み上げ表示 */
-    #displayWord {
-        margin-top: 30px;
-        font-size: 40px;
-        font-weight: bold;
-        text-align: center;
+    .word-list {
+      margin-top: 20px;
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 500px;
+      text-align: left;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
 
-    /* 読み上げボタン */
-    .play-buttons {
-        margin-top: 20px;
-        text-align: center;
+    .word-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 8px 10px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    .play-buttons button {
-        padding: 12px 20px;
-        font-size: 20px;
-        margin: 5px;
-        border: none;
-        background: #FF9800;
-        color: white;
-        border-radius: 6px;
+
+    .word-item span {
+      font-weight: bold;
+      margin-right: 8px;
     }
-</style>
+
+    .delete-btn {
+      border: none;
+      background: #ff6666;
+      color: white;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
 
-<h2>ユーザー追加単語の読み上げ</h2>
+  <!-- play.html と同じヘッダー（設定ボタンなし） -->
+  <div class="play-header">
+    <button onclick="location.href='index.html'">🏠 ホーム</button>
+    <button onclick="location.href='edit.html'">✏️ 単語一覧</button>
+  </div>
 
-<!-- 上部ナビ -->
-<div class="nav">
-    <button onclick="location.href='index.html'">ホーム</button>
-    <button onclick="location.href='play.html'">収録単語</button>
-    <button onclick="readNext()">読み上げ</button>
-</div>
+  <h1>ユーザー追加単語</h1>
 
-<!-- 追加フォーム -->
-<input id="newWord" placeholder="単語を追加">
-<button id="addBtn" onclick="addWord()">追加</button>
+  <!-- play.html の操作ボタン（ジャンル関連は削除） -->
+  <div class="control-buttons">
+    <button id="shuffleBtn">🔀 シャッフル</button>
+    <button id="restartBtn">⏮ 最初から</button>
+  </div>
 
-<!-- 単語一覧 -->
-<ul id="wordList"></ul>
+  <!-- 単語追加欄 -->
+  <div class="add-area">
+    <input type="text" id="newWordInput" placeholder="単語を追加">
+    <button id="addWordBtn">追加</button>
+  </div>
 
-<!-- 読み上げ表示 -->
-<div id="displayWord">---</div>
+  <p style="font-size:14px; color:#555;">※ 最大20個まで保存できます</p>
 
-<!-- 読み上げ操作 -->
-<div class="play-buttons">
-    <button onclick="readNext()">▶ 次の単語</button>
-    <button onclick="resetShuffle()">🔁 シャッフル</button>
-</div>
+  <!-- 単語一覧 -->
+  <div class="word-list" id="wordList"></div>
 
-<script>
+  <script>
+    // localStorage 読み込み
     let userWords = JSON.parse(localStorage.getItem("userWords") || "[]");
-    let remaining = [];
 
-    function save() {
-        localStorage.setItem("userWords", JSON.stringify(userWords));
+    const wordList = document.getElementById("wordList");
+    const newWordInput = document.getElementById("newWordInput");
+    const addWordBtn = document.getElementById("addWordBtn");
+
+    function saveWords() {
+      localStorage.setItem("userWords", JSON.stringify(userWords));
     }
 
-    function addWord() {
-        const w = document.getElementById("newWord").value.trim();
-        if (!w) return;
-        userWords.push(w);
-        save();
-        renderList();
-        document.getElementById("newWord").value = "";
-        resetShuffle();
+    function renderWords() {
+      wordList.innerHTML = "";
+
+      userWords.forEach((w, idx) => {
+        const div = document.createElement("div");
+        div.className = "word-item";
+
+        const numSpan = document.createElement("span");
+        numSpan.textContent = (idx + 1) + ". ";
+
+        const textSpan = document.createElement("span");
+        textSpan.textContent = w;
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "削除";
+        delBtn.className = "delete-btn";
+        delBtn.onclick = () => {
+          userWords.splice(idx, 1);
+          saveWords();
+          renderWords();
+        };
+
+        div.appendChild(numSpan);
+        div.appendChild(textSpan);
+        div.appendChild(delBtn);
+
+        wordList.appendChild(div);
+      });
     }
 
-    function renderList() {
-        const ul = document.getElementById("wordList");
-        ul.innerHTML = "";
-        userWords.forEach((w) => {
-            const li = document.createElement("li");
-            li.textContent = w;
-            ul.appendChild(li);
-        });
-    }
+    addWordBtn.addEventListener("click", () => {
+      const val = newWordInput.value.trim();
+      if (!val) return;
 
-    function resetShuffle() {
-        remaining = [...userWords];
-        shuffle(remaining);
-        document.getElementById("displayWord").textContent = "---";
-    }
+      if (userWords.length >= 20) {
+        alert("最大20個までです。");
+        return;
+      }
 
-    function readNext() {
-        if (remaining.length === 0) return;
-        const word = remaining.shift();
-        document.getElementById("displayWord").textContent = word;
-        playAudio(word);
-    }
+      userWords.push(val);
+      saveWords();
+      newWordInput.value = "";
+      renderWords();
+    });
 
-    function shuffle(arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    }
+    // シャッフル
+    document.getElementById("shuffleBtn").onclick = () => {
+      userWords.sort(() => Math.random() - 0.5);
+      saveWords();
+      renderWords();
+    };
 
-    function playAudio(word) {
-        const audio = new Audio(`audio/${word}.mp3`);
-        audio.play();
-    }
+    // 最初から
+    document.getElementById("restartBtn").onclick = () => {
+      renderWords();
+      alert("最初から表示します。");
+    };
 
-    renderList();
-    resetShuffle();
-</script>
+    renderWords();
+  </script>
+
+  <footer>
+    © 2026 Studio OZ
+  </footer>
 
 </body>
 </html>
