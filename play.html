@@ -104,6 +104,15 @@
       background: #aaa;
       color: white;
     }
+
+    /* ★ ラジオボタンの位置調整 */
+    #voiceSelector {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+    #voiceSelector label {
+      margin: 0 10px;
+    }
   </style>
 </head>
 
@@ -122,15 +131,16 @@
     <button id="clearCheckBtn" class="top-btn">チェッククリア</button>
   </div>
 
+  <!-- ★ 速度ゲージ削除 → 男性/女性の声ラジオボタン追加 -->
+  <div id="voiceSelector">
+    <label><input type="radio" name="voice" value="boy" checked> 男性の声</label>
+    <label><input type="radio" name="voice" value="girl"> 女性の声</label>
+  </div>
+
   <div class="reading-header">
     <button id="autoPlayToggle" class="top-btn auto-off">自動再生 OFF</button>
 
-    <span id="rateDisplay">
-      速度：
-      <button id="rateDown">▼</button>
-      <input id="rateInput" type="number" step="0.1" min="0.5" max="3" value="1" style="width:60px;">
-      <button id="rateUp">▲</button>
-    </span>
+    <!-- ★ 速度ゲージ削除済み -->
 
     <span id="intervalDisplay">
       間隔：
@@ -148,7 +158,6 @@
   <button id="nextWordBtn" class="main-btn">次の単語</button>
   <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ スタート</button>
 
-  <!-- ★ 停止ボタン（停止専用） -->
   <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
 
   <p id="remainingCount">残り：0</p>
@@ -165,7 +174,6 @@
     });
 
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
-    const readRate = settings.rate || 1;
     const readInterval = settings.interval || 6;
     let autoPlay = settings.autoPlay || false;
 
@@ -250,12 +258,16 @@
       remainingCount.textContent = "残り：" + (shuffled.length - index);
     }
 
+    /* ★ 男性/女性の声に応じてフォルダ切り替え */
     function speakWord(word) {
+      const voice = document.querySelector('input[name="voice"]:checked').value;
+
       if (audioPlayer) {
         audioPlayer.pause();
         audioPlayer.currentTime = 0;
       }
-      audioPlayer = new Audio(`sound/${word.toLowerCase()}.mp3`);
+
+      audioPlayer = new Audio(`sound/${voice}/${word.toLowerCase()}.mp3`);
       audioPlayer.play();
     }
 
@@ -271,7 +283,6 @@
       updateRemaining();
     });
 
-    /* ★ 停止ボタン（停止専用） */
     pauseButton.addEventListener("click", () => {
       isPaused = true;
 
@@ -295,37 +306,10 @@
     }
     updateAutoBtn();
 
-    autoBtn.addEventListener("click", () => {
-      autoPlay = !autoPlay;
-      updateAutoBtn();
-      if (autoPlay) autoPlayLoop();
-    });
-
-    const rateInput = document.getElementById("rateInput");
-    const intervalInput = document.getElementById("intervalInput");
-
-    rateInput.value = readRate;
     intervalInput.value = readInterval;
-
-    rateInput.addEventListener("input", () => {
-      settings.rate = Number(rateInput.value);
-      localStorage.setItem("settings", JSON.stringify(settings));
-    });
 
     intervalInput.addEventListener("input", () => {
       settings.interval = Number(intervalInput.value);
-      localStorage.setItem("settings", JSON.stringify(settings));
-    });
-
-    document.getElementById("rateUp").addEventListener("click", () => {
-      rateInput.value = Math.min(3, Number(rateInput.value) + 0.1).toFixed(1);
-      settings.rate = Number(rateInput.value);
-      localStorage.setItem("settings", JSON.stringify(settings));
-    });
-
-    document.getElementById("rateDown").addEventListener("click", () => {
-      rateInput.value = Math.max(0.5, Number(rateInput.value) - 0.1).toFixed(1);
-      settings.rate = Number(rateInput.value);
       localStorage.setItem("settings", JSON.stringify(settings));
     });
 
