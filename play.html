@@ -113,6 +113,15 @@
     #voiceSelector label {
       margin: 0 10px;
     }
+
+    /* ★ 自動再生ボタンが押せない問題の修正 */
+    .reading-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 
@@ -131,7 +140,7 @@
     <button id="clearCheckBtn" class="top-btn">チェッククリア</button>
   </div>
 
-  <!-- ★ 速度ゲージ削除 → 男性/女性の声ラジオボタン追加 -->
+  <!-- ★ 男性/女性の声ラジオボタン -->
   <div id="voiceSelector">
     <label><input type="radio" name="voice" value="boy" checked> 男性の声</label>
     <label><input type="radio" name="voice" value="girl"> 女性の声</label>
@@ -139,8 +148,6 @@
 
   <div class="reading-header">
     <button id="autoPlayToggle" class="top-btn auto-off">自動再生 OFF</button>
-
-    <!-- ★ 速度ゲージ削除済み -->
 
     <span id="intervalDisplay">
       間隔：
@@ -258,7 +265,6 @@
       remainingCount.textContent = "残り：" + (shuffled.length - index);
     }
 
-    /* ★ 男性/女性の声に応じてフォルダ切り替え */
     function speakWord(word) {
       const voice = document.querySelector('input[name="voice"]:checked').value;
 
