@@ -254,19 +254,36 @@
       speechSynthesis.speak(utter);
     }
 
+    /* ★★★ play.html と同じ表示／非表示仕様 ★★★ */
     document.getElementById("toggleDisplayBtn").onclick = () => {
       isDisplayVisible = !isDisplayVisible;
-      document.getElementById("displayWord").style.visibility =
-        isDisplayVisible ? "visible" : "hidden";
+
+      const dw = document.getElementById("displayWord");
+
+      if (isDisplayVisible) {
+        dw.style.visibility = "visible";
+        if (currentIndex > 0 && currentIndex <= speakList.length) {
+          dw.textContent = speakList[currentIndex - 1];
+        }
+      } else {
+        dw.style.visibility = "hidden";
+        dw.textContent = "";
+      }
     };
 
+    /* ★★★ 次の単語（表示 OFF のときは画面に出さない） ★★★ */
     document.getElementById("nextWordBtn").onclick = () => {
       if (currentIndex >= speakList.length) {
         alert("これ以上単語がありません");
         return;
       }
+
       const word = speakList[currentIndex];
-      document.getElementById("displayWord").textContent = word;
+
+      if (isDisplayVisible) {
+        document.getElementById("displayWord").textContent = word;
+      }
+
       speak(word);
       currentIndex++;
       updateRemaining();
@@ -281,11 +298,16 @@
       nextAuto();
     };
 
+    /* ★★★ 自動再生（表示 OFF のときは画面に出さない） ★★★ */
     function nextAuto() {
       if (currentIndex >= speakList.length) return;
 
       const word = speakList[currentIndex];
-      document.getElementById("displayWord").textContent = word;
+
+      if (isDisplayVisible) {
+        document.getElementById("displayWord").textContent = word;
+      }
+
       speak(word);
       currentIndex++;
       updateRemaining();
