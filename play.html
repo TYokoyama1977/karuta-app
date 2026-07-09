@@ -151,16 +151,14 @@
       <button id="toggleWordBtn" class="top-btn">👁 表示</button>
     </div>
 
-    <!-- ★ 残り数をここに移動 -->
     <div style="display:flex; justify-content:center; margin-top:10px;">
       <p id="remainingCount">残り：0</p>
     </div>
+
     <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ スタート</button>
     <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
     <button id="nextWordBtn" class="main-btn">次の単語</button>
     <button id="shuffleResetBtn" class="main-btn" style="background:#ffcc66;">🔄 シャッフル</button>
-    
-   
 
   </div>
 
@@ -294,7 +292,16 @@
     pauseButton.addEventListener("click", () => {
       isPaused = true;
 
-      if (audioPlayer) audioPlayer.pause();
+      if (audioPlayer) {
+
+        if (!audioPlayer.paused) {
+          audioPlayer.pause();
+          audioPlayer.currentTime = 0;
+          audioPlayer.play();   // ★ レオン案：再生中なら同じmp3をもう一度再生
+        } else {
+          audioPlayer.pause();
+        }
+      }
 
       pauseButton.style.background = "#ff4444";
       pauseButton.textContent = "⏹ 停止中";
