@@ -19,6 +19,8 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
+      background: #fff;
+      border-bottom: 1px solid #ddd;
     }
     .play-header button {
       font-size: 18px;
@@ -32,49 +34,58 @@
     h1 {
       margin-top: 10px;
       font-size: 28px;
+      color: #444;
     }
 
-    /* 単語表示欄 */
-    #displayArea {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 15px;
+    /* ▼▼ play.html と統一した白背景カード ▼▼ */
+    .reading-card {
+      background: #fff;
+      width: 90%;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     #displayWord {
-      font-size: 64px;
-      font-weight: bold;
-      min-height: 70px;
+      font-size: 80px;
+      margin-top: 10px;
+      color: #333;
+      min-height: 80px;
     }
 
-    #toggleDisplayBtn {
+    .top-btn {
       font-size: 18px;
       padding: 8px 14px;
       border-radius: 8px;
       border: none;
-      background: #ffcc66;
+      background: #eee;
+      margin: 5px;
       cursor: pointer;
     }
 
-    /* 読み上げ操作 */
-    .read-controls {
+    .main-btn {
       margin-top: 15px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-    .read-controls button {
-      font-size: 18px;
-      padding: 8px 14px;
-      border-radius: 8px;
+      padding: 18px 40px;
+      font-size: 22px;
+      border-radius: 50px;
       border: none;
       background: #ffcc66;
       cursor: pointer;
     }
 
-    /* 単語追加欄 */
+    .main-btn:hover {
+      background: #ffdd88;
+    }
+
+    #remainingCount {
+      font-size: 22px;
+      color: #444;
+      margin-top: 10px;
+    }
+
+    /* ▼▼ 単語追加欄 ▼▼ */
     .add-area {
       margin-top: 25px;
     }
@@ -94,7 +105,7 @@
       cursor: pointer;
     }
 
-    /* 単語一覧（2列） */
+    /* ▼▼ 単語一覧 ▼▼ */
     .word-list {
       margin-top: 20px;
       width: 90%;
@@ -138,23 +149,25 @@
 
   <h1>ユーザー追加単語</h1>
 
-  <!-- 単語表示欄（右に表示/非表示ボタン） -->
-  <div id="displayArea">
-    <div id="displayWord"></div>
-    <button id="toggleDisplayBtn">表示/非表示</button>
+  <!-- ▼▼ play.html と統一した reading-card ▼▼ -->
+  <div class="reading-card">
+
+    <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
+      <div id="displayWord">---</div>
+      <button id="toggleDisplayBtn" class="top-btn">👁 表示</button>
+    </div>
+
+    <p id="remainingCount">残り: 0 個</p>
+
+    <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ スタート</button>
+    <button id="pauseBtn" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
+    <button id="resumeBtn" class="main-btn">再開</button>
+    <button id="nextWordBtn" class="main-btn">次の単語</button>
+    <button id="shuffleBtn" class="main-btn" style="background:#ffcc66;">🔄 シャッフル</button>
+
   </div>
 
-  <!-- 読み上げ操作 -->
-  <div class="read-controls">
-    <button id="nextWordBtn">次の単語</button>
-    <button id="startBtn">スタート</button>
-    <button id="pauseBtn">ポーズ</button>
-    <button id="resumeBtn">再開</button>
-  </div>
-
-  <p id="remainingCount" style="font-size:16px; margin-top:10px;">残り: 0 個</p>
-
-  <!-- 単語追加欄 -->
+  <!-- ▼▼ 単語追加欄（現状維持） ▼▼ -->
   <div class="add-area">
     <input type="text" id="newWordInput" placeholder="単語を追加">
     <button id="addWordBtn">追加</button>
@@ -162,7 +175,7 @@
 
   <p style="font-size:14px; color:#555;">※ 最大20個まで保存できます</p>
 
-  <!-- 単語一覧（2列） -->
+  <!-- ▼▼ 単語一覧（現状維持） ▼▼ -->
   <div class="word-list" id="wordList"></div>
 
   <script>
@@ -254,7 +267,7 @@
       speechSynthesis.speak(utter);
     }
 
-    /* ★★★ play.html と同じ表示／非表示仕様 ★★★ */
+    /* ▼▼ 表示／非表示（play.html と統一） ▼▼ */
     document.getElementById("toggleDisplayBtn").onclick = () => {
       isDisplayVisible = !isDisplayVisible;
 
@@ -271,7 +284,7 @@
       }
     };
 
-    /* ★★★ 次の単語（表示 OFF のときは画面に出さない） ★★★ */
+    /* ▼▼ 次の単語 ▼▼ */
     document.getElementById("nextWordBtn").onclick = () => {
       if (currentIndex >= speakList.length) {
         alert("これ以上単語がありません");
@@ -289,16 +302,18 @@
       updateRemaining();
     };
 
+    /* ▼▼ スタート ▼▼ */
     document.getElementById("startBtn").onclick = () => {
       if (speakList.length === 0) {
         alert("チェックされた単語がありません");
         return;
       }
       currentIndex = 0;
+      isPaused = false;
       nextAuto();
     };
 
-    /* ★★★ 自動再生（表示 OFF のときは画面に出さない） ★★★ */
+    /* ▼▼ 自動再生 ▼▼ */
     function nextAuto() {
       if (currentIndex >= speakList.length) return;
 
@@ -317,15 +332,25 @@
       }
     }
 
+    /* ▼▼ 停止 ▼▼ */
     document.getElementById("pauseBtn").onclick = () => {
       isPaused = true;
       speechSynthesis.pause();
     };
 
+    /* ▼▼ 再開 ▼▼ */
     document.getElementById("resumeBtn").onclick = () => {
       isPaused = false;
       speechSynthesis.resume();
       nextAuto();
+    };
+
+    /* ▼▼ シャッフル ▼▼ */
+    document.getElementById("shuffleBtn").onclick = () => {
+      speakList = [...speakList].sort(() => Math.random() - 0.5);
+      currentIndex = 0;
+      updateRemaining();
+      document.getElementById("displayWord").textContent = "---";
     };
 
     function updateRemaining() {
