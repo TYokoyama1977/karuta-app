@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>設定 - 英語かるたアプリ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .header {
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .home-btn {
+      font-size: 18px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: #eee;
+      cursor: pointer;
+    }
+
+    .setting-card {
+      background: #fff;
+      width: 90%;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+
+    .setting-row {
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    input[type="number"] {
+      width: 80px;
+      font-size: 20px;
+    }
+
+    .save-btn {
+      margin-top: 20px;
+      padding: 15px 40px;
+      font-size: 22px;
+      border-radius: 50px;
+      border: none;
+      background: #66ccff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <button id="homeButton" class="home-btn">🏠 戻る</button>
+  </div>
+
+  <h2>設定</h2>
+
+  <div class="setting-card">
+
+    <div class="setting-row">
+      <label>
+        <input type="checkbox" id="autoPlayCheck">
+        自動再生
+      </label>
+    </div>
+
+    <div class="setting-row">
+      声：
+      <label><input type="radio" name="voice" value="boy"> 男性</label>
+      <label><input type="radio" name="voice" value="girl"> 女性</label>
+    </div>
+
+    <div class="setting-row">
+      速度：
+      <input id="rateInput" type="number" step="0.1" min="0.5" max="3">
+    </div>
+
+    <div class="setting-row">
+      間隔（秒）：
+      <input id="intervalInput" type="number" step="1" min="1" max="20">
+    </div>
+
+    <button id="saveBtn" class="save-btn">保存する</button>
+  </div>
+
+  <script>
+    homeButton.addEventListener("click", () => {
+      window.location.href = "play.html";
+    });
+
+    const settings = JSON.parse(localStorage.getItem("settings") || "{}");
+
+    autoPlayCheck.checked = settings.autoPlay || false;
+    rateInput.value = settings.rate || 1;
+    intervalInput.value = settings.interval || 6;
+
+    if (settings.voice === "girl") {
+      document.querySelector('input[value="girl"]').checked = true;
+    } else {
+      document.querySelector('input[value="boy"]').checked = true;
+    }
+
+    saveBtn.addEventListener("click", () => {
+      const newSettings = {
+        autoPlay: autoPlayCheck.checked,
+        voice: document.querySelector('input[name="voice"]:checked').value,
+        rate: Number(rateInput.value),
+        interval: Number(intervalInput.value)
+      };
+
+      localStorage.setItem("settings", JSON.stringify(newSettings));
+
+      alert("設定を保存しました");
+    });
+  </script>
+
+</body>
+</html>

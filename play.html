@@ -14,19 +14,28 @@
       text-align: center;
     }
 
+    /* ナビゲーション */
     .play-header {
       padding: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: #fff;
+      border-bottom: 1px solid #ddd;
     }
 
-    .home-btn, .edit-btn {
+    .nav-right {
+      display: flex;
+      gap: 10px;
+    }
+
+    .home-btn, .edit-btn, .setting-btn {
       font-size: 18px;
       padding: 8px 14px;
       border-radius: 8px;
       border: none;
       background: #eee;
+      cursor: pointer;
     }
 
     h2 {
@@ -35,6 +44,7 @@
       color: #444;
     }
 
+    /* ジャンルアイコン */
     .genre-icons {
       display: flex;
       flex-wrap: wrap;
@@ -50,6 +60,8 @@
       padding: 5px;
       border-radius: 10px;
       transition: 0.2s;
+      background: #fff;
+      border: 1px solid #ddd;
     }
 
     .genre img {
@@ -67,19 +79,31 @@
       transform: scale(1.3);
     }
 
+    /* 読み上げカード */
+    .reading-card {
+      background: #fff;
+      width: 90%;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
     #currentWord {
       font-size: 80px;
-      margin-top: 30px;
+      margin-top: 10px;
       color: #333;
     }
 
     .main-btn {
-      margin-top: 20px;
-      padding: 20px 40px;
+      margin-top: 15px;
+      padding: 18px 40px;
       font-size: 22px;
       border-radius: 50px;
       border: none;
       background: #ffcc66;
+      cursor: pointer;
     }
 
     .main-btn:hover {
@@ -93,84 +117,61 @@
       border: none;
       background: #eee;
       margin: 5px;
+      cursor: pointer;
     }
 
-    #autoPlayToggle.auto-on {
-      background: #4CAF50;
-      color: white;
-    }
-
-    #autoPlayToggle.auto-off {
-      background: #aaa;
-      color: white;
-    }
-
-    /* ★ 男声/女声ラジオボタン */
-    #voiceSelector {
+    #remainingCount {
+      font-size: 22px;
       margin-top: 10px;
-      margin-bottom: 10px;
-      font-size: 18px;
-    }
-    #voiceSelector label {
-      margin: 0 10px;
+      color: #444;
     }
   </style>
 </head>
 
 <body>
 
+  <!-- ナビゲーション -->
   <div class="play-header">
     <button id="homeButton" class="home-btn">🏠 ホーム</button>
-    <button id="editButton" class="edit-btn">✏️ 単語一覧</button>
+
+    <div class="nav-right">
+      <button id="editButton" class="edit-btn">✏️ 単語一覧</button>
+      <button id="settingButton" class="setting-btn">🔧 設定</button>
+    </div>
   </div>
 
   <h2>ジャンルを選択してください</h2>
 
   <div class="genre-icons" id="genreArea"></div>
+
   <div style="margin-top:10px;">
     <button id="checkAllBtn" class="top-btn">全ジャンルチェック</button>
     <button id="clearCheckBtn" class="top-btn">チェッククリア</button>
   </div>
 
-  <div class="reading-header">
-    <button id="autoPlayToggle" class="top-btn auto-off">自動再生 OFF</button>
+  <!-- 読み上げカード -->
+  <div class="reading-card">
 
-    <!-- ★ 自動再生ボタンのすぐ下に追加 -->
-    <div id="voiceSelector">
-      <label><input type="radio" name="voice" value="boy" checked> 男性の声</label>
-      <label><input type="radio" name="voice" value="girl"> 女性の声</label>
+    <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
+      <div id="currentWord">---</div>
+      <button id="toggleWordBtn" class="top-btn">👁 表示</button>
     </div>
 
-    <span id="rateDisplay">
-      速度：
-      <button id="rateDown">▼</button>
-      <input id="rateInput" type="number" step="0.1" min="0.5" max="3" value="1" style="width:60px;">
-      <button id="rateUp">▲</button>
-    </span>
+    <button id="nextWordBtn" class="main-btn">次の単語</button>
+    <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ スタート</button>
+    <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
 
-    <span id="intervalDisplay">
-      間隔：
-      <button id="intervalDown">▼</button>
-      <input id="intervalInput" type="number" step="1" min="1" max="20" value="6" style="width:60px;">
-      <button id="intervalUp">▲</button>
-    </span>
+    <p id="remainingCount">残り：0</p>
+
+    <button id="shuffleResetBtn" class="main-btn">🔄 シャッフルして最初から</button>
   </div>
 
-  <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
-    <div id="currentWord">---</div>
-    <button id="toggleWordBtn" class="top-btn">👁 表示</button>
-  </div>
-
-  <button id="nextWordBtn" class="main-btn">次の単語</button>
-  <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ スタート</button>
-
-  <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
-
-  <p id="remainingCount">残り：0</p>
-
-  <button id="shuffleResetBtn" class="main-btn">🔄 シャッフルして最初から</button>
+  <footer>
+    © 2026 Studio OZ
+  </footer>
 
   <script>
+    /* ナビゲーション */
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
@@ -179,11 +180,17 @@
       window.location.href = "edit.html";
     });
 
+    settingButton.addEventListener("click", () => {
+      window.location.href = "settings.html";
+    });
+
+    /* 設定読み込み */
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
     const readRate = settings.rate || 1;
     const readInterval = settings.interval || 6;
     let autoPlay = settings.autoPlay || false;
 
+    /* ジャンル */
     const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
     const genreArea = document.getElementById("genreArea");
 
@@ -265,9 +272,9 @@
       remainingCount.textContent = "残り：" + (shuffled.length - index);
     }
 
-    /* ★ 男声/女声対応 */
+    /* 読み上げ */
     function speakWord(word) {
-      const voice = document.querySelector('input[name="voice"]:checked').value;
+      const voice = settings.voice || "boy";
 
       if (audioPlayer) {
         audioPlayer.pause();
@@ -299,73 +306,13 @@
       pauseButton.textContent = "⏹ 停止中";
     });
 
-    const autoBtn = document.getElementById("autoPlayToggle");
-    function updateAutoBtn() {
-      if (autoPlay) {
-        autoBtn.textContent = "自動再生 ON";
-        autoBtn.classList.add("auto-on");
-        autoBtn.classList.remove("auto-off");
-      } else {
-        autoBtn.textContent = "自動再生 OFF";
-        autoBtn.classList.add("auto-off");
-        autoBtn.classList.remove("auto-on");
-      }
-    }
-    updateAutoBtn();
-
-    autoBtn.addEventListener("click", () => {
-      autoPlay = !autoPlay;
-      updateAutoBtn();
-      if (autoPlay) autoPlayLoop();
-    });
-
-    const rateInput = document.getElementById("rateInput");
-    const intervalInput = document.getElementById("intervalInput");
-
-    rateInput.value = readRate;
-    intervalInput.value = readInterval;
-
-    rateInput.addEventListener("input", () => {
-      settings.rate = Number(rateInput.value);
-      localStorage.setItem("settings", JSON.stringify(settings));
-    });
-
-    intervalInput.addEventListener("input", () => {
-      settings.interval = Number(intervalInput.value);
-      localStorage.setItem("settings", JSON.stringify(settings));
-    });
-
-    document.getElementById("rateUp").addEventListener("click", () => {
-      rateInput.value = Math.min(3, Number(rateInput.value) + 0.1).toFixed(1);
-      settings.rate = Number(rateInput.value);
-      localStorage.setItem("settings", JSON.stringify(settings));
-    });
-
-    document.getElementById("rateDown").addEventListener("click", () => {
-      rateInput.value = Math.max(0.5, Number(rateInput.value) - 0.1).toFixed(1);
-      settings.rate = Number(rateInput.value);
-      localStorage.setItem("settings", JSON.stringify(settings));
-    });
-
-    document.getElementById("intervalUp").addEventListener("click", () => {
-      intervalInput.value = Math.min(20, Number(intervalInput.value) + 1);
-      settings.interval = Number(intervalInput.value);
-      localStorage.setItem("settings", JSON.stringify(settings));
-    });
-
-    document.getElementById("intervalDown").addEventListener("click", () => {
-      intervalInput.value = Math.max(1, Number(intervalInput.value) - 1);
-      settings.interval = Number(intervalInput.value);
-      localStorage.setItem("settings", JSON.stringify(settings));
-    });
-
     function autoPlayLoop() {
       if (!autoPlay || isPaused) return;
 
       nextWordBtn.click();
 
       if (index < shuffled.length) {
-        setTimeout(autoPlayLoop, Number(intervalInput.value) * 1000);
+        setTimeout(autoPlayLoop, readInterval * 1000);
       }
     }
 
@@ -393,7 +340,7 @@
       }
 
       if (autoPlay) {
-        setTimeout(autoPlayLoop, Number(intervalInput.value) * 1000);
+        setTimeout(autoPlayLoop, readInterval * 1000);
       }
     });
 
@@ -408,10 +355,6 @@
       toggleWordBtn.textContent = wordVisible ? "👁 表示" : "👁 非表示";
     });
   </script>
-
-  <footer>
-    © 2026 Studio OZ
-  </footer>
 
 </body>
 </html>
