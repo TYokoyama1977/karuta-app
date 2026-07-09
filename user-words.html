@@ -159,10 +159,7 @@
 
     <p id="remainingCount">残り: 0 個</p>
 
-    <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ スタート</button>
-    <button id="pauseBtn" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
-    <button id="resumeBtn" class="main-btn">再開</button>
-    <button id="nextWordBtn" class="main-btn">次の単語</button>
+    <button id="readBtn" class="main-btn" style="background:#99ddff;">📖 読む</button>
     <button id="shuffleBtn" class="main-btn" style="background:#ffcc66;">🔄 シャッフル</button>
 
   </div>
@@ -188,7 +185,6 @@
     let speakList = [];
     let currentIndex = 0;
     let isDisplayVisible = true;
-    let isPaused = false;
 
     function saveWords() {
       localStorage.setItem("userWords", JSON.stringify(userWords));
@@ -267,7 +263,7 @@
       speechSynthesis.speak(utter);
     }
 
-    /* ▼▼ 表示／非表示（play.html と統一） ▼▼ */
+    /* ▼▼ 表示／非表示 ▼▼ */
     document.getElementById("toggleDisplayBtn").onclick = () => {
       isDisplayVisible = !isDisplayVisible;
 
@@ -284,8 +280,13 @@
       }
     };
 
-    /* ▼▼ 次の単語 ▼▼ */
-    document.getElementById("nextWordBtn").onclick = () => {
+    /* ▼▼ 読む（3秒待ってから読み上げ） ▼▼ */
+    document.getElementById("readBtn").onclick = () => {
+      if (speakList.length === 0) {
+        alert("チェックされた単語がありません");
+        return;
+      }
+
       if (currentIndex >= speakList.length) {
         alert("これ以上単語がありません");
         return;
@@ -297,52 +298,12 @@
         document.getElementById("displayWord").textContent = word;
       }
 
-      speak(word);
+      setTimeout(() => {
+        speak(word);
+      }, 3000);
+
       currentIndex++;
       updateRemaining();
-    };
-
-    /* ▼▼ スタート ▼▼ */
-    document.getElementById("startBtn").onclick = () => {
-      if (speakList.length === 0) {
-        alert("チェックされた単語がありません");
-        return;
-      }
-      currentIndex = 0;
-      isPaused = false;
-      nextAuto();
-    };
-
-    /* ▼▼ 自動再生 ▼▼ */
-    function nextAuto() {
-      if (currentIndex >= speakList.length) return;
-
-      const word = speakList[currentIndex];
-
-      if (isDisplayVisible) {
-        document.getElementById("displayWord").textContent = word;
-      }
-
-      speak(word);
-      currentIndex++;
-      updateRemaining();
-
-      if (!isPaused) {
-        setTimeout(nextAuto, 2000);
-      }
-    }
-
-    /* ▼▼ 停止 ▼▼ */
-    document.getElementById("pauseBtn").onclick = () => {
-      isPaused = true;
-      speechSynthesis.pause();
-    };
-
-    /* ▼▼ 再開 ▼▼ */
-    document.getElementById("resumeBtn").onclick = () => {
-      isPaused = false;
-      speechSynthesis.resume();
-      nextAuto();
     };
 
     /* ▼▼ シャッフル ▼▼ */
