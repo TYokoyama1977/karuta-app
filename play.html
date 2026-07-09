@@ -121,6 +121,12 @@
       font-size: 22px;
       color: #444;
     }
+
+    #autoPlayStatus {
+      font-size: 20px;
+      margin-top: 5px;
+      color: #666;
+    }
   </style>
 </head>
 
@@ -151,13 +157,14 @@
       <button id="toggleWordBtn" class="top-btn">👁 表示</button>
     </div>
 
+    <p id="autoPlayStatus">自動再生：OFF</p>
+
     <div style="display:flex; justify-content:center; margin-top:10px;">
       <p id="remainingCount">残り：0</p>
     </div>
 
-    <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ スタート</button>
+    <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ 読む</button>
     <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
-    <button id="nextWordBtn" class="main-btn">次の単語</button>
     <button id="shuffleResetBtn" class="main-btn" style="background:#ffcc66;">🔄 シャッフル</button>
 
   </div>
@@ -183,6 +190,9 @@
     const readRate = settings.rate || 1;
     const readInterval = settings.interval || 6;
     let autoPlay = settings.autoPlay || false;
+
+    const autoPlayStatus = document.getElementById("autoPlayStatus");
+    autoPlayStatus.textContent = "自動再生：" + (autoPlay ? "ON" : "OFF");
 
     const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
     const genreArea = document.getElementById("genreArea");
@@ -277,19 +287,33 @@
       audioPlayer.play();
     }
 
-    nextWordBtn.addEventListener("click", () => {
-      if (index >= shuffled.length) return;
+    /* ★ 読む/再開ボタンに統合 */
+    startBtn.addEventListener("click", () => {
+      if (shuffled.length === 0) return;
 
-      const word = shuffled[index];
-      currentWord.textContent = word;
+      isPaused = false;
+
+      pauseButton.style.background = "#ff9999";
+      pauseButton.textContent = "⏹ 停止";
+
+      startBtn.textContent = "▶ 読む";
+
+      let word = currentWord.textContent;
+
+      if (!word || word === "---") {
+        word = shuffled[index];
+        currentWord.textContent = word;
+        index++;
+        updateRemaining();
+      }
 
       setTimeout(() => speakWord(word), 3000);
 
-      index++;
-      updateRemaining();
+      if (autoPlay) {
+        setTimeout(autoPlayLoop, readInterval * 1000);
+      }
     });
 
-    /* ★ 修正済み：停止時は止めるだけ（再生しない） */
     pauseButton.addEventListener("click", () => {
       isPaused = true;
 
@@ -300,12 +324,13 @@
 
       pauseButton.style.background = "#ff4444";
       pauseButton.textContent = "⏹ 停止中";
+      startBtn.textContent = "▶ 再開";
     });
 
     function autoPlayLoop() {
       if (!autoPlay || isPaused) return;
 
-      nextWordBtn.click();
+      startBtn.click();
 
       if (index < shuffled.length) {
         setTimeout(autoPlayLoop, readInterval * 1000);
@@ -316,28 +341,7 @@
       loadWords();
       currentWord.textContent = "---";
       index = 0;
-    });
-
-    startBtn.addEventListener("click", () => {
-      if (shuffled.length === 0) return;
-
-      isPaused = false;
-
-      pauseButton.style.background = "#ff9999";
-      pauseButton.textContent = "⏹ 停止";
-
-      const current = currentWord.textContent;
-
-      if (!current || current === "---") {
-        index = 0;
-        nextWordBtn.click();
-      } else {
-        speakWord(current);
-      }
-
-      if (autoPlay) {
-        setTimeout(autoPlayLoop, readInterval * 1000);
-      }
+      startBtn.textContent = "▶ 読む";
     });
 
     loadWords();

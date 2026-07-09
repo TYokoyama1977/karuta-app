@@ -160,6 +160,12 @@
 
   </div>
 
+  <!-- ★ ここに追加：全てチェック / チェッククリア -->
+  <div style="margin-top:15px;">
+    <button id="checkAllBtn" class="top-btn">全てチェック</button>
+    <button id="clearCheckBtn" class="top-btn">チェッククリア</button>
+  </div>
+
   <div class="add-area">
     <input type="text" id="newWordInput" placeholder="単語を追加">
     <button id="addWordBtn">追加</button>
@@ -237,6 +243,22 @@
         "残り: " + speakList.length + " 個";
     }
 
+    /* ★ 全てチェック */
+    document.getElementById("checkAllBtn").addEventListener("click", () => {
+      document.querySelectorAll(".word-item input[type='checkbox']").forEach(cb => {
+        cb.checked = true;
+      });
+      updateSpeakList();
+    });
+
+    /* ★ チェッククリア */
+    document.getElementById("clearCheckBtn").addEventListener("click", () => {
+      document.querySelectorAll(".word-item input[type='checkbox']").forEach(cb => {
+        cb.checked = false;
+      });
+      updateSpeakList();
+    });
+
     addWordBtn.addEventListener("click", () => {
       const val = newWordInput.value.trim();
       if (!val) return;
@@ -252,17 +274,14 @@
       renderWords();
     });
 
-    /* ★ 音声が確実に出るように修正した speak() */
     function speak(text) {
-      // 初期化（無音の短い読み上げ）
       const init = new SpeechSynthesisUtterance(" ");
       init.lang = "en-US";
       speechSynthesis.speak(init);
 
-      // 本番読み上げ
       setTimeout(() => {
         const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = "en-US";   // ★ 英語の声を強制
+        utter.lang = "en-US";
         speechSynthesis.speak(utter);
       }, 100);
     }
@@ -300,7 +319,6 @@
         document.getElementById("displayWord").textContent = word;
       }
 
-      // 3秒待ってから読み上げ
       setTimeout(() => {
         speak(word);
       }, 3000);
