@@ -88,10 +88,7 @@
       <label><input type="radio" name="voice" value="girl"> 女性</label>
     </div>
 
-    <div class="setting-row">
-      速度：
-      <input id="rateInput" type="number" step="0.1" min="0.5" max="3">
-    </div>
+    <!-- ★ 速度の設定は削除済み -->
 
     <div class="setting-row">
       間隔（秒）：
@@ -109,7 +106,6 @@
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 
     autoPlayCheck.checked = settings.autoPlay || false;
-    rateInput.value = settings.rate || 1;
     intervalInput.value = settings.interval || 6;
 
     if (settings.voice === "girl") {
@@ -122,7 +118,6 @@
       const newSettings = {
         autoPlay: autoPlayCheck.checked,
         voice: document.querySelector('input[name="voice"]:checked').value,
-        rate: Number(rateInput.value),
         interval: Number(intervalInput.value)
       };
 
