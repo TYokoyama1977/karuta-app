@@ -285,6 +285,26 @@
 
       audioPlayer = new Audio(`sound/${voice}/${word.toLowerCase()}.mp3`);
       audioPlayer.play();
+
+      /* ★ mp3再生開始イベント：次の単語をセットする（自動再生ON/OFF共通） */
+      audioPlayer.onplay = () => {
+
+        if (index < shuffled.length) {
+          const nextWord = shuffled[index];
+          currentWord.textContent = nextWord;
+          index++;
+          updateRemaining();
+        }
+
+        /* ★ 自動再生ONならインターバル後に自動で読む */
+        if (autoPlay && !isPaused) {
+          setTimeout(() => {
+            startBtn.click();
+          }, readInterval * 1000);
+        }
+
+        /* ★ 自動再生OFFなら何もしない（読むボタンを押せば次が読まれる） */
+      };
     }
 
     /* ★ 読む/再開ボタンに統合 */
@@ -308,10 +328,6 @@
       }
 
       setTimeout(() => speakWord(word), 3000);
-
-      if (autoPlay) {
-        setTimeout(autoPlayLoop, readInterval * 1000);
-      }
     });
 
     pauseButton.addEventListener("click", () => {
@@ -326,16 +342,6 @@
       pauseButton.textContent = "⏹ 停止中";
       startBtn.textContent = "▶ 再開";
     });
-
-    function autoPlayLoop() {
-      if (!autoPlay || isPaused) return;
-
-      startBtn.click();
-
-      if (index < shuffled.length) {
-        setTimeout(autoPlayLoop, readInterval * 1000);
-      }
-    }
 
     shuffleResetBtn.addEventListener("click", () => {
       loadWords();
