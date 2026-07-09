@@ -289,18 +289,13 @@
       updateRemaining();
     });
 
+    /* ★ 修正済み：停止時は止めるだけ（再生しない） */
     pauseButton.addEventListener("click", () => {
       isPaused = true;
 
-      if (audioPlayer) {
-
-        if (!audioPlayer.paused) {
-          audioPlayer.pause();
-          audioPlayer.currentTime = 0;
-          audioPlayer.play();   // ★ レオン案：再生中なら同じmp3をもう一度再生
-        } else {
-          audioPlayer.pause();
-        }
+      if (audioPlayer && !audioPlayer.paused) {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
       }
 
       pauseButton.style.background = "#ff4444";
