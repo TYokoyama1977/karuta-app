@@ -71,19 +71,12 @@
       window.location.href = "index.html";
     }
 
-    const data = {
-      "Animal": ["dog","cat","bird","fish","rabbit","bear","lion","horse"],
-      "Color": ["red","blue","yellow","green","black","white","pink","purple"],
-      "Food": ["bread","rice","milk","egg","soup","cake","cheese","juice"],
-      "Fruit": ["apple","banana","orange","grape","peach","lemon","melon","strawberry"],
-      "Body": ["head","hand","foot","eye","ear","nose","mouth","hair"],
-      "Other": ["car","house","book","chair","clock","cup","ball","star"]
-    };
+    /* ▼ 単語一覧は不要なので削除し、カテゴリ名だけに最適化 ▼ */
+    const categories = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
 
     const nav = document.getElementById("nav");
-    const keys = Object.keys(data);
 
-    keys.forEach(key => {
+    categories.forEach(key => {
       const btn = document.createElement("button");
       btn.textContent = key;
       btn.addEventListener("click", () => {
