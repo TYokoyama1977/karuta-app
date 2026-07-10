@@ -36,8 +36,8 @@ fetch(`https://api.counterapi.dev/v1/${namespace}/${key}`)
     document.getElementById("total").innerText = `合計アクセス数：${data.count}`;
   });
 
-// 日別アクセス
-fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/daily`)
+// 日別アクセス（修正ポイント）
+fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/history/day`)
   .then(res => res.json())
   .then(data => {
     const labels = data.map(item => item.date);
@@ -57,11 +57,11 @@ fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/daily`)
     });
   });
 
-// 月別アクセス
-fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/monthly`)
+// 月別アクセス（修正ポイント）
+fetch(`https://api.counterapi.dev/v1/${namespace}/${key}/history/month`)
   .then(res => res.json())
   .then(data => {
-    const labels = data.map(item => item.month);
+    const labels = data.map(item => item.date);
     const counts = data.map(item => item.count);
 
     new Chart(document.getElementById("monthlyChart"), {
