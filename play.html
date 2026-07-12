@@ -14,7 +14,7 @@
       text-align: center;
     }
 
-    /* ★ ホーム左、設定右に配置 */
+    /* ホーム左、設定右に配置 */
     .play-header {
       padding: 10px;
       display: flex;
@@ -24,7 +24,7 @@
       border-bottom: 1px solid #ddd;
     }
 
-    .home-btn, .edit-btn, .setting-btn {
+    .home-btn, .setting-btn {
       font-size: 18px;
       padding: 8px 14px;
       border-radius: 8px;
@@ -166,6 +166,7 @@
   </footer>
 
   <script>
+    /* ページ遷移 */
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
@@ -174,13 +175,14 @@
       window.location.href = "settings.html";
     });
 
+    /* 設定読み込み */
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
     const readInterval = settings.interval || 6;
     let autoPlay = settings.autoPlay || false;
 
-    const autoPlayStatus = document.getElementById("autoPlayStatus");
     autoPlayStatus.textContent = "自動再生：" + (autoPlay ? "ON" : "OFF");
 
+    /* ジャンル読み込み */
     const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
     const genreArea = document.getElementById("genreArea");
 
@@ -207,7 +209,7 @@
       genreArea.appendChild(div);
     });
 
-    document.getElementById("checkAllBtn").addEventListener("click", () => {
+    checkAllBtn.addEventListener("click", () => {
       document.querySelectorAll(".genre").forEach(g => {
         const cb = g.querySelector("input");
         cb.checked = true;
@@ -216,7 +218,7 @@
       loadWords();
     });
 
-    document.getElementById("clearCheckBtn").addEventListener("click", () => {
+    clearCheckBtn.addEventListener("click", () => {
       document.querySelectorAll(".genre").forEach(g => {
         const cb = g.querySelector("input");
         cb.checked = false;
@@ -225,14 +227,15 @@
       loadWords();
     });
 
+    /* 単語管理 */
     let words = [];
     let shuffled = [];
     let index = 0;
+
     let isPaused = false;
+    let isPlaying = false;
 
     let audioPlayer = null;
-
-    let isPlaying = false;  // ★再生中フラグ
 
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
@@ -264,6 +267,7 @@
       remainingCount.textContent = "残り：" + (shuffled.length - index);
     }
 
+    /* 読み上げ処理 */
     function speakWord(word) {
       const voice = settings.voice || "boy";
 
@@ -276,8 +280,7 @@
       audioPlayer.play();
 
       audioPlayer.onplay = () => {
-
-        isPlaying = true;  // ★再生開始
+        isPlaying = true;
         startBtn.textContent = "🔊 読み上げ中";
 
         if (index < shuffled.length) {
@@ -295,16 +298,16 @@
       };
 
       audioPlayer.onended = () => {
-        isPlaying = false;  // ★再生終了
-        // ★ 読み上げ中の表示を維持するため、ボタンを戻さない
+        isPlaying = false;
+        /* 読み上げ中の表示は維持 */
       };
     }
 
+    /* 読むボタン */
     startBtn.addEventListener("click", () => {
+      if (isPlaying) return;
 
-      if (isPlaying) return;  // ★連打防止
-
-      isPlaying = true;       // ★押した瞬間に再生中扱いにする（重要）
+      isPlaying = true;  /* 押した瞬間に再生中扱いにする */
 
       if (shuffled.length === 0) return;
 
@@ -320,11 +323,12 @@
         currentWord.textContent = word;
       }
 
-      startBtn.textContent = "🔊 読み上げ中";  // ★維持
+      startBtn.textContent = "🔊 読み上げ中";
 
       setTimeout(() => speakWord(word), 3000);
     });
 
+    /* 停止ボタン */
     pauseButton.addEventListener("click", () => {
       isPaused = true;
 
@@ -333,13 +337,14 @@
         audioPlayer.currentTime = 0;
       }
 
-      isPlaying = false;  // ★停止時も再生中フラグ解除
+      isPlaying = false;
 
       pauseButton.style.background = "#ff4444";
       pauseButton.textContent = "⏹ 停止中";
       startBtn.textContent = "▶ 再開";
     });
 
+    /* シャッフル */
     shuffleResetBtn.addEventListener("click", () => {
       loadWords();
       currentWord.textContent = "---";
@@ -350,9 +355,7 @@
 
     loadWords();
 
-    const toggleWordBtn = document.getElementById("toggleWordBtn");
-    let wordVisible = true;
-
+    /* 単語表示切替 */
     toggleWordBtn.addEventListener("click", () => {
       wordVisible = !wordVisible;
       currentWord.style.visibility = wordVisible ? "visible" : "hidden";
