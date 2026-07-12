@@ -14,7 +14,6 @@
       text-align: center;
     }
 
-    /* ホーム左、設定右に配置 */
     .play-header {
       padding: 10px;
       display: flex;
@@ -166,7 +165,6 @@
   </footer>
 
   <script>
-    /* ページ遷移 */
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
@@ -175,14 +173,12 @@
       window.location.href = "settings.html";
     });
 
-    /* 設定読み込み */
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
     const readInterval = settings.interval || 6;
     let autoPlay = settings.autoPlay || false;
 
     autoPlayStatus.textContent = "自動再生：" + (autoPlay ? "ON" : "OFF");
 
-    /* ジャンル読み込み */
     const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
     const genreArea = document.getElementById("genreArea");
 
@@ -227,7 +223,6 @@
       loadWords();
     });
 
-    /* 単語管理 */
     let words = [];
     let shuffled = [];
     let index = 0;
@@ -267,7 +262,6 @@
       remainingCount.textContent = "残り：" + (shuffled.length - index);
     }
 
-    /* 読み上げ処理 */
     function speakWord(word) {
       const voice = settings.voice || "boy";
 
@@ -299,15 +293,13 @@
 
       audioPlayer.onended = () => {
         isPlaying = false;
-        /* 読み上げ中の表示は維持 */
       };
     }
 
-    /* 読むボタン */
     startBtn.addEventListener("click", () => {
       if (isPlaying) return;
 
-      isPlaying = true;  /* 押した瞬間に再生中扱いにする */
+      isPlaying = true;
 
       if (shuffled.length === 0) return;
 
@@ -328,7 +320,6 @@
       setTimeout(() => speakWord(word), 3000);
     });
 
-    /* 停止ボタン */
     pauseButton.addEventListener("click", () => {
       isPaused = true;
 
@@ -344,8 +335,9 @@
       startBtn.textContent = "▶ 再開";
     });
 
-    /* シャッフル */
     shuffleResetBtn.addEventListener("click", () => {
+      isPaused = true;   /* ★ 自動再生の予約を確実に止める修正ポイント */
+
       loadWords();
       currentWord.textContent = "---";
       index = 0;
@@ -355,7 +347,6 @@
 
     loadWords();
 
-    /* 単語表示切替 */
     toggleWordBtn.addEventListener("click", () => {
       wordVisible = !wordVisible;
       currentWord.style.visibility = wordVisible ? "visible" : "hidden";
