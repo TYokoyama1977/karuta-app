@@ -49,13 +49,29 @@
     }
 
     .setting-row {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       font-size: 20px;
     }
 
-    input[type="number"] {
-      width: 80px;
-      font-size: 20px;
+    /* ▼ ▲ ボタンを押しやすくする */
+    .interval-btn {
+      font-size: 28px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: #eee;
+      border: none;
+      cursor: pointer;
+    }
+
+    .interval-btn:active {
+      background: #ddd;
+    }
+
+    #intervalDisplay {
+      font-size: 32px;
+      width: 70px;
+      display: inline-block;
+      text-align: center;
     }
 
     .save-btn {
@@ -95,9 +111,17 @@
       <label><input type="radio" name="voice" value="girl"> 女性</label>
     </div>
 
+    <!-- ▼ ▲ ボタン方式に変更 -->
     <div class="setting-row">
       間隔（秒）：
-      <input id="intervalInput" type="number" step="1" min="1" max="20">
+
+      <div style="display:flex; justify-content:center; align-items:center; gap:20px; margin-top:10px;">
+        <button id="intervalDown" class="interval-btn">▼</button>
+
+        <span id="intervalDisplay">6</span>
+
+        <button id="intervalUp" class="interval-btn">▲</button>
+      </div>
     </div>
 
     <button id="saveBtn" class="save-btn">保存する</button>
@@ -115,20 +139,39 @@
 
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 
+    /* 自動再生 */
     autoPlayCheck.checked = settings.autoPlay || false;
-    intervalInput.value = settings.interval || 6;
 
+    /* 声の設定 */
     if (settings.voice === "girl") {
       document.querySelector('input[value="girl"]').checked = true;
     } else {
       document.querySelector('input[value="boy"]').checked = true;
     }
 
+    /* 間隔（秒） 初期値 */
+    let intervalValue = settings.interval || 6;
+    const intervalDisplay = document.getElementById("intervalDisplay");
+    intervalDisplay.textContent = intervalValue;
+
+    /* ▼ ボタン（減らす） */
+    document.getElementById("intervalDown").addEventListener("click", () => {
+      if (intervalValue > 1) intervalValue--;
+      intervalDisplay.textContent = intervalValue;
+    });
+
+    /* ▲ ボタン（増やす） */
+    document.getElementById("intervalUp").addEventListener("click", () => {
+      if (intervalValue < 20) intervalValue++;
+      intervalDisplay.textContent = intervalValue;
+    });
+
+    /* 保存 */
     saveBtn.addEventListener("click", () => {
       const newSettings = {
         autoPlay: autoPlayCheck.checked,
         voice: document.querySelector('input[name="voice"]:checked').value,
-        interval: Number(intervalInput.value)
+        interval: intervalValue
       };
 
       localStorage.setItem("settings", JSON.stringify(newSettings));

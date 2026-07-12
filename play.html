@@ -14,14 +14,14 @@
       text-align: center;
     }
 
+    /* ★ ホーム左、設定右に配置 */
     .play-header {
       padding: 10px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       background: #fff;
       border-bottom: 1px solid #ddd;
-      gap: 20px;
     }
 
     .home-btn, .edit-btn, .setting-btn {
@@ -130,7 +130,6 @@
 
   <div class="play-header">
     <button id="homeButton" class="home-btn">🏠 ホーム</button>
-    <button id="editButton" class="edit-btn">✏️ 単語一覧</button>
     <button id="settingButton" class="setting-btn">🔧 設定</button>
   </div>
 
@@ -169,10 +168,6 @@
   <script>
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
-    });
-
-    editButton.addEventListener("click", () => {
-      window.location.href = "edit.html";
     });
 
     settingButton.addEventListener("click", () => {
@@ -237,7 +232,7 @@
 
     let audioPlayer = null;
 
-    let isPlaying = false;  // ★追加：再生中フラグ
+    let isPlaying = false;  // ★再生中フラグ
 
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
@@ -301,15 +296,15 @@
 
       audioPlayer.onended = () => {
         isPlaying = false;  // ★再生終了
-        if (!isPaused) {
-          startBtn.textContent = "▶ 読む";
-        }
+        // ★ 読み上げ中の表示を維持するため、ボタンを戻さない
       };
     }
 
     startBtn.addEventListener("click", () => {
 
-      if (isPlaying) return;  // ★追加：連打防止
+      if (isPlaying) return;  // ★連打防止
+
+      isPlaying = true;       // ★押した瞬間に再生中扱いにする（重要）
 
       if (shuffled.length === 0) return;
 
@@ -324,6 +319,8 @@
         word = shuffled[index];
         currentWord.textContent = word;
       }
+
+      startBtn.textContent = "🔊 読み上げ中";  // ★維持
 
       setTimeout(() => speakWord(word), 3000);
     });
