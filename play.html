@@ -238,6 +238,7 @@
     let audioPlayer = null;
 
     let isPlaying = false;
+    let firstPlayed = false;   // ★追加：最初の1回だけ自動再生を無効化する
 
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
@@ -292,7 +293,8 @@
           updateRemaining();
         }
 
-        if (autoPlay && !isPaused) {
+        // ★最初の1回だけ自動再生を予約しない
+        if (autoPlay && !isPaused && firstPlayed) {
           setTimeout(() => {
             if (!isPaused) startBtn.click();
           }, readInterval * 1000);
@@ -300,7 +302,7 @@
       };
 
       audioPlayer.onended = () => {
-        /* ★修正：isPlaying を false にしない */
+        isPlaying = false;
         if (!isPaused) {
           startBtn.textContent = "▶ 読む";
         }
@@ -311,14 +313,17 @@
 
       if (isPlaying) return;
 
-      isPlaying = true;
-
       if (shuffled.length === 0) return;
 
       isPaused = false;
 
       pauseButton.style.background = "#ff9999";
       pauseButton.textContent = "⏹ 停止";
+
+      // ★最初の「読む」ボタン押下で firstPlayed を true にする
+      if (!firstPlayed) {
+        firstPlayed = true;
+      }
 
       let word = currentWord.textContent;
 
@@ -354,6 +359,7 @@
       index = 0;
       startBtn.textContent = "▶ 読む";
       isPlaying = false;
+      firstPlayed = false;   // ★リセット時も初期化
     });
 
     loadWords();
