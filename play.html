@@ -300,7 +300,7 @@
       };
 
       audioPlayer.onended = () => {
-        isPlaying = false;
+        /* ★修正：isPlaying を false にしない */
         if (!isPaused) {
           startBtn.textContent = "▶ 読む";
         }
@@ -311,7 +311,7 @@
 
       if (isPlaying) return;
 
-      isPlaying = true;   /* ★追加：読むボタンを押した瞬間に再生中扱い */
+      isPlaying = true;
 
       if (shuffled.length === 0) return;
 
@@ -347,7 +347,7 @@
 
     shuffleResetBtn.addEventListener("click", () => {
 
-      isPaused = true;   /* ★追加：autoplay の予約を確実に止める */
+      isPaused = true;
 
       loadWords();
       currentWord.textContent = "---";
