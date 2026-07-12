@@ -53,9 +53,9 @@
       font-size: 20px;
     }
 
-    /* ▼ ▲ ボタンを押しやすくする */
+    /* ▼ ▲ ボタン（フォント統一） */
     .interval-btn {
-      font-size: 28px;
+      font-size: 22px;
       padding: 10px 20px;
       border-radius: 10px;
       background: #eee;
@@ -67,8 +67,9 @@
       background: #ddd;
     }
 
+    /* 数字のフォントサイズ調整 */
     #intervalDisplay {
-      font-size: 32px;
+      font-size: 26px;
       width: 70px;
       display: inline-block;
       text-align: center;
@@ -111,7 +112,7 @@
       <label><input type="radio" name="voice" value="girl"> 女性</label>
     </div>
 
-    <!-- ▼ ▲ ボタン方式に変更 -->
+    <!-- ▼ ▲ ボタン方式 -->
     <div class="setting-row">
       間隔（秒）：
 
@@ -155,13 +156,13 @@
     intervalDisplay.textContent = intervalValue;
 
     /* ▼ ボタン（減らす） */
-    document.getElementById("intervalDown").addEventListener("click", () => {
+    intervalDown.addEventListener("click", () => {
       if (intervalValue > 1) intervalValue--;
       intervalDisplay.textContent = intervalValue;
     });
 
     /* ▲ ボタン（増やす） */
-    document.getElementById("intervalUp").addEventListener("click", () => {
+    intervalUp.addEventListener("click", () => {
       if (intervalValue < 20) intervalValue++;
       intervalDisplay.textContent = intervalValue;
     });
