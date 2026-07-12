@@ -277,7 +277,6 @@
         audioPlayer.currentTime = 0;
       }
 
-      // 今回の修正：ここで currentWord を更新し、index は触らない
       currentWord.textContent = word;
 
       audioPlayer = new Audio(`sound/${voice}/${word.toLowerCase()}.mp3`);
@@ -289,14 +288,12 @@
       };
 
       audioPlayer.onended = () => {
-        // autoplay 中は「読み上げ中」を維持、停止時だけ「▶ 読む」に戻す
         if (!autoPlay || isPaused) {
           isPlaying = false;
           startBtn.textContent = "▶ 読む";
         }
       };
 
-      // autoplay の予約はここでだけ index を進める
       if (autoPlay && !isPaused) {
         setTimeout(() => {
           if (isPaused) return;
@@ -317,6 +314,8 @@
 
       if (isPlaying) return;
       if (shuffled.length === 0) return;
+
+      isPlaying = true;   // ★追加：読むボタン連打防止（2回目以降は無視）
 
       isPaused = false;
 
