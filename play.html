@@ -17,13 +17,14 @@
     .play-header {
       padding: 10px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       background: #fff;
       border-bottom: 1px solid #ddd;
+      gap: 20px;
     }
 
-    .home-btn, .setting-btn {
+    .home-btn, .edit-btn, .setting-btn {
       font-size: 18px;
       padding: 8px 14px;
       border-radius: 8px;
@@ -129,6 +130,7 @@
 
   <div class="play-header">
     <button id="homeButton" class="home-btn">🏠 ホーム</button>
+    <button id="editButton" class="edit-btn">✏️ 単語一覧</button>
     <button id="settingButton" class="setting-btn">🔧 設定</button>
   </div>
 
@@ -169,6 +171,10 @@
       window.location.href = "index.html";
     });
 
+    editButton.addEventListener("click", () => {
+      window.location.href = "edit.html";
+    });
+
     settingButton.addEventListener("click", () => {
       window.location.href = "settings.html";
     });
@@ -177,6 +183,7 @@
     const readInterval = settings.interval || 6;
     let autoPlay = settings.autoPlay || false;
 
+    const autoPlayStatus = document.getElementById("autoPlayStatus");
     autoPlayStatus.textContent = "自動再生：" + (autoPlay ? "ON" : "OFF");
 
     const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
@@ -205,7 +212,7 @@
       genreArea.appendChild(div);
     });
 
-    checkAllBtn.addEventListener("click", () => {
+    document.getElementById("checkAllBtn").addEventListener("click", () => {
       document.querySelectorAll(".genre").forEach(g => {
         const cb = g.querySelector("input");
         cb.checked = true;
@@ -214,7 +221,7 @@
       loadWords();
     });
 
-    clearCheckBtn.addEventListener("click", () => {
+    document.getElementById("clearCheckBtn").addEventListener("click", () => {
       document.querySelectorAll(".genre").forEach(g => {
         const cb = g.querySelector("input");
         cb.checked = false;
@@ -226,11 +233,11 @@
     let words = [];
     let shuffled = [];
     let index = 0;
-
     let isPaused = false;
-    let isPlaying = false;
 
     let audioPlayer = null;
+
+    let isPlaying = false;  // ★追加：再生中フラグ
 
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
@@ -274,7 +281,8 @@
       audioPlayer.play();
 
       audioPlayer.onplay = () => {
-        isPlaying = true;
+
+        isPlaying = true;  // ★再生開始
         startBtn.textContent = "🔊 読み上げ中";
 
         if (index < shuffled.length) {
@@ -292,14 +300,16 @@
       };
 
       audioPlayer.onended = () => {
-        isPlaying = false;
+        isPlaying = false;  // ★再生終了
+        if (!isPaused) {
+          startBtn.textContent = "▶ 読む";
+        }
       };
     }
 
     startBtn.addEventListener("click", () => {
-      if (isPlaying) return;
 
-      isPlaying = true;
+      if (isPlaying) return;  // ★追加：連打防止
 
       if (shuffled.length === 0) return;
 
@@ -315,8 +325,6 @@
         currentWord.textContent = word;
       }
 
-      startBtn.textContent = "🔊 読み上げ中";
-
       setTimeout(() => speakWord(word), 3000);
     });
 
@@ -328,7 +336,7 @@
         audioPlayer.currentTime = 0;
       }
 
-      isPlaying = false;
+      isPlaying = false;  // ★停止時も再生中フラグ解除
 
       pauseButton.style.background = "#ff4444";
       pauseButton.textContent = "⏹ 停止中";
@@ -336,8 +344,6 @@
     });
 
     shuffleResetBtn.addEventListener("click", () => {
-      isPaused = true;   /* ★ 自動再生の予約を確実に止める修正ポイント */
-
       loadWords();
       currentWord.textContent = "---";
       index = 0;
@@ -346,6 +352,9 @@
     });
 
     loadWords();
+
+    const toggleWordBtn = document.getElementById("toggleWordBtn");
+    let wordVisible = true;
 
     toggleWordBtn.addEventListener("click", () => {
       wordVisible = !wordVisible;
