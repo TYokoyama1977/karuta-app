@@ -237,6 +237,8 @@
 
     let audioPlayer = null;
 
+    let isPlaying = false;  // ★追加：再生中フラグ
+
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
       words = [];
@@ -280,6 +282,9 @@
 
       audioPlayer.onplay = () => {
 
+        isPlaying = true;  // ★再生開始
+        startBtn.textContent = "🔊 読み上げ中";
+
         if (index < shuffled.length) {
           const nextWord = shuffled[index];
           currentWord.textContent = nextWord;
@@ -293,17 +298,25 @@
           }, readInterval * 1000);
         }
       };
+
+      audioPlayer.onended = () => {
+        isPlaying = false;  // ★再生終了
+        if (!isPaused) {
+          startBtn.textContent = "▶ 読む";
+        }
+      };
     }
 
     startBtn.addEventListener("click", () => {
+
+      if (isPlaying) return;  // ★追加：連打防止
+
       if (shuffled.length === 0) return;
 
       isPaused = false;
 
       pauseButton.style.background = "#ff9999";
       pauseButton.textContent = "⏹ 停止";
-
-      startBtn.textContent = "▶ 読む";
 
       let word = currentWord.textContent;
 
@@ -323,6 +336,8 @@
         audioPlayer.currentTime = 0;
       }
 
+      isPlaying = false;  // ★停止時も再生中フラグ解除
+
       pauseButton.style.background = "#ff4444";
       pauseButton.textContent = "⏹ 停止中";
       startBtn.textContent = "▶ 再開";
@@ -333,6 +348,7 @@
       currentWord.textContent = "---";
       index = 0;
       startBtn.textContent = "▶ 読む";
+      isPlaying = false;
     });
 
     loadWords();
