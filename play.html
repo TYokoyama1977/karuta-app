@@ -277,44 +277,40 @@
         audioPlayer.currentTime = 0;
       }
 
+      // 今回の修正：ここで currentWord を更新し、index は触らない
+      currentWord.textContent = word;
+
       audioPlayer = new Audio(`sound/${voice}/${word.toLowerCase()}.mp3`);
       audioPlayer.play();
 
       audioPlayer.onplay = () => {
-
         isPlaying = true;
         startBtn.textContent = "🔊 読み上げ中";
-
-        if (index < shuffled.length) {
-          const nextWord = shuffled[index];
-          currentWord.textContent = nextWord;
-          index++;
-          updateRemaining();
-        }
-
-        if (autoPlay && !isPaused) {
-          setTimeout(() => {
-            if (isPaused) return;
-            if (index >= shuffled.length) {
-              isPlaying = false;
-              startBtn.textContent = "▶ 読む";
-              return;
-            }
-            const nextWord = shuffled[index];
-            currentWord.textContent = nextWord;
-            index++;
-            updateRemaining();
-            speakWord(nextWord);
-          }, readInterval * 1000);
-        }
       };
 
       audioPlayer.onended = () => {
-        if (!autoPlay) {
+        // autoplay 中は「読み上げ中」を維持、停止時だけ「▶ 読む」に戻す
+        if (!autoPlay || isPaused) {
           isPlaying = false;
           startBtn.textContent = "▶ 読む";
         }
       };
+
+      // autoplay の予約はここでだけ index を進める
+      if (autoPlay && !isPaused) {
+        setTimeout(() => {
+          if (isPaused) return;
+          if (index >= shuffled.length) {
+            isPlaying = false;
+            startBtn.textContent = "▶ 読む";
+            return;
+          }
+          const nextWord = shuffled[index];
+          index++;
+          updateRemaining();
+          speakWord(nextWord);
+        }, readInterval * 1000);
+      }
     }
 
     startBtn.addEventListener("click", () => {
@@ -331,7 +327,6 @@
 
       if (!word || word === "---") {
         word = shuffled[index];
-        currentWord.textContent = word;
         index++;
         updateRemaining();
       }
