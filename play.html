@@ -238,7 +238,6 @@
     let audioPlayer = null;
 
     let isPlaying = false;
-    let firstPlayed = false;   // ★追加：最初の1回だけ自動再生を無効化する
 
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
@@ -282,21 +281,25 @@
       audioPlayer.play();
 
       audioPlayer.onplay = () => {
-
         isPlaying = true;
         startBtn.textContent = "🔊 読み上げ中";
 
-        if (index < shuffled.length) {
-          const nextWord = shuffled[index];
-          currentWord.textContent = nextWord;
-          index++;
-          updateRemaining();
-        }
+        // ここでは currentWord は「今読んでいる単語」のままにしておく
 
-        // ★最初の1回だけ自動再生を予約しない
-        if (autoPlay && !isPaused && firstPlayed) {
+        // 自動再生：設定間隔後に次の単語を直接 speakWord する
+        if (autoPlay && !isPaused) {
           setTimeout(() => {
-            if (!isPaused) startBtn.click();
+            if (isPaused) return;
+            if (index >= shuffled.length) {
+              isPlaying = false;
+              startBtn.textContent = "▶ 読む";
+              return;
+            }
+            const nextWord = shuffled[index];
+            currentWord.textContent = nextWord;
+            index++;
+            updateRemaining();
+            speakWord(nextWord);
           }, readInterval * 1000);
         }
       };
@@ -310,9 +313,7 @@
     }
 
     startBtn.addEventListener("click", () => {
-
       if (isPlaying) return;
-
       if (shuffled.length === 0) return;
 
       isPaused = false;
@@ -320,18 +321,16 @@
       pauseButton.style.background = "#ff9999";
       pauseButton.textContent = "⏹ 停止";
 
-      // ★最初の「読む」ボタン押下で firstPlayed を true にする
-      if (!firstPlayed) {
-        firstPlayed = true;
-      }
-
       let word = currentWord.textContent;
 
       if (!word || word === "---") {
         word = shuffled[index];
         currentWord.textContent = word;
+        index++;
+        updateRemaining();
       }
 
+      // 読むボタンは常に 3 秒待ってから最初の speakWord を開始
       setTimeout(() => speakWord(word), 3000);
     });
 
@@ -351,7 +350,6 @@
     });
 
     shuffleResetBtn.addEventListener("click", () => {
-
       isPaused = true;
 
       loadWords();
@@ -359,7 +357,6 @@
       index = 0;
       startBtn.textContent = "▶ 読む";
       isPlaying = false;
-      firstPlayed = false;   // ★リセット時も初期化
     });
 
     loadWords();
