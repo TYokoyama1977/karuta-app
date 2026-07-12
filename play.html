@@ -281,10 +281,10 @@
       audioPlayer.play();
 
       audioPlayer.onplay = () => {
-
         isPlaying = true;
         startBtn.textContent = "🔊 読み上げ中";
 
+        // ★正常版の index ロジック（ここは触らない）
         if (index < shuffled.length) {
           const nextWord = shuffled[index];
           currentWord.textContent = nextWord;
@@ -292,6 +292,7 @@
           updateRemaining();
         }
 
+        // ★正常版の autoplay ロジック（ここも触らない）
         if (autoPlay && !isPaused) {
           setTimeout(() => {
             if (isPaused) return;
@@ -310,7 +311,8 @@
       };
 
       audioPlayer.onended = () => {
-        if (!autoPlay) {
+        // ★今回の修正ポイント：autoplay中はボタン表示を変えない
+        if (!autoPlay || isPaused) {
           isPlaying = false;
           startBtn.textContent = "▶ 読む";
         }
