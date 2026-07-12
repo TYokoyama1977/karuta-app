@@ -281,12 +281,17 @@
       audioPlayer.play();
 
       audioPlayer.onplay = () => {
+
         isPlaying = true;
         startBtn.textContent = "🔊 読み上げ中";
 
-        // ここでは currentWord は「今読んでいる単語」のままにしておく
+        if (index < shuffled.length) {
+          const nextWord = shuffled[index];
+          currentWord.textContent = nextWord;
+          index++;
+          updateRemaining();
+        }
 
-        // 自動再生：設定間隔後に次の単語を直接 speakWord する
         if (autoPlay && !isPaused) {
           setTimeout(() => {
             if (isPaused) return;
@@ -305,14 +310,15 @@
       };
 
       audioPlayer.onended = () => {
-        isPlaying = false;
-        if (!isPaused) {
+        if (!autoPlay) {
+          isPlaying = false;
           startBtn.textContent = "▶ 読む";
         }
       };
     }
 
     startBtn.addEventListener("click", () => {
+
       if (isPlaying) return;
       if (shuffled.length === 0) return;
 
@@ -330,7 +336,6 @@
         updateRemaining();
       }
 
-      // 読むボタンは常に 3 秒待ってから最初の speakWord を開始
       setTimeout(() => speakWord(word), 3000);
     });
 
@@ -350,6 +355,7 @@
     });
 
     shuffleResetBtn.addEventListener("click", () => {
+
       isPaused = true;
 
       loadWords();
