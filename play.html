@@ -243,6 +243,9 @@
     let startDelayTimer = null;
     let autoPlayTimer = null;
 
+    /* ★追加：予約された次の単語を保持 */
+    let reservedNextWord = null;
+
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
       words = [];
@@ -308,6 +311,10 @@
             return;
           }
           const nextWord = shuffled[index];
+
+          /* ★予約された次の単語を保存 */
+          reservedNextWord = nextWord;
+
           index++;
           updateRemaining();
           speakWord(nextWord);
@@ -329,7 +336,11 @@
 
       let word = currentWord.textContent;
 
-      if (!word || word === "---") {
+      /* ★予約された次の単語がある場合はそれを読む */
+      if (reservedNextWord) {
+        word = reservedNextWord;
+        reservedNextWord = null;
+      } else if (!word || word === "---") {
         word = shuffled[index];
         index++;
         updateRemaining();
