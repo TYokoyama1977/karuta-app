@@ -239,6 +239,10 @@
 
     let isPlaying = false;
 
+    /* ★追加：タイマーIDを保持 */
+    let startDelayTimer = null;
+    let autoPlayTimer = null;
+
     function loadWords() {
       const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
       words = [];
@@ -294,8 +298,9 @@
         }
       };
 
+      /* ★自動再生タイマーを保存 */
       if (autoPlay && !isPaused) {
-        setTimeout(() => {
+        autoPlayTimer = setTimeout(() => {
           if (isPaused) return;
           if (index >= shuffled.length) {
             isPlaying = false;
@@ -315,7 +320,7 @@
       if (isPlaying) return;
       if (shuffled.length === 0) return;
 
-      isPlaying = true;   // ★追加：読むボタン連打防止（2回目以降は無視）
+      isPlaying = true;
 
       isPaused = false;
 
@@ -330,7 +335,8 @@
         updateRemaining();
       }
 
-      setTimeout(() => speakWord(word), 3000);
+      /* ★開始遅延タイマーを保存 */
+      startDelayTimer = setTimeout(() => speakWord(word), 3000);
     });
 
     pauseButton.addEventListener("click", () => {
@@ -343,6 +349,10 @@
 
       isPlaying = false;
 
+      /* ★停止時にタイマーを確実にキャンセル */
+      clearTimeout(startDelayTimer);
+      clearTimeout(autoPlayTimer);
+
       pauseButton.style.background = "#ff4444";
       pauseButton.textContent = "⏹ 停止中";
       startBtn.textContent = "▶ 再開";
@@ -351,6 +361,10 @@
     shuffleResetBtn.addEventListener("click", () => {
 
       isPaused = true;
+
+      /* ★シャッフル時もタイマーをキャンセル */
+      clearTimeout(startDelayTimer);
+      clearTimeout(autoPlayTimer);
 
       loadWords();
       currentWord.textContent = "---";
