@@ -53,6 +53,29 @@
       font-size: 20px;
     }
 
+    /* ボタン型の選択肢 */
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .btn-option {
+      flex: 1;
+      padding: 12px 0;
+      font-size: 20px;
+      border-radius: 10px;
+      border: none;
+      background: #eee;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn-option.selected {
+      background: #ffcc66;
+      border: 2px solid #ff9900;
+    }
+
     /* ▼ ▲ ボタン（フォント統一） */
     .interval-btn {
       font-size: 22px;
@@ -99,28 +122,30 @@
 
   <div class="setting-card">
 
+    <!-- 自動再生 -->
     <div class="setting-row">
-      <label>
-        <input type="checkbox" id="autoPlayCheck">
-        自動再生
-      </label>
+      自動再生
+      <div class="btn-group">
+        <button id="autoOn" class="btn-option">ON</button>
+        <button id="autoOff" class="btn-option">OFF</button>
+      </div>
     </div>
 
+    <!-- 声 -->
     <div class="setting-row">
-      声：
-      <label><input type="radio" name="voice" value="boy"> 男性</label>
-      <label><input type="radio" name="voice" value="girl"> 女性</label>
+      声
+      <div class="btn-group">
+        <button id="voiceBoy" class="btn-option">男性</button>
+        <button id="voiceGirl" class="btn-option">女性</button>
+      </div>
     </div>
 
-    <!-- ▼ ▲ ボタン方式 -->
+    <!-- 間隔（秒） -->
     <div class="setting-row">
-      間隔（秒）：
-
+      間隔（秒）
       <div style="display:flex; justify-content:center; align-items:center; gap:20px; margin-top:10px;">
         <button id="intervalDown" class="interval-btn">▼</button>
-
         <span id="intervalDisplay">6</span>
-
         <button id="intervalUp" class="interval-btn">▲</button>
       </div>
     </div>
@@ -141,37 +166,55 @@
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 
     /* 自動再生 */
-    autoPlayCheck.checked = settings.autoPlay || false;
+    let autoPlay = settings.autoPlay || false;
 
-    /* 声の設定 */
-    if (settings.voice === "girl") {
-      document.querySelector('input[value="girl"]').checked = true;
-    } else {
-      document.querySelector('input[value="boy"]').checked = true;
-    }
+    /* 声 */
+    let voice = settings.voice || "boy";
 
     /* 間隔（秒） 初期値 */
     let intervalValue = settings.interval || 6;
+
+    const autoOn = document.getElementById("autoOn");
+    const autoOff = document.getElementById("autoOff");
+    const voiceBoy = document.getElementById("voiceBoy");
+    const voiceGirl = document.getElementById("voiceGirl");
     const intervalDisplay = document.getElementById("intervalDisplay");
-    intervalDisplay.textContent = intervalValue;
+
+    function updateUI() {
+      autoOn.classList.toggle("selected", autoPlay);
+      autoOff.classList.toggle("selected", !autoPlay);
+
+      voiceBoy.classList.toggle("selected", voice === "boy");
+      voiceGirl.classList.toggle("selected", voice === "girl");
+
+      intervalDisplay.textContent = intervalValue;
+    }
+
+    /* 自動再生ボタン */
+    autoOn.onclick = () => { autoPlay = true; updateUI(); };
+    autoOff.onclick = () => { autoPlay = false; updateUI(); };
+
+    /* 声ボタン */
+    voiceBoy.onclick = () => { voice = "boy"; updateUI(); };
+    voiceGirl.onclick = () => { voice = "girl"; updateUI(); };
 
     /* ▼ ボタン（減らす） */
     intervalDown.addEventListener("click", () => {
       if (intervalValue > 1) intervalValue--;
-      intervalDisplay.textContent = intervalValue;
+      updateUI();
     });
 
     /* ▲ ボタン（増やす） */
     intervalUp.addEventListener("click", () => {
       if (intervalValue < 20) intervalValue++;
-      intervalDisplay.textContent = intervalValue;
+      updateUI();
     });
 
     /* 保存 */
     saveBtn.addEventListener("click", () => {
       const newSettings = {
-        autoPlay: autoPlayCheck.checked,
-        voice: document.querySelector('input[name="voice"]:checked').value,
+        autoPlay: autoPlay,
+        voice: voice,
         interval: intervalValue
       };
 
@@ -179,6 +222,8 @@
 
       alert("設定を保存しました");
     });
+
+    updateUI();
   </script>
 
 </body>
