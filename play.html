@@ -236,14 +236,11 @@
     let isPaused = false;
 
     let audioPlayer = null;
-
     let isPlaying = false;
 
-    /* ★追加：タイマーIDを保持 */
     let startDelayTimer = null;
     let autoPlayTimer = null;
 
-    /* ★追加：予約された次の単語を保持 */
     let reservedNextWord = null;
 
     function loadWords() {
@@ -301,7 +298,6 @@
         }
       };
 
-      /* ★自動再生タイマーを保存 */
       if (autoPlay && !isPaused) {
         autoPlayTimer = setTimeout(() => {
           if (isPaused) return;
@@ -311,10 +307,7 @@
             return;
           }
           const nextWord = shuffled[index];
-
-          /* ★予約された次の単語を保存 */
           reservedNextWord = nextWord;
-
           index++;
           updateRemaining();
           speakWord(nextWord);
@@ -322,32 +315,39 @@
       }
     }
 
+    /* ★ 修正版 startBtn */
     startBtn.addEventListener("click", () => {
 
       if (isPlaying) return;
       if (shuffled.length === 0) return;
 
       isPlaying = true;
-
       isPaused = false;
 
       pauseButton.style.background = "#ff9999";
       pauseButton.textContent = "⏹ 停止";
 
-      let word = currentWord.textContent;
+      let word;
 
-      /* ★予約された次の単語がある場合はそれを読む */
-      if (reservedNextWord) {
-        word = reservedNextWord;
-        reservedNextWord = null;
-      } else if (!word || word === "---") {
+      if (!autoPlay) {
         word = shuffled[index];
         index++;
         updateRemaining();
       }
+      else if (reservedNextWord) {
+        word = reservedNextWord;
+        reservedNextWord = null;
+      }
+      else if (currentWord.textContent === "---") {
+        word = shuffled[index];
+        index++;
+        updateRemaining();
+      }
+      else {
+        word = currentWord.textContent;
+      }
 
-      /* ★開始遅延タイマーを保存 */
-      startDelayTimer = setTimeout(() => speakWord(word), 3000);
+      startDelayTimer = setTimeout(() => speakWord(word), 300);
     });
 
     pauseButton.addEventListener("click", () => {
@@ -360,7 +360,6 @@
 
       isPlaying = false;
 
-      /* ★停止時にタイマーを確実にキャンセル */
       clearTimeout(startDelayTimer);
       clearTimeout(autoPlayTimer);
 
@@ -373,7 +372,6 @@
 
       isPaused = true;
 
-      /* ★シャッフル時もタイマーをキャンセル */
       clearTimeout(startDelayTimer);
       clearTimeout(autoPlayTimer);
 
