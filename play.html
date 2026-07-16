@@ -61,6 +61,7 @@
     .genre img {
       width: 70px;
       height: 70px;
+      height: 70px;
     }
 
     .genre.selected {
@@ -123,9 +124,15 @@
       margin-top: 5px;
       color: #666;
     }
+
+    footer {
+      margin-top: 20px;
+      padding: 10px;
+      font-size: 14px;
+      color: #777;
+    }
   </style>
 </head>
-
 <body>
 
   <div class="play-header">
@@ -167,16 +174,17 @@
   </footer>
 
   <script>
-    /* 固定単語データ（localStorage 不使用） */
+    // 固定60語（ジャンルごとに10語）
     const wordsData = {
-      Animal: ["bear", "dog", "cat", "lion", "tiger", "fox"],
-      Color: ["red", "blue", "green", "yellow", "black", "white"],
-      Food: ["pizza", "bread", "rice", "noodle", "meat", "fish"],
-      Fruit: ["apple", "banana", "orange", "grape", "melon"],
-      Body: ["hand", "leg", "head", "arm", "foot"],
-      Other: ["star", "clock", "car", "house", "tree"]
+      Animal: ["dog","cat","bird","fish","rabbit","bear","lion","horse","elephant","zebra"],
+      Color: ["red","blue","yellow","green","black","white","pink","purple","brown","gray"],
+      Food: ["bread","rice","milk","egg","soup","cake","cheese","juice","hamburger","cookie"],
+      Fruit: ["apple","banana","orange","grape","peach","lemon","melon","strawberry","kiwi","watermelon"],
+      Body: ["head","hand","foot","eye","ear","nose","mouth","hair","elbow","knee"],
+      Other: ["car","house","book","chair","clock","cup","ball","star","table","chopsticks"]
     };
 
+    // 画面遷移ボタン
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
@@ -189,13 +197,15 @@
       window.location.href = "settings.html";
     });
 
+    // 設定読み込み
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
-    const readInterval = settings.interval || 6;
+    const readInterval = settings.interval || 6; // 自動再生間隔（秒）
     let autoPlay = settings.autoPlay || false;
 
     const autoPlayStatus = document.getElementById("autoPlayStatus");
     autoPlayStatus.textContent = "自動再生：" + (autoPlay ? "ON" : "OFF");
 
+    // ジャンル生成
     const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
     const genreArea = document.getElementById("genreArea");
 
@@ -211,17 +221,18 @@
       `;
 
       div.addEventListener("click", (e) => {
+        const cb = div.querySelector("input");
         if (e.target.tagName !== "INPUT") {
-          const cb = div.querySelector("input");
           cb.checked = !cb.checked;
         }
-        div.classList.toggle("selected", div.querySelector("input").checked);
+        div.classList.toggle("selected", cb.checked);
         loadWords();
       });
 
       genreArea.appendChild(div);
     });
 
+    // 全ジャンルチェック
     document.getElementById("checkAllBtn").addEventListener("click", () => {
       document.querySelectorAll(".genre").forEach(g => {
         const cb = g.querySelector("input");
@@ -231,6 +242,7 @@
       loadWords();
     });
 
+    // チェッククリア
     document.getElementById("clearCheckBtn").addEventListener("click", () => {
       document.querySelectorAll(".genre").forEach(g => {
         const cb = g.querySelector("input");
@@ -240,20 +252,18 @@
       loadWords();
     });
 
+    // 読み上げ用変数
     let words = [];
     let shuffled = [];
     let index = 0;
-    let isPaused = false;
 
     let audioPlayer = null;
     let isPlaying = false;
+    let isPaused = false;
 
-    let startDelayTimer = null;
     let autoPlayTimer = null;
 
-    let reservedNextWord = null;
-
-    /* localStorage を使わない loadWords */
+    // ジャンルから単語を読み込む（固定60語）
     function loadWords() {
       words = [];
 
@@ -261,13 +271,16 @@
         const cb = g.querySelector("input");
         if (cb.checked) {
           const genre = g.dataset.genre;
-          if (wordsData[genre]) words.push(...wordsData[genre]);
+          if (wordsData[genre]) {
+            words.push(...wordsData[genre]);
+          }
         }
       });
 
       shuffleWords();
     }
 
+    // シャッフル
     function shuffleWords() {
       shuffled = [...words];
       for (let i = shuffled.length - 1; i > 0; i--) {
@@ -279,10 +292,12 @@
       currentWord.textContent = "---";
     }
 
+    // 残り数表示
     function updateRemaining() {
       remainingCount.textContent = "残り：" + (shuffled.length - index);
     }
 
+    // 単語読み上げ
     function speakWord(word) {
       const voice = settings.voice || "boy";
 
@@ -308,7 +323,9 @@
         }
       };
 
+      // 自動再生
       if (autoPlay && !isPaused) {
+        clearTimeout(autoPlayTimer);
         autoPlayTimer = setTimeout(() => {
           if (isPaused) return;
           if (index >= shuffled.length) {
@@ -317,7 +334,6 @@
             return;
           }
           const nextWord = shuffled[index];
-          reservedNextWord = nextWord;
           index++;
           updateRemaining();
           speakWord(nextWord);
@@ -325,40 +341,37 @@
       }
     }
 
+    // 読むボタン
     startBtn.addEventListener("click", () => {
-
       if (isPlaying) return;
       if (shuffled.length === 0) return;
 
-      isPlaying = true;
       isPaused = false;
-
       pauseButton.style.background = "#ff9999";
       pauseButton.textContent = "⏹ 停止";
 
       let word;
 
       if (!autoPlay) {
+        // 手動再生：次の単語を即時読み上げ
         word = shuffled[index];
         index++;
         updateRemaining();
-      }
-      else if (reservedNextWord) {
-        word = reservedNextWord;
-        reservedNextWord = null;
-      }
-      else if (currentWord.textContent === "---") {
-        word = shuffled[index];
-        index++;
-        updateRemaining();
-      }
-      else {
-        word = currentWord.textContent;
+      } else {
+        // 自動再生ON時：最初の単語または現在の単語から開始
+        if (currentWord.textContent === "---") {
+          word = shuffled[index];
+          index++;
+          updateRemaining();
+        } else {
+          word = currentWord.textContent;
+        }
       }
 
-      startDelayTimer = setTimeout(() => speakWord(word), 300);
+      speakWord(word);
     });
 
+    // 停止ボタン
     pauseButton.addEventListener("click", () => {
       isPaused = true;
 
@@ -369,7 +382,6 @@
 
       isPlaying = false;
 
-      clearTimeout(startDelayTimer);
       clearTimeout(autoPlayTimer);
 
       pauseButton.style.background = "#ff4444";
@@ -377,11 +389,10 @@
       startBtn.textContent = "▶ 再開";
     });
 
+    // シャッフルボタン
     shuffleResetBtn.addEventListener("click", () => {
-
       isPaused = true;
 
-      clearTimeout(startDelayTimer);
       clearTimeout(autoPlayTimer);
 
       loadWords();
@@ -391,8 +402,10 @@
       isPlaying = false;
     });
 
+    // 初期読み込み（デフォルトで全ジャンルチェックしてもよければここで設定しても良い）
     loadWords();
 
+    // 単語表示切り替え
     const toggleWordBtn = document.getElementById("toggleWordBtn");
     let wordVisible = true;
 
