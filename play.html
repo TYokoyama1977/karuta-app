@@ -167,6 +167,16 @@
   </footer>
 
   <script>
+    /* 固定単語データ（localStorage 不使用） */
+    const wordsData = {
+      Animal: ["bear", "dog", "cat", "lion", "tiger", "fox"],
+      Color: ["red", "blue", "green", "yellow", "black", "white"],
+      Food: ["pizza", "bread", "rice", "noodle", "meat", "fish"],
+      Fruit: ["apple", "banana", "orange", "grape", "melon"],
+      Body: ["hand", "leg", "head", "arm", "foot"],
+      Other: ["star", "clock", "car", "house", "tree"]
+    };
+
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
@@ -243,15 +253,15 @@
 
     let reservedNextWord = null;
 
+    /* localStorage を使わない loadWords */
     function loadWords() {
-      const data = JSON.parse(localStorage.getItem("wordsData") || "{}");
       words = [];
 
       document.querySelectorAll(".genre").forEach(g => {
         const cb = g.querySelector("input");
         if (cb.checked) {
           const genre = g.dataset.genre;
-          if (data[genre]) words.push(...data[genre]);
+          if (wordsData[genre]) words.push(...wordsData[genre]);
         }
       });
 
@@ -315,7 +325,6 @@
       }
     }
 
-    /* ★ 修正版 startBtn */
     startBtn.addEventListener("click", () => {
 
       if (isPlaying) return;
