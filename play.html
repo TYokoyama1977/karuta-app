@@ -163,6 +163,9 @@
       <p id="remainingCount">残り：0</p>
     </div>
 
+    <!-- ★ カウントダウン表示 -->
+    <p id="countdownMessage" style="font-size:24px; color:#555; margin-top:10px;"></p>
+
     <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ 読む</button>
     <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
     <button id="shuffleResetBtn" class="main-btn" style="background:#ffcc66;">🔄 シャッフル</button>
@@ -251,6 +254,9 @@
     let autoPlayTimer = null;
     let startDelayTimer = null;
 
+    /* ★ カウントダウン用 */
+    let countdownTimer = null;
+
     /* 単語読み込み */
     function loadWords() {
       words = [];
@@ -274,6 +280,7 @@
       index = 0;
       updateRemaining();
       currentWord.textContent = "---";
+      countdownMessage.textContent = "";
     }
 
     function updateRemaining() {
@@ -303,6 +310,11 @@
         if (!autoPlay || isPaused) {
           isPlaying = false;
           startBtn.textContent = "▶ 読む";
+
+          /* ★ 最後まで読んだときのメッセージ */
+          if (index >= shuffled.length) {
+            countdownMessage.textContent = "終わりました";
+          }
         }
       };
 
@@ -314,6 +326,7 @@
           if (index >= shuffled.length) {
             isPlaying = false;
             startBtn.textContent = "▶ 読む";
+            countdownMessage.textContent = "終わりました";
             return;
           }
           const nextWord = shuffled[index];
@@ -335,10 +348,25 @@
 
       let word;
 
-      /* ★ 修正：再開時も currentWord を使わず、必ず次の単語を読む */
+      /* ★ 再開時も必ず次の単語を読む */
       word = shuffled[index];
       index++;
       updateRemaining();
+
+      /* ★ カウントダウン表示 */
+      clearInterval(countdownTimer);
+      countdownMessage.textContent = "3";
+      let count = 3;
+
+      countdownTimer = setInterval(() => {
+        count--;
+        countdownMessage.textContent = count;
+
+        if (count <= 0) {
+          clearInterval(countdownTimer);
+          countdownMessage.textContent = "";
+        }
+      }, 1000);
 
       clearTimeout(startDelayTimer);
       startDelayTimer = setTimeout(() => {
@@ -359,6 +387,7 @@
 
       clearTimeout(startDelayTimer);
       clearTimeout(autoPlayTimer);
+      clearInterval(countdownTimer);
 
       pauseButton.style.background = "#ff4444";
       pauseButton.textContent = "⏹ 停止中";
@@ -371,11 +400,13 @@
 
       clearTimeout(startDelayTimer);
       clearTimeout(autoPlayTimer);
+      clearInterval(countdownTimer);
 
       loadWords();
       currentWord.textContent = "---";
       index = 0;
       startBtn.textContent = "▶ 読む";
+      countdownMessage.textContent = "";
       isPlaying = false;
     });
 
