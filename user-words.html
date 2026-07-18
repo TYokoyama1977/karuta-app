@@ -22,6 +22,7 @@
       background: #fff;
       border-bottom: 1px solid #ddd;
     }
+
     .play-header button {
       font-size: 18px;
       padding: 8px 14px;
@@ -87,12 +88,14 @@
     .add-area {
       margin-top: 25px;
     }
+
     .add-area input {
       font-size: 18px;
       padding: 8px;
       width: 60%;
       max-width: 250px;
     }
+
     .add-area button {
       font-size: 18px;
       padding: 8px 12px;
@@ -147,7 +150,6 @@
   <h1>ユーザー追加単語</h1>
 
   <div class="reading-card">
-
     <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
       <div id="displayWord">---</div>
       <button id="toggleDisplayBtn" class="top-btn">👁 表示</button>
@@ -157,10 +159,9 @@
 
     <button id="readBtn" class="main-btn" style="background:#99ddff;">📖 読む</button>
     <button id="shuffleBtn" class="main-btn" style="background:#ffcc66;">🔄 シャッフル</button>
-
   </div>
 
-  <!-- ★ ここに追加：全てチェック / チェッククリア -->
+  <!-- ★ 全てチェック / チェッククリア -->
   <div style="margin-top:15px;">
     <button id="checkAllBtn" class="top-btn">全てチェック</button>
     <button id="clearCheckBtn" class="top-btn">チェッククリア</button>
@@ -171,13 +172,14 @@
     <button id="addWordBtn">追加</button>
   </div>
 
+  <!-- ★ 注意書き追加 -->
+  <p style="font-size:14px; color:#555;">※ 英単語のみ登録できます（スペース不可）</p>
   <p style="font-size:14px; color:#555;">※ 最大20個まで保存できます</p>
 
   <div class="word-list" id="wordList"></div>
 
   <script>
     let userWords = JSON.parse(localStorage.getItem("userWords") || "[]");
-
     const wordList = document.getElementById("wordList");
     const newWordInput = document.getElementById("newWordInput");
     const addWordBtn = document.getElementById("addWordBtn");
@@ -192,7 +194,6 @@
 
     function renderWords() {
       wordList.innerHTML = "";
-
       userWords.forEach((w, idx) => {
         const div = document.createElement("div");
         div.className = "word-item";
@@ -259,12 +260,26 @@
       updateSpeakList();
     });
 
+    /* ★ 単語のみ登録（スペース禁止・記号禁止） */
     addWordBtn.addEventListener("click", () => {
       const val = newWordInput.value.trim();
+
       if (!val) return;
 
       if (userWords.length >= 20) {
         alert("最大20個までです。");
+        return;
+      }
+
+      /* 半角スペース・全角スペース禁止 */
+      if (val.includes(" ") || val.includes("　")) {
+        alert("スペースが入っています。単語のみ登録できます。");
+        return;
+      }
+
+      /* 記号・数字・句読点禁止（英字のみ許可） */
+      if (/[^a-zA-Z]/.test(val)) {
+        alert("英単語のみ登録できます（記号や数字は不可）");
         return;
       }
 
@@ -288,7 +303,6 @@
 
     document.getElementById("toggleDisplayBtn").onclick = () => {
       isDisplayVisible = !isDisplayVisible;
-
       const dw = document.getElementById("displayWord");
 
       if (isDisplayVisible) {
@@ -343,9 +357,7 @@
     renderWords();
   </script>
 
-  <footer>
-    © 2026 Studio OZ
-  </footer>
+  <footer>© 2026 Studio OZ</footer>
 
 </body>
 </html>
