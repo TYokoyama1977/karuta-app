@@ -337,7 +337,7 @@
       }
     }
 
-    /* 読むボタン（3秒後に読む） */
+    /* 読むボタン（インターバル秒後に読む） */
     startBtn.addEventListener("click", () => {
       if (isPlaying) return;
       if (shuffled.length === 0) return;
@@ -353,10 +353,10 @@
       index++;
       updateRemaining();
 
-      /* ★ カウントダウン表示 */
+      /* ★ カウントダウン表示（readInterval に連動） */
       clearInterval(countdownTimer);
-      countdownMessage.textContent = "3";
-      let count = 3;
+      countdownMessage.textContent = readInterval;
+      let count = readInterval;
 
       countdownTimer = setInterval(() => {
         count--;
@@ -371,7 +371,7 @@
       clearTimeout(startDelayTimer);
       startDelayTimer = setTimeout(() => {
         speakWord(word);
-      }, 3000);
+      }, readInterval * 1000);
     });
 
     /* 停止ボタン（予約破棄） */
