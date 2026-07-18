@@ -89,14 +89,16 @@
       color: #333;
     }
 
+    /* ★ ボタンのフォントサイズを小さく＋幅固定 */
     .main-btn {
       margin-top: 12px;
       padding: 14px 32px;
-      font-size: 20px;
+      font-size: 18px;     /* ← 20px → 18px */
       border-radius: 40px;
       border: none;
       background: #ffcc66;
       cursor: pointer;
+      width: 160px;        /* ← 幅固定でUI揺れゼロ */
     }
 
     .main-btn:hover {
@@ -185,7 +187,9 @@
 
     <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ 読む</button>
     <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
-    <button id="shuffleResetBtn" class="main-btn" style="background:#ffcc66;">🔄 シャッフル</button>
+
+    <!-- ★ シャッフル → 始めから -->
+    <button id="shuffleResetBtn" class="main-btn" style="background:#ffcc66;">🔄 始めから</button>
 
   </div>
 
@@ -405,7 +409,7 @@ pauseButton.addEventListener("click", () => {
   startBtn.textContent = "▶ 再開";
 });
 
-/* シャッフル */
+/* 始めから（シャッフル） */
 shuffleResetBtn.addEventListener("click", () => {
   isPaused = true;
 
