@@ -39,7 +39,7 @@
       color: #444;
     }
 
-    /* ★ ジャンル選択の縦幅を短くする */
+    /* ★ ジャンル選択の縦幅を短くする＋チェックボックス廃止 */
     .genre-icons {
       display: flex;
       flex-wrap: wrap;
@@ -52,7 +52,7 @@
       width: 85px;
       text-align: center;
       cursor: pointer;
-      padding: 3px; /* ← 縦幅短縮 */
+      padding: 3px;
       border-radius: 10px;
       transition: 0.2s;
       background: #fff;
@@ -60,23 +60,18 @@
     }
 
     .genre img {
-      width: 50px;   /* ← 小さくして縦幅短縮 */
+      width: 50px;
       height: 50px;
     }
 
     .genre p {
-      font-size: 14px; /* ← 縦幅短縮 */
+      font-size: 14px;
       margin: 2px 0;
     }
 
     .genre.selected {
       border: 3px solid #ffcc33;
       background: #fff7cc;
-    }
-
-    .genre input[type="checkbox"] {
-      margin-top: 2px; /* ← 縦幅短縮 */
-      transform: scale(1.1);
     }
 
     .reading-card {
@@ -87,6 +82,7 @@
       padding: 15px;
       border-radius: 15px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
     }
 
     #currentWord {
@@ -95,17 +91,26 @@
       color: #333;
     }
 
+    /* ★ 自動再生：ON を右上に小さく配置 */
+    #autoPlayStatus {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 14px;
+      color: #666;
+    }
+
     /* ★ ボタンのフォントを小さく＋折り返し禁止＋幅固定 */
     .main-btn {
       margin-top: 12px;
       padding: 14px 32px;
-      font-size: 16px;     /* ← 20px → 16px */
+      font-size: 16px;
       border-radius: 40px;
       border: none;
       background: #ffcc66;
       cursor: pointer;
-      width: 160px;        /* ← 幅固定 */
-      white-space: nowrap; /* ★ 折り返し禁止（1行固定） */
+      width: 160px;
+      white-space: nowrap;
     }
 
     .main-btn:hover {
@@ -145,12 +150,6 @@
       color: #444;
     }
 
-    #autoPlayStatus {
-      font-size: 18px;
-      margin-top: 5px;
-      color: #666;
-    }
-
     footer {
       margin-top: 15px;
       padding: 10px;
@@ -184,6 +183,7 @@
       <button id="toggleWordBtn" class="top-btn">👁 表示</button>
     </div>
 
+    <!-- ★ 自動再生：ON を右上に配置 -->
     <p id="autoPlayStatus">自動再生：OFF</p>
 
     <!-- ★ 残り単語数＋カウントダウン（横並び） -->
@@ -194,7 +194,9 @@
 
     <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ 読む</button>
     <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
-    <button id="shuffleResetBtn" class="main-btn" style="background:#ffcc66;">🔄 始めから</button>
+
+    <!-- ★ 始めから（軽いリセットアイコン） -->
+    <button id="shuffleResetBtn" class="main-btn" style="background:#ffcc66;">🔁 始めから</button>
 
   </div>
 
@@ -225,7 +227,7 @@ let autoPlay = settings.autoPlay || false;
 
 autoPlayStatus.textContent = "自動再生：" + (autoPlay ? "ON" : "OFF");
 
-/* ジャンル生成 */
+/* ジャンル生成（チェックボックス廃止版） */
 const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
 const genreArea = document.getElementById("genreArea");
 
@@ -237,13 +239,10 @@ genres.forEach(g => {
   div.innerHTML = `
     <img src="images/${g.toLowerCase()}_icon.png">
     <p>${g}</p>
-    <input type="checkbox">
   `;
 
-  div.addEventListener("click", (e) => {
-    const cb = div.querySelector("input");
-    if (e.target.tagName !== "INPUT") cb.checked = !cb.checked;
-    div.classList.toggle("selected", cb.checked);
+  div.addEventListener("click", () => {
+    div.classList.toggle("selected");
     loadWords();
   });
 
@@ -252,8 +251,6 @@ genres.forEach(g => {
 
 checkAllBtn.addEventListener("click", () => {
   document.querySelectorAll(".genre").forEach(g => {
-    const cb = g.querySelector("input");
-    cb.checked = true;
     g.classList.add("selected");
   });
   loadWords();
@@ -261,8 +258,6 @@ checkAllBtn.addEventListener("click", () => {
 
 clearCheckBtn.addEventListener("click", () => {
   document.querySelectorAll(".genre").forEach(g => {
-    const cb = g.querySelector("input");
-    cb.checked = false;
     g.classList.remove("selected");
   });
   loadWords();
@@ -286,12 +281,9 @@ let countdownTimer = null;
 /* 単語読み込み */
 function loadWords() {
   words = [];
-  document.querySelectorAll(".genre").forEach(g => {
-    const cb = g.querySelector("input");
-    if (cb.checked) {
-      const genre = g.dataset.genre;
-      words.push(...wordsData[genre]);
-    }
+  document.querySelectorAll(".genre.selected").forEach(g => {
+    const genre = g.dataset.genre;
+    words.push(...wordsData[genre]);
   });
   shuffleWords();
 }
@@ -414,7 +406,7 @@ pauseButton.addEventListener("click", () => {
   startBtn.textContent = "▶ 再開";
 });
 
-/* 始めから（シャッフル） */
+/* 始めから（軽いリセットアイコン） */
 shuffleResetBtn.addEventListener("click", () => {
   isPaused = true;
 
