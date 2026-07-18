@@ -14,14 +14,18 @@
       text-align: center;
     }
 
+    /* ★ 上部ナビを 左・中央・右 に配置 */
     .play-header {
       padding: 8px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       background: #fff;
       border-bottom: 1px solid #ddd;
-      gap: 15px;
+    }
+
+    .center-btn {
+      margin: 0 auto;
     }
 
     .home-btn, .edit-btn, .setting-btn {
@@ -150,6 +154,11 @@
       color: #444;
     }
 
+    /* ★ 自動再生OFFのとき停止ボタン非表示 */
+    .autoPlayOff #pauseButton {
+      display: none;
+    }
+
     footer {
       margin-top: 15px;
       padding: 10px;
@@ -163,7 +172,9 @@
 
   <div class="play-header">
     <button id="homeButton" class="home-btn">🏠 ホーム</button>
-    <button id="editButton" class="edit-btn">✏️ 単語一覧</button>
+
+    <button id="editButton" class="edit-btn center-btn">✏️ 単語一覧</button>
+
     <button id="settingButton" class="setting-btn">🔧 設定</button>
   </div>
 
@@ -183,10 +194,8 @@
       <button id="toggleWordBtn" class="top-btn">👁 表示</button>
     </div>
 
-    <!-- ★ 自動再生：ON を右上に配置 -->
     <p id="autoPlayStatus">自動再生：OFF</p>
 
-    <!-- ★ 残り単語数＋カウントダウン（横並び） -->
     <div class="countdown-row">
       <p id="remainingCount">残り単語数：0</p>
       <p id="countdownMessage"></p>
@@ -195,7 +204,6 @@
     <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ 読む</button>
     <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
 
-    <!-- ★ 始めから（軽いリセットアイコン） -->
     <button id="shuffleResetBtn" class="main-btn" style="background:#ffcc66;">🔁 始めから</button>
 
   </div>
@@ -226,6 +234,11 @@ const readInterval = settings.interval || 6;
 let autoPlay = settings.autoPlay || false;
 
 autoPlayStatus.textContent = "自動再生：" + (autoPlay ? "ON" : "OFF");
+
+/* ★ 自動再生OFFなら停止ボタン非表示 */
+if (!autoPlay) {
+  document.body.classList.add("autoPlayOff");
+}
 
 /* ジャンル生成（チェックボックス廃止版） */
 const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
@@ -354,7 +367,6 @@ function speakWord(word) {
       return;
     }
 
-    /* ★ インターバルカウントダウン */
     startCountdown(readInterval, () => {
       if (index >= shuffled.length) {
         countdownMessage.textContent = "終わりました";
@@ -373,6 +385,11 @@ startBtn.addEventListener("click", () => {
   if (isPlaying) return;
   if (shuffled.length === 0) return;
 
+  /* ★ 自動再生OFFのときは連打防止のため isPlaying = true にする */
+  if (!autoPlay) {
+    isPlaying = true;
+  }
+
   isPaused = false;
   pauseButton.style.background = "#ff9999";
   pauseButton.textContent = "⏹ 停止";
@@ -383,6 +400,14 @@ startBtn.addEventListener("click", () => {
 
   startCountdown(3, () => {
     speakWord(word);
+
+    /* ★ 自動再生OFFのときは読み終わったら isPlaying を戻す */
+    if (!autoPlay) {
+      audioPlayer.onended = () => {
+        isPlaying = false;
+        startBtn.textContent = "▶ 読む";
+      };
+    }
   });
 });
 
