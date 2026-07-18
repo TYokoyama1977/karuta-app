@@ -132,6 +132,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="play-header">
@@ -334,19 +335,10 @@
 
       let word;
 
-      if (!autoPlay) {
-        word = shuffled[index];
-        index++;
-        updateRemaining();
-      } else {
-        if (currentWord.textContent === "---") {
-          word = shuffled[index];
-          index++;
-          updateRemaining();
-        } else {
-          word = currentWord.textContent;
-        }
-      }
+      /* ★ 修正：再開時も currentWord を使わず、必ず次の単語を読む */
+      word = shuffled[index];
+      index++;
+      updateRemaining();
 
       clearTimeout(startDelayTimer);
       startDelayTimer = setTimeout(() => {
