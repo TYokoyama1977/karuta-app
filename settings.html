@@ -104,6 +104,17 @@
       cursor: pointer;
     }
 
+    .delete-btn {
+      margin-top: 25px;
+      padding: 15px 40px;
+      font-size: 22px;
+      border-radius: 50px;
+      border: none;
+      background: #ff6666;
+      color: white;
+      cursor: pointer;
+    }
+
     .interval-note {
       font-size: 16px;
       color: #666;
@@ -123,7 +134,7 @@
 
   <div class="setting-card">
 
-    <!-- 声（最上段へ移動） -->
+    <!-- 声 -->
     <div class="setting-row">
       声
       <div class="btn-group">
@@ -132,7 +143,7 @@
       </div>
     </div>
 
-    <!-- 自動再生（2番目へ移動） -->
+    <!-- 自動再生 -->
     <div class="setting-row">
       自動再生
       <div class="btn-group">
@@ -141,7 +152,7 @@
       </div>
     </div>
 
-    <!-- 間隔（説明文追加） -->
+    <!-- 間隔 -->
     <div class="setting-row">
       間隔（秒）
       <div style="display:flex; justify-content:center; align-items:center; gap:20px; margin-top:10px;">
@@ -154,6 +165,10 @@
     </div>
 
     <button id="saveBtn" class="save-btn">保存する</button>
+
+    <!-- 🔥 追加：登録単語すべて消去 -->
+    <button id="deleteWordsBtn" class="delete-btn">🗑 登録単語をすべて消去</button>
+
   </div>
 
   <script>
@@ -212,6 +227,14 @@
 
       localStorage.setItem("settings", JSON.stringify(newSettings));
       alert("設定を保存しました");
+    });
+
+    /* 🔥 登録単語すべて消去 */
+    deleteWordsBtn.addEventListener("click", () => {
+      if (confirm("登録した単語をすべて消去しますか？")) {
+        localStorage.removeItem("userWords");
+        alert("登録単語を消去しました");
+      }
     });
 
     updateUI();
