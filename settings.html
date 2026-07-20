@@ -83,10 +83,6 @@
       cursor: pointer;
     }
 
-    .interval-btn:active {
-      background: #ddd;
-    }
-
     #intervalDisplay {
       font-size: 26px;
       width: 70px;
@@ -114,20 +110,20 @@
       color: white;
       cursor: pointer;
     }
-
-    .interval-note {
-      font-size: 16px;
-      color: #666;
-      margin-top: 8px;
-    }
   </style>
 </head>
 
 <body>
 
+  <!-- 上部ヘッダー（修正済み） -->
   <div class="header">
     <button id="homeButton" class="nav-btn">🏠 ホーム</button>
-    <button id="playButton" class="nav-btn">🔊 読み上げ</button>
+
+    <!-- ★ 新規追加：中央ボタン -->
+    <button id="myWordsButton" class="nav-btn">📚 マイ単語読み上げ</button>
+
+    <!-- ★ 名称変更：右端ボタン -->
+    <button id="playButton" class="nav-btn">🔊 ジャンル読み上げ</button>
   </div>
 
   <h2>設定</h2>
@@ -160,26 +156,30 @@
         <span id="intervalDisplay">6</span>
         <button id="intervalUp" class="interval-btn">▲</button>
       </div>
-
-      <p class="interval-note">※自動再生の読み上げ間隔の設定です。</p>
     </div>
 
     <button id="saveBtn" class="save-btn">保存する</button>
 
-    <!-- 🔥 追加：登録単語すべて消去 -->
+    <!-- 🔥 保存ボタンの直下に固定 -->
     <button id="deleteWordsBtn" class="delete-btn">🗑 登録単語をすべて消去</button>
 
   </div>
 
   <script>
+    /* 上部ボタンのリンク設定 */
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
+    });
+
+    myWordsButton.addEventListener("click", () => {
+      window.location.href = "user-words.html";  // ★ 指定どおり修正
     });
 
     playButton.addEventListener("click", () => {
       window.location.href = "play.html";
     });
 
+    /* 設定読み込み */
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 
     let autoPlay = settings.autoPlay || false;
@@ -195,16 +195,13 @@
     function updateUI() {
       autoOn.classList.toggle("selected", autoPlay);
       autoOff.classList.toggle("selected", !autoPlay);
-
       voiceBoy.classList.toggle("selected", voice === "boy");
       voiceGirl.classList.toggle("selected", voice === "girl");
-
       intervalDisplay.textContent = intervalValue;
     }
 
     autoOn.onclick = () => { autoPlay = true; updateUI(); };
     autoOff.onclick = () => { autoPlay = false; updateUI(); };
-
     voiceBoy.onclick = () => { voice = "boy"; updateUI(); };
     voiceGirl.onclick = () => { voice = "girl"; updateUI(); };
 
@@ -218,6 +215,7 @@
       updateUI();
     });
 
+    /* 設定保存 */
     saveBtn.addEventListener("click", () => {
       const newSettings = {
         autoPlay: autoPlay,
@@ -229,7 +227,7 @@
       alert("設定を保存しました");
     });
 
-    /* 🔥 登録単語すべて消去 */
+    /* 登録単語すべて消去 */
     deleteWordsBtn.addEventListener("click", () => {
       if (confirm("登録した単語をすべて消去しますか？")) {
         localStorage.removeItem("userWords");
