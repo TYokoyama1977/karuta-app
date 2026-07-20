@@ -13,6 +13,8 @@ body {
     padding: 0;
     text-align: center;
 }
+
+/* 上部ナビ */
 .header {
     padding: 10px;
     display: flex;
@@ -31,8 +33,8 @@ body {
 }
 .nav-btn:hover { background: #dcdcdc; }
 
+/* カード共通 */
 .setting-card {
-    background: #fff;
     width: 90%;
     max-width: 500px;
     margin: 20px auto;
@@ -41,10 +43,24 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     text-align: left;
 }
+
+/* マイ単語カード（ピンク） */
+.card-mywords {
+    background: #ffe6e6;
+    border-left: 8px solid #ff9999;
+}
+
+/* ジャンル読み上げカード（ブルー） */
+.card-play {
+    background: #e6f3ff;
+    border-left: 8px solid #66b3ff;
+}
+
 .setting-row {
     margin-bottom: 25px;
     font-size: 20px;
 }
+
 .btn-group {
     display: flex;
     gap: 15px;
@@ -64,6 +80,7 @@ body {
     background: #ffcc66;
     border: 2px solid #ff9900;
 }
+
 .interval-btn {
     font-size: 22px;
     padding: 10px 20px;
@@ -102,7 +119,17 @@ body {
 
 <h2>設定</h2>
 
-<div class="setting-card">
+<!-- ① マイ単語設定（上） -->
+<div class="setting-card card-mywords">
+
+    <div class="setting-row">マイ単語の登録単語</div>
+
+    <button id="deleteWordsBtn" class="delete-btn">全て消去</button>
+
+</div>
+
+<!-- ② ジャンル読み上げ設定（下） -->
+<div class="setting-card card-play">
 
     <!-- 声 -->
     <div class="setting-row">
@@ -131,12 +158,6 @@ body {
             <button id="intervalUp" class="interval-btn">▲</button>
         </div>
     </div>
-
-    <!-- マイ単語の登録単語 -->
-    <div class="setting-row">マイ単語の登録単語</div>
-
-    <!-- 全て消去ボタン -->
-    <button id="deleteWordsBtn" class="delete-btn">全て消去</button>
 
 </div>
 
@@ -168,7 +189,7 @@ function updateUI() {
     intervalDisplay.textContent = intervalValue;
 }
 
-// 自動保存関数
+// 自動保存
 function saveSettings() {
     const newSettings = {
         autoPlay: autoPlay,
