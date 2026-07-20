@@ -101,7 +101,7 @@
     }
 
     .delete-btn {
-      margin-top: 25px;
+      margin-top: 15px;
       padding: 15px 40px;
       font-size: 22px;
       border-radius: 50px;
@@ -115,14 +115,9 @@
 
 <body>
 
-  <!-- 上部ヘッダー（修正済み） -->
   <div class="header">
     <button id="homeButton" class="nav-btn">🏠 ホーム</button>
-
-    <!-- ★ 新規追加：中央ボタン -->
     <button id="myWordsButton" class="nav-btn">📚 マイ単語読み上げ</button>
-
-    <!-- ★ 名称変更：右端ボタン -->
     <button id="playButton" class="nav-btn">🔊 ジャンル読み上げ</button>
   </div>
 
@@ -158,28 +153,31 @@
       </div>
     </div>
 
+    <!-- マイ単語の登録単語 -->
+    <div class="setting-row">
+      マイ単語の登録単語
+    </div>
+
     <button id="saveBtn" class="save-btn">保存する</button>
 
-    <!-- 🔥 保存ボタンの直下に固定 -->
-    <button id="deleteWordsBtn" class="delete-btn">🗑 登録単語をすべて消去</button>
+    <!-- 全て消去ボタン（保存の直下） -->
+    <button id="deleteWordsBtn" class="delete-btn">全て消去</button>
 
   </div>
 
   <script>
-    /* 上部ボタンのリンク設定 */
     homeButton.addEventListener("click", () => {
       window.location.href = "index.html";
     });
 
     myWordsButton.addEventListener("click", () => {
-      window.location.href = "user-words.html";  // ★ 指定どおり修正
+      window.location.href = "user-words.html";
     });
 
     playButton.addEventListener("click", () => {
       window.location.href = "play.html";
     });
 
-    /* 設定読み込み */
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 
     let autoPlay = settings.autoPlay || false;
@@ -215,7 +213,6 @@
       updateUI();
     });
 
-    /* 設定保存 */
     saveBtn.addEventListener("click", () => {
       const newSettings = {
         autoPlay: autoPlay,
@@ -227,7 +224,6 @@
       alert("設定を保存しました");
     });
 
-    /* 登録単語すべて消去 */
     deleteWordsBtn.addEventListener("click", () => {
       if (confirm("登録した単語をすべて消去しますか？")) {
         localStorage.removeItem("userWords");
