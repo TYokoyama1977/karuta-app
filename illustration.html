@@ -1,104 +1,186 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>イラスト集 | 読み上げかるた</title>
-  <link rel="stylesheet" href="css/illustration.css">
+<meta charset="UTF-8">
+<title>イラスト集 | 読み上げかるた</title>
+<style>
+/* ===== 全体 ===== */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #f7f5ff;
+  color: #333;
+}
+
+/* ===== ヘッダー ===== */
+.header {
+  background: linear-gradient(135deg, #ffe9f0, #e5f3ff);
+  border-bottom: 4px solid #333;
+  padding: 24px 16px 32px;
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 0.05em;
+}
+
+.header p {
+  margin-top: 8px;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ===== カテゴリグリッド ===== */
+.main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 16px 40px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* ===== カード ===== */
+.card {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-radius: 18px;
+  border: 4px solid #333;
+  background: #fff;
+  text-decoration: none;
+  color: #333;
+  box-shadow: 5px 5px 0 rgba(0,0,0,0.15);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0 rgba(0,0,0,0.2);
+}
+
+.card-icon {
+  font-size: 2.2rem;
+  margin-right: 12px;
+}
+
+.card-title {
+  margin: 0 0 4px;
+  font-size: 1.2rem;
+}
+
+.card-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* ===== カテゴリ別背景色 ===== */
+.animal { background: #fff7e0; }
+.color  { background: #ffe9ff; }
+.food   { background: #fff3e8; }
+.fruit  { background: #e9ffe9; }
+.body   { background: #e9f5ff; }
+.other  { background: #f5f0ff; }
+
+/* ===== 印刷ヘルプ ===== */
+.help-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 24px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 3px solid #333;
+  background: #fff;
+  text-decoration: none;
+  color: #333;
+  font-size: 1rem;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.15);
+}
+
+.help-link:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.2);
+}
+
+.help-icon {
+  margin-right: 8px;
+}
+</style>
 </head>
+
 <body>
-  <header class="page-header">
-    <div class="page-header__inner">
-      <div class="page-header__breadcrumbs">
-        <a href="index.html" class="breadcrumb-link">🏠 ホーム</a>
-        <span class="breadcrumb-separator">›</span>
-        <span class="breadcrumb-current">イラスト集</span>
+
+<header class="header">
+  <h1>イラスト集</h1>
+  <p>初期登録されている英単語のイラストをカテゴリ別に表示し、印刷できます。</p>
+</header>
+
+<main class="main">
+
+  <div class="category-grid">
+
+    <a href="illustration_animal.html" class="card animal">
+      <div class="card-icon">🐾</div>
+      <div>
+        <h3 class="card-title">Animal</h3>
+        <p class="card-desc">動物のイラストを一覧表示して印刷できます。</p>
       </div>
-      <h1 class="page-title">イラスト集</h1>
-      <p class="page-subtitle">
-        初期登録されている英単語のイラストをカテゴリ別に表示し、印刷することができます。
-      </p>
-    </div>
-  </header>
+    </a>
 
-  <main class="page-main">
-    <section class="category-section">
-      <h2 class="section-title">カテゴリを選んでください</h2>
-
-      <div class="category-grid">
-        <!-- Animal -->
-        <a href="illustration_animal.html" class="category-card category-card--animal">
-          <div class="category-card__icon">🐾</div>
-          <div class="category-card__body">
-            <h3 class="category-card__title">Animal</h3>
-            <p class="category-card__description">
-              動物のイラストを一覧表示して印刷できます。
-            </p>
-          </div>
-        </a>
-
-        <!-- Color -->
-        <a href="illustration_color.html" class="category-card category-card--color">
-          <div class="category-card__icon">🎨</div>
-          <div class="category-card__body">
-            <h3 class="category-card__title">Color</h3>
-            <p class="category-card__description">
-              色に関するイラストを一覧表示して印刷できます。
-            </p>
-          </div>
-        </a>
-
-        <!-- Food -->
-        <a href="illustration_food.html" class="category-card category-card--food">
-          <div class="category-card__icon">🍽️</div>
-          <div class="category-card__body">
-            <h3 class="category-card__title">Food</h3>
-            <p class="category-card__description">
-              食べ物のイラストを一覧表示して印刷できます。
-            </p>
-          </div>
-        </a>
-
-        <!-- Fruit -->
-        <a href="illustration_fruit.html" class="category-card category-card--fruit">
-          <div class="category-card__icon">🍎</div>
-          <div class="category-card__body">
-            <h3 class="category-card__title">Fruit</h3>
-            <p class="category-card__description">
-              果物のイラストを一覧表示して印刷できます。
-            </p>
-          </div>
-        </a>
-
-        <!-- Body -->
-        <a href="illustration_body.html" class="category-card category-card--body">
-          <div class="category-card__icon">🧍</div>
-          <div class="category-card__body">
-            <h3 class="category-card__title">Body</h3>
-            <p class="category-card__description">
-              からだの部位のイラストを一覧表示して印刷できます。
-            </p>
-          </div>
-        </a>
-
-        <!-- Other -->
-        <a href="illustration_other.html" class="category-card category-card--other">
-          <div class="category-card__icon">✨</div>
-          <div class="category-card__body">
-            <h3 class="category-card__title">Other</h3>
-            <p class="category-card__description">
-              その他のイラストを一覧表示して印刷できます。
-            </p>
-          </div>
-        </a>
+    <a href="illustration_color.html" class="card color">
+      <div class="card-icon">🎨</div>
+      <div>
+        <h3 class="card-title">Color</h3>
+        <p class="card-desc">色に関するイラストを一覧表示して印刷できます。</p>
       </div>
-    </section>
+    </a>
 
-    <section class="help-section">
-      <a href="print_help.html" class="help-link">
-        <span class="help-link__icon">🖨️</span>
-        <span class="help-link__text">印刷方法のヘルプを見る</span>
-      </a>
-    </section>
-  </main>
+    <a href="illustration_food.html" class="card food">
+      <div class="card-icon">🍽️</div>
+      <div>
+        <h3 class="card-title">Food</h3>
+        <p class="card-desc">食べ物のイラストを一覧表示して印刷できます。</p>
+      </div>
+    </a>
+
+    <a href="illustration_fruit.html" class="card fruit">
+      <div class="card-icon">🍎</div>
+      <div>
+        <h3 class="card-title">Fruit</h3>
+        <p class="card-desc">果物のイラストを一覧表示して印刷できます。</p>
+      </div>
+    </a>
+
+    <a href="illustration_body.html" class="card body">
+      <div class="card-icon">🧍</div>
+      <div>
+        <h3 class="card-title">Body</h3>
+        <p class="card-desc">からだの部位のイラストを一覧表示して印刷できます。</p>
+      </div>
+    </a>
+
+    <a href="illustration_other.html" class="card other">
+      <div class="card-icon">✨</div>
+      <div>
+        <h3 class="card-title">Other</h3>
+        <p class="card-desc">その他のイラストを一覧表示して印刷できます。</p>
+      </div>
+    </a>
+
+  </div>
+
+  <a href="print_help.html" class="help-link">
+    <span class="help-icon">🖨️</span>
+    印刷方法のヘルプを見る
+  </a>
+
+</main>
+
 </body>
 </html>
