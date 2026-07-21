@@ -2,89 +2,103 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>イラスト集</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      font-family: "Arial", sans-serif;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      background: #fff;
-    }
-
-    .illust-header {
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #f7f7f7;
-    }
-
-    .home-btn {
-      font-size: 18px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      background: #eee;
-      cursor: pointer;
-    }
-
-    h1 {
-      margin: 10px 0;
-      font-size: 24px;
-    }
-
-    .nav button {
-      margin: 4px;
-      padding: 8px 14px;
-      border-radius: 6px;
-      border: none;
-      background: #ddd;
-      cursor: pointer;
-    }
-  </style>
+  <title>イラスト集 | 読み上げかるた</title>
+  <link rel="stylesheet" href="css/illustration.css">
 </head>
 <body>
+  <header class="page-header">
+    <div class="page-header__inner">
+      <div class="page-header__breadcrumbs">
+        <a href="index.html" class="breadcrumb-link">🏠 ホーム</a>
+        <span class="breadcrumb-separator">›</span>
+        <span class="breadcrumb-current">イラスト集</span>
+      </div>
+      <h1 class="page-title">イラスト集</h1>
+      <p class="page-subtitle">
+        初期登録されている英単語のイラストをカテゴリ別に表示し、印刷することができます。
+      </p>
+    </div>
+  </header>
 
-  <div class="illust-header">
-    <button class="home-btn" onclick="goHome()">🏠 ホーム</button>
-  </div>
+  <main class="page-main">
+    <section class="category-section">
+      <h2 class="section-title">カテゴリを選んでください</h2>
 
-  <h1>イラスト集</h1>
+      <div class="category-grid">
+        <!-- Animal -->
+        <a href="illustration_animal.html" class="category-card category-card--animal">
+          <div class="category-card__icon">🐾</div>
+          <div class="category-card__body">
+            <h3 class="category-card__title">Animal</h3>
+            <p class="category-card__description">
+              動物のイラストを一覧表示して印刷できます。
+            </p>
+          </div>
+        </a>
 
-  <div style="font-size:16px; margin-bottom:10px;">
-    初期登録されている英単語のイラストを印刷することできます。
-  </div>
+        <!-- Color -->
+        <a href="illustration_color.html" class="category-card category-card--color">
+          <div class="category-card__icon">🎨</div>
+          <div class="category-card__body">
+            <h3 class="category-card__title">Color</h3>
+            <p class="category-card__description">
+              色に関するイラストを一覧表示して印刷できます。
+            </p>
+          </div>
+        </a>
 
-  <div class="nav" id="nav"></div>
+        <!-- Food -->
+        <a href="illustration_food.html" class="category-card category-card--food">
+          <div class="category-card__icon">🍽️</div>
+          <div class="category-card__body">
+            <h3 class="category-card__title">Food</h3>
+            <p class="category-card__description">
+              食べ物のイラストを一覧表示して印刷できます。
+            </p>
+          </div>
+        </a>
 
-  <div style="margin-top: 12px;">
-    <a href="help-print.html" style="font-size: 16px; text-decoration: underline; cursor: pointer;">
-      印刷方法のヘルプ
-    </a>
-  </div>
+        <!-- Fruit -->
+        <a href="illustration_fruit.html" class="category-card category-card--fruit">
+          <div class="category-card__icon">🍎</div>
+          <div class="category-card__body">
+            <h3 class="category-card__title">Fruit</h3>
+            <p class="category-card__description">
+              果物のイラストを一覧表示して印刷できます。
+            </p>
+          </div>
+        </a>
 
-  <script>
-    function goHome() {
-      window.location.href = "index.html";
-    }
+        <!-- Body -->
+        <a href="illustration_body.html" class="category-card category-card--body">
+          <div class="category-card__icon">🧍</div>
+          <div class="category-card__body">
+            <h3 class="category-card__title">Body</h3>
+            <p class="category-card__description">
+              からだの部位のイラストを一覧表示して印刷できます。
+            </p>
+          </div>
+        </a>
 
-    /* ▼ 単語一覧は不要なので削除し、カテゴリ名だけに最適化 ▼ */
-    const categories = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
+        <!-- Other -->
+        <a href="illustration_other.html" class="category-card category-card--other">
+          <div class="category-card__icon">✨</div>
+          <div class="category-card__body">
+            <h3 class="category-card__title">Other</h3>
+            <p class="category-card__description">
+              その他のイラストを一覧表示して印刷できます。
+            </p>
+          </div>
+        </a>
+      </div>
+    </section>
 
-    const nav = document.getElementById("nav");
-
-    categories.forEach(key => {
-      const btn = document.createElement("button");
-      btn.textContent = key;
-      btn.addEventListener("click", () => {
-        window.location.href = `${key.toLowerCase()}-viewer.html`;
-      });
-      nav.appendChild(btn);
-    });
-  </script>
-
+    <section class="help-section">
+      <a href="print_help.html" class="help-link">
+        <span class="help-link__icon">🖨️</span>
+        <span class="help-link__text">印刷方法のヘルプを見る</span>
+      </a>
+    </section>
+  </main>
 </body>
 </html>
