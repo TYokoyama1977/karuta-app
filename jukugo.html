@@ -14,6 +14,27 @@
     color: #333;
   }
 
+  /* 進捗＆全体ステータス */
+  #header-info {
+    max-width: 400px;
+    margin: 0 auto 10px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #555;
+  }
+  .check-reset-btn {
+    font-size: 12px;
+    padding: 4px 8px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .check-reset-btn:hover { background-color: #c82333; }
+
   /* 問題表示エリア */
   #question-box {
     background-color: #fff;
@@ -22,12 +43,36 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     max-width: 400px;
     margin: 0 auto 15px auto;
+    position: relative;
   }
-  .q-label {
-    font-size: 14px;
-    color: #666;
+  .q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 5px;
   }
+  .q-label { font-size: 14px; color: #666; }
+  
+  /* チェックマーク表示エリア */
+  .check-marks {
+    display: flex;
+    gap: 4px;
+  }
+  .check-badge {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .check-badge.active {
+    background-color: #28a745;
+  }
+
   #question-hiragana {
     font-size: 28px;
     font-weight: bold;
@@ -70,9 +115,7 @@
     cursor: crosshair;
   }
 
-  .controls {
-    margin: 10px 0;
-  }
+  .controls { margin: 10px 0; }
   button {
     padding: 8px 14px;
     font-size: 14px;
@@ -83,9 +126,7 @@
     background-color: #fff;
     transition: 0.2s;
   }
-  button:hover {
-    background-color: #e6e6e6;
-  }
+  button:hover { background-color: #e6e6e6; }
   .btn-next {
     background-color: #28a745;
     color: white;
@@ -94,14 +135,10 @@
     padding: 10px 20px;
     font-size: 16px;
   }
-  .btn-next:hover {
-    background-color: #218838;
-  }
+  .btn-next:hover { background-color: #218838; }
 
   /* 候補領域 */
-  #result-box {
-    margin-top: 5px;
-  }
+  #result-box { margin-top: 5px; }
   .candidate-list {
     display: flex;
     justify-content: center;
@@ -145,54 +182,87 @@
     color: #721c24;
     border: 1px solid #f5c6cb;
   }
-  #result-status {
-    font-size: 22px;
-    font-weight: bold;
+  #result-status { font-size: 20px; font-weight: bold; }
+  #result-meaning { font-size: 14px; margin-top: 5px; text-align: left; }
+
+  /* 結果発表画面 */
+  #session-result {
+    display: none;
+    background: #fff;
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
-  #result-meaning {
-    font-size: 14px;
-    margin-top: 5px;
-    text-align: left;
-  }
+  #session-result h3 { margin-top: 0; color: #007bff; }
+  .score-display { font-size: 28px; font-weight: bold; margin: 15px 0; }
 </style>
 </head>
 <body>
 
 <h2>4字熟語 手書きクイズ</h2>
 
-<!-- 問題表示 -->
-<div id="question-box">
-  <div class="q-label">【問題】以下のひらがなを漢字にしなさい</div>
-  <div id="question-hiragana">読み込み中...</div>
+<!-- 全体ステータス ＆ チェックリセット -->
+<div id="header-info">
+  <span id="session-progress">第 1 / 10 問</span>
+  <button id="resetChecksBtn" class="check-reset-btn">全チェック消去</button>
 </div>
 
-<!-- 4文字入力エリア -->
-<div id="word-container">
-  <div class="char-box active" data-index="0"></div>
-  <div class="char-box" data-index="1"></div>
-  <div class="char-box" data-index="2"></div>
-  <div class="char-box" data-index="3"></div>
+<!-- クイズ領域 -->
+<div id="quiz-area">
+  <!-- 問題表示 -->
+  <div id="question-box">
+    <div class="q-header">
+      <span class="q-label">【問題】ひらがなを漢字にしなさい</span>
+      <!-- チェック数表示ランプ（最大2個） -->
+      <div class="check-marks">
+        <span id="check1" class="check-badge">✓</span>
+        <span id="check2" class="check-badge">✓</span>
+      </div>
+    </div>
+    <div id="question-hiragana">読み込み中...</div>
+  </div>
+
+  <!-- 4文字入力エリア -->
+  <div id="word-container">
+    <div class="char-box active" data-index="0"></div>
+    <div class="char-box" data-index="1"></div>
+    <div class="char-box" data-index="2"></div>
+    <div class="char-box" data-index="3"></div>
+  </div>
+
+  <!-- 手書きキャンバス -->
+  <canvas id="canvas" width="280" height="280"></canvas>
+
+  <div class="controls">
+    <button id="clearBtn">一画消去</button>
+    <button id="backspaceBtn">1文字削除</button>
+    <button id="nextBtn" class="btn-next" style="display:none;">次の問題 ➔</button>
+  </div>
+
+  <!-- 漢字候補 -->
+  <div id="result-box">
+    <div style="font-size: 13px; color: #666;">候補（タップで選択）:</div>
+    <div id="candidates" class="candidate-list"></div>
+  </div>
+
+  <!-- 判定・解説 -->
+  <div id="judgement-box" style="display:none;">
+    <div id="result-status"></div>
+    <div id="result-meaning"></div>
+  </div>
 </div>
 
-<!-- 手書きキャンバス -->
-<canvas id="canvas" width="280" height="280"></canvas>
-
-<div class="controls">
-  <button id="clearBtn">一画消去</button>
-  <button id="backspaceBtn">1文字削除</button>
-  <button id="nextBtn" class="btn-next" style="display:none;">次の問題へ ➔</button>
-</div>
-
-<!-- 漢字候補 -->
-<div id="result-box">
-  <div style="font-size: 13px; color: #666;">候補（タップで選択）:</div>
-  <div id="candidates" class="candidate-list"></div>
-</div>
-
-<!-- 判定・解説 -->
-<div id="judgement-box" style="display:none;">
-  <div id="result-status"></div>
-  <div id="result-meaning"></div>
+<!-- 10問完了時の結果画面 -->
+<div id="session-result">
+  <h3>🎉 セッション終了！</h3>
+  <p>10問のクイズが完了しました。</p>
+  <div class="score-display">
+    正解数: <span id="correct-count">0</span> / 10<br>
+    スコア: <span id="score-val">0</span> 点
+  </div>
+  <button id="restartBtn" class="btn-next">次の10問に挑戦 ➔</button>
 </div>
 
 <script>
@@ -200,35 +270,49 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const boxes = document.querySelectorAll(".char-box");
 
-let database = [];          // CSVから読み込んだ問題データ
-let currentQuiz = null;     // 現在出題中の問題
-let currentIndex = 0;      // 現在入力対象のマス（0〜3）
+let database = [];          // CSV問題データ
+let checkMap = {};          // { 問題ID/漢字: 正解回数(0,1,2) }
+let availablePool = [];     // 2回正解していない出題可能問題リスト
+
+// セッション管理（10問単位）
+let currentSessionQuestions = [];
+let sessionIndex = 0;
+let sessionCorrectCount = 0;
+let currentQuiz = null;
+
+let currentIndex = 0;
 let strokes = [];
 let currentStrokeX = [];
 let currentStrokeY = [];
 let drawing = false;
 let recognizeTimer = null;
 
-// 1. CSVデータの読み込み処理
+// ストレージからチェック状態を読み込み
+function loadCheckData() {
+  const data = localStorage.getItem("kanji_check_map");
+  checkMap = data ? JSON.parse(data) : {};
+}
+
+// チェック状態の保存
+function saveCheckData() {
+  localStorage.setItem("kanji_check_map", JSON.stringify(checkMap));
+}
+
+// CSV読み込み
 async function loadCSV() {
   try {
     const response = await fetch('yojijukugo.csv');
     const text = await response.text();
-    
-    // 行ごとに分割してパース
     const lines = text.split(/\r\n|\n/);
     database = [];
     
-    // ヘッダー行をスキップしてデータ取得 (1行目: id, kanji, hiragana, meaning)
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
-      
-      // カンマで分割（簡易パース）
       const cols = line.split(',');
       if (cols.length >= 3) {
         database.push({
-          id: cols[0],
+          id: cols[0].trim(),
           kanji: cols[1].trim(),
           hiragana: cols[2].trim(),
           meaning: cols[3] ? cols[3].trim() : ""
@@ -236,28 +320,58 @@ async function loadCSV() {
       }
     }
 
-    if (database.length > 0) {
-      nextQuestion();
-    } else {
-      document.getElementById("question-hiragana").textContent = "データが空です";
-    }
+    loadCheckData();
+    startNewSession();
   } catch (error) {
     console.error("CSV読み込みエラー:", error);
     document.getElementById("question-hiragana").textContent = "CSVの読み込みに失敗しました";
   }
 }
 
-// 2. 問題をランダムに出題
-function nextQuestion() {
-  // ランダムに1つ選択
-  const randomIndex = Math.floor(Math.random() * database.length);
-  currentQuiz = database[randomIndex];
+// 10問のセッションを開始
+function startNewSession() {
+  // チェックが2回未満の問題（未習得問題）を抽出
+  availablePool = database.filter(q => {
+    const count = checkMap[q.kanji] || 0;
+    return count < 2;
+  });
+
+  if (availablePool.length === 0) {
+    alert("すべての問題をクリア（2回正解）しました！全チェックを初期化します。");
+    checkMap = {};
+    saveCheckData();
+    availablePool = [...database];
+  }
+
+  // 出題候補をシャッフル
+  const shuffled = [...availablePool].sort(() => Math.random() - 0.5);
+  // 最大10問を抽出
+  currentSessionQuestions = shuffled.slice(0, 10);
+  sessionIndex = 0;
+  sessionCorrectCount = 0;
+
+  document.getElementById("quiz-area").style.display = "block";
+  document.getElementById("session-result").style.display = "none";
+
+  loadQuestion();
+}
+
+// 各問題のセットアップ
+function loadQuestion() {
+  currentQuiz = currentSessionQuestions[sessionIndex];
+
+  // ヘッダー情報更新
+  document.getElementById("session-progress").textContent = `第 ${sessionIndex + 1} / ${currentSessionQuestions.length} 問`;
+  document.getElementById("question-hiragana").textContent = currentQuiz.hiragana;
+
+  // チェックランプの更新
+  const checks = checkMap[currentQuiz.kanji] || 0;
+  document.getElementById("check1").classList.toggle("active", checks >= 1);
+  document.getElementById("check2").classList.toggle("active", checks >= 2);
 
   // 画面リセット
-  document.getElementById("question-hiragana").textContent = currentQuiz.hiragana;
   document.getElementById("judgement-box").style.display = "none";
   document.getElementById("nextBtn").style.display = "none";
-  
   boxes.forEach(box => box.textContent = "");
   setActiveBox(0);
   initCanvas();
@@ -294,7 +408,7 @@ boxes.forEach((box, i) => {
   box.addEventListener("click", () => setActiveBox(i));
 });
 
-// 手書き入力座標関連
+// 手書き入力処理
 function getPos(e) {
   const rect = canvas.getBoundingClientRect();
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -339,7 +453,6 @@ canvas.addEventListener("touchstart", startDrawing, { passive: false });
 canvas.addEventListener("touchmove", draw, { passive: false });
 canvas.addEventListener("touchend", stopDrawing);
 
-// クリア・削除処理
 document.getElementById("clearBtn").addEventListener("click", initCanvas);
 document.getElementById("backspaceBtn").addEventListener("click", () => {
   if (boxes[currentIndex].textContent !== "") {
@@ -350,7 +463,29 @@ document.getElementById("backspaceBtn").addEventListener("click", () => {
   }
   checkAnswer();
 });
-document.getElementById("nextBtn").addEventListener("click", nextQuestion);
+
+// 「次の問題」ボタン処理
+document.getElementById("nextBtn").addEventListener("click", () => {
+  sessionIndex++;
+  if (sessionIndex < currentSessionQuestions.length) {
+    loadQuestion();
+  } else {
+    showSessionResult();
+  }
+});
+
+// 全チェックリセットボタン
+document.getElementById("resetChecksBtn").addEventListener("click", () => {
+  if (confirm("これまでの正解（チェック）履歴をすべて消去しますか？")) {
+    checkMap = {};
+    saveCheckData();
+    alert("チェックをクリアしました。新しい問題を開始します。");
+    startNewSession();
+  }
+});
+
+// リスタートボタン
+document.getElementById("restartBtn").addEventListener("click", startNewSession);
 
 // Google 手書き認識 API
 async function recognizeKanji() {
@@ -379,12 +514,10 @@ async function recognizeKanji() {
   }
 }
 
-// 漢字判定
 function isKanji(ch) {
   return /^[\u4E00-\u9FFF\u3400-\u4DBF]+$/.test(ch);
 }
 
-// 候補表示（漢字のみ上位5つ）
 function displayCandidates(candidates) {
   const container = document.getElementById("candidates");
   container.innerHTML = "";
@@ -401,7 +534,6 @@ function displayCandidates(candidates) {
   });
 }
 
-// 文字入力＆マス自動移動
 function selectCharacter(char) {
   boxes[currentIndex].textContent = char;
   initCanvas();
@@ -413,11 +545,10 @@ function selectCharacter(char) {
   checkAnswer();
 }
 
-// 3. 正誤判定＆解説表示
+// 正誤判定処理
 function checkAnswer() {
   const userWord = Array.from(boxes).map(box => box.textContent).join("");
   
-  // 4文字全て埋まったら判定を実施
   if (userWord.length === 4) {
     const jBox = document.getElementById("judgement-box");
     const statusEl = document.getElementById("result-status");
@@ -430,6 +561,20 @@ function checkAnswer() {
     if (userWord === currentQuiz.kanji) {
       jBox.className = "correct";
       statusEl.textContent = "🎉 正解！";
+      sessionCorrectCount++;
+
+      // チェックを加算 (最大2)
+      let currentChecks = checkMap[currentQuiz.kanji] || 0;
+      if (currentChecks < 2) {
+        checkMap[currentQuiz.kanji] = currentChecks + 1;
+        saveCheckData();
+      }
+
+      // ランプを更新
+      const newChecks = checkMap[currentQuiz.kanji];
+      document.getElementById("check1").classList.toggle("active", newChecks >= 1);
+      document.getElementById("check2").classList.toggle("active", newChecks >= 2);
+
     } else {
       jBox.className = "incorrect";
       statusEl.textContent = `❌ 不正解... (正解: ${currentQuiz.kanji})`;
@@ -439,7 +584,19 @@ function checkAnswer() {
   }
 }
 
-// アプリ起動時にCSVを読み込む
+// 10問終了後のセッション結果表示
+function showSessionResult() {
+  document.getElementById("quiz-area").style.display = "none";
+  document.getElementById("session-result").style.display = "block";
+
+  const total = currentSessionQuestions.length;
+  const score = Math.round((sessionCorrectCount / total) * 100);
+
+  document.getElementById("correct-count").textContent = sessionCorrectCount;
+  document.getElementById("score-val").textContent = score;
+}
+
+// 起動処理
 loadCSV();
 </script>
 
