@@ -128,14 +128,14 @@
   }
   button:hover { background-color: #e6e6e6; }
   .btn-next {
-    background-color: #28a745;
+    background-color: #007bff;
     color: white;
     border: none;
     font-weight: bold;
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 8px 16px;
+    font-size: 14px;
   }
-  .btn-next:hover { background-color: #218838; }
+  .btn-next:hover { background-color: #0056b3; }
 
   /* 候補領域 */
   #result-box { margin-top: 5px; }
@@ -238,7 +238,8 @@
   <div class="controls">
     <button id="clearBtn">一画消去</button>
     <button id="backspaceBtn">1文字削除</button>
-    <button id="nextBtn" class="btn-next" style="display:none;">次の問題 ➔</button>
+    <!-- 常時表示されるパス/次の問題ボタン -->
+    <button id="nextBtn" class="btn-next">次の問題 ➔</button>
   </div>
 
   <!-- 漢字候補 -->
@@ -262,7 +263,7 @@
     正解数: <span id="correct-count">0</span> / 10<br>
     スコア: <span id="score-val">0</span> 点
   </div>
-  <button id="restartBtn" class="btn-next">次の10問に挑戦 ➔</button>
+  <button id="restartBtn" class="btn-next" style="padding: 10px 20px; font-size: 16px; background-color: #28a745;">次の10問に挑戦 ➔</button>
 </div>
 
 <script>
@@ -371,7 +372,6 @@ function loadQuestion() {
 
   // 画面リセット
   document.getElementById("judgement-box").style.display = "none";
-  document.getElementById("nextBtn").style.display = "none";
   boxes.forEach(box => box.textContent = "");
   setActiveBox(0);
   initCanvas();
@@ -464,7 +464,7 @@ document.getElementById("backspaceBtn").addEventListener("click", () => {
   checkAnswer();
 });
 
-// 「次の問題」ボタン処理
+// 「次の問題」ボタン処理（パス可能）
 document.getElementById("nextBtn").addEventListener("click", () => {
   sessionIndex++;
   if (sessionIndex < currentSessionQuestions.length) {
@@ -553,10 +553,8 @@ function checkAnswer() {
     const jBox = document.getElementById("judgement-box");
     const statusEl = document.getElementById("result-status");
     const meaningEl = document.getElementById("result-meaning");
-    const nextBtn = document.getElementById("nextBtn");
 
     jBox.style.display = "block";
-    nextBtn.style.display = "inline-block";
 
     if (userWord === currentQuiz.kanji) {
       jBox.className = "correct";
