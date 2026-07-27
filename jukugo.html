@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4字熟語 手書きクイズゲーム</title>
+<style>
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 15px;
+    background-color: #f4f7f6;
+    color: #333;
+  }
+
+  /* 問題表示エリア */
+  #question-box {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 400px;
+    margin: 0 auto 15px auto;
+  }
+  .q-label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+  }
+  #question-hiragana {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2c3e50;
+    letter-spacing: 2px;
+  }
+
+  /* 4文字の入力枠 */
+  #word-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  .char-box {
+    width: 55px;
+    height: 55px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 55px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+  }
+  .char-box.active {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
+    background-color: #eef6ff;
+  }
+
+  /* キャンバス */
+  #canvas {
+    border: 2px solid #333;
+    border-radius: 6px;
+    background-color: #ffffff;
+    touch-action: none;
+    cursor: crosshair;
+  }
+
+  .controls {
+    margin: 10px 0;
+  }
+  button {
+    padding: 8px 14px;
+    font-size: 14px;
+    margin: 0 3px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    transition: 0.2s;
+  }
+  button:hover {
+    background-color: #e6e6e6;
+  }
+  .btn-next {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    font-weight: bold;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+  .btn-next:hover {
+    background-color: #218838;
+  }
+
+  /* 候補領域 */
+  #result-box {
+    margin-top: 5px;
+  }
+  .candidate-list {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    min-height: 45px;
+    margin-top: 5px;
+  }
+  .candidate {
+    display: inline-block;
+    width: 42px;
+    height: 42px;
+    line-height: 42px;
+    font-size: 22px;
+    border: 1px solid #007bff;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #007bff;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+  }
+  .candidate:hover {
+    background-color: #007bff;
+    color: #fff;
+  }
+
+  /* 判定結果・解説領域 */
+  #judgement-box {
+    max-width: 400px;
+    margin: 15px auto 0 auto;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  .correct {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  .incorrect {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  #result-status {
+    font-size: 22px;
+    font-weight: bold;
+  }
+  #result-meaning {
+    font-size: 14px;
+    margin-top: 5px;
+    text-align: left;
+  }
+</style>
+</head>
+<body>
+
+<h2>4字熟語 手書きクイズ</h2>
+
+<!-- 問題表示 -->
+<div id="question-box">
+  <div class="q-label">【問題】以下のひらがなを漢字にしなさい</div>
+  <div id="question-hiragana">読み込み中...</div>
+</div>
+
+<!-- 4文字入力エリア -->
+<div id="word-container">
+  <div class="char-box active" data-index="0"></div>
+  <div class="char-box" data-index="1"></div>
+  <div class="char-box" data-index="2"></div>
+  <div class="char-box" data-index="3"></div>
+</div>
+
+<!-- 手書きキャンバス -->
+<canvas id="canvas" width="280" height="280"></canvas>
+
+<div class="controls">
+  <button id="clearBtn">一画消去</button>
+  <button id="backspaceBtn">1文字削除</button>
+  <button id="nextBtn" class="btn-next" style="display:none;">次の問題へ ➔</button>
+</div>
+
+<!-- 漢字候補 -->
+<div id="result-box">
+  <div style="font-size: 13px; color: #666;">候補（タップで選択）:</div>
+  <div id="candidates" class="candidate-list"></div>
+</div>
+
+<!-- 判定・解説 -->
+<div id="judgement-box" style="display:none;">
+  <div id="result-status"></div>
+  <div id="result-meaning"></div>
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const boxes = document.querySelectorAll(".char-box");
+
+let database = [];          // CSVから読み込んだ問題データ
+let currentQuiz = null;     // 現在出題中の問題
+let currentIndex = 0;      // 現在入力対象のマス（0〜3）
+let strokes = [];
+let currentStrokeX = [];
+let currentStrokeY = [];
+let drawing = false;
+let recognizeTimer = null;
+
+// 1. CSVデータの読み込み処理
+async function loadCSV() {
+  try {
+    const response = await fetch('yojijukugo.csv');
+    const text = await response.text();
+    
+    // 行ごとに分割してパース
+    const lines = text.split(/\r\n|\n/);
+    database = [];
+    
+    // ヘッダー行をスキップしてデータ取得 (1行目: id, kanji, hiragana, meaning)
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      // カンマで分割（簡易パース）
+      const cols = line.split(',');
+      if (cols.length >= 3) {
+        database.push({
+          id: cols[0],
+          kanji: cols[1].trim(),
+          hiragana: cols[2].trim(),
+          meaning: cols[3] ? cols[3].trim() : ""
+        });
+      }
+    }
+
+    if (database.length > 0) {
+      nextQuestion();
+    } else {
+      document.getElementById("question-hiragana").textContent = "データが空です";
+    }
+  } catch (error) {
+    console.error("CSV読み込みエラー:", error);
+    document.getElementById("question-hiragana").textContent = "CSVの読み込みに失敗しました";
+  }
+}
+
+// 2. 問題をランダムに出題
+function nextQuestion() {
+  // ランダムに1つ選択
+  const randomIndex = Math.floor(Math.random() * database.length);
+  currentQuiz = database[randomIndex];
+
+  // 画面リセット
+  document.getElementById("question-hiragana").textContent = currentQuiz.hiragana;
+  document.getElementById("judgement-box").style.display = "none";
+  document.getElementById("nextBtn").style.display = "none";
+  
+  boxes.forEach(box => box.textContent = "");
+  setActiveBox(0);
+  initCanvas();
+}
+
+// キャンバス初期化
+function initCanvas() {
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = "#f0f0f0";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(canvas.width / 2, 0); ctx.lineTo(canvas.width / 2, canvas.height);
+  ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
+  ctx.stroke();
+
+  strokes = [];
+  document.getElementById("candidates").innerHTML = "";
+}
+
+// マス目のアクティブ設定
+function setActiveBox(index) {
+  if (index < 0) index = 0;
+  if (index > 3) index = 3;
+  currentIndex = index;
+
+  boxes.forEach((box, i) => {
+    box.classList.toggle("active", i === currentIndex);
+  });
+}
+
+boxes.forEach((box, i) => {
+  box.addEventListener("click", () => setActiveBox(i));
+});
+
+// 手書き入力座標関連
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: clientX - rect.left, y: clientY - rect.top };
+}
+
+function startDrawing(e) {
+  e.preventDefault();
+  drawing = true;
+  clearTimeout(recognizeTimer);
+  const pos = getPos(e);
+  currentStrokeX = [pos.x]; currentStrokeY = [pos.y];
+  ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+}
+
+function draw(e) {
+  if (!drawing) return;
+  e.preventDefault();
+  const pos = getPos(e);
+  currentStrokeX.push(pos.x); currentStrokeY.push(pos.y);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.strokeStyle = "#000000"; ctx.lineWidth = 5;
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.stroke();
+}
+
+function stopDrawing(e) {
+  if (!drawing) return;
+  drawing = false;
+  if (currentStrokeX.length > 0) {
+    strokes.push([currentStrokeX, currentStrokeY]);
+  }
+  recognizeTimer = setTimeout(recognizeKanji, 600);
+}
+
+canvas.addEventListener("mousedown", startDrawing);
+canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mouseup", stopDrawing);
+canvas.addEventListener("mouseleave", stopDrawing);
+canvas.addEventListener("touchstart", startDrawing, { passive: false });
+canvas.addEventListener("touchmove", draw, { passive: false });
+canvas.addEventListener("touchend", stopDrawing);
+
+// クリア・削除処理
+document.getElementById("clearBtn").addEventListener("click", initCanvas);
+document.getElementById("backspaceBtn").addEventListener("click", () => {
+  if (boxes[currentIndex].textContent !== "") {
+    boxes[currentIndex].textContent = "";
+  } else if (currentIndex > 0) {
+    setActiveBox(currentIndex - 1);
+    boxes[currentIndex].textContent = "";
+  }
+  checkAnswer();
+});
+document.getElementById("nextBtn").addEventListener("click", nextQuestion);
+
+// Google 手書き認識 API
+async function recognizeKanji() {
+  if (strokes.length === 0) return;
+
+  const requestData = {
+    options: "enable_homophone_disambiguation",
+    requests: [{
+      writing_guide: { writing_area_width: canvas.width, writing_area_height: canvas.height },
+      ink: strokes, language: "ja"
+    }]
+  };
+
+  try {
+    const response = await fetch("https://www.google.com/inputtools/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestData)
+    });
+    const data = await response.json();
+    if (data[0] === "SUCCESS") {
+      displayCandidates(data[1][0][1]);
+    }
+  } catch (error) {
+    console.error("認識エラー:", error);
+  }
+}
+
+// 漢字判定
+function isKanji(ch) {
+  return /^[\u4E00-\u9FFF\u3400-\u4DBF]+$/.test(ch);
+}
+
+// 候補表示（漢字のみ上位5つ）
+function displayCandidates(candidates) {
+  const container = document.getElementById("candidates");
+  container.innerHTML = "";
+
+  let kanjiCandidates = candidates.filter(char => isKanji(char));
+  if (kanjiCandidates.length === 0) kanjiCandidates = candidates;
+
+  kanjiCandidates.slice(0, 5).forEach(char => {
+    const btn = document.createElement("div");
+    btn.className = "candidate";
+    btn.textContent = char;
+    btn.onclick = () => selectCharacter(char);
+    container.appendChild(btn);
+  });
+}
+
+// 文字入力＆マス自動移動
+function selectCharacter(char) {
+  boxes[currentIndex].textContent = char;
+  initCanvas();
+
+  if (currentIndex < 3) {
+    setActiveBox(currentIndex + 1);
+  }
+
+  checkAnswer();
+}
+
+// 3. 正誤判定＆解説表示
+function checkAnswer() {
+  const userWord = Array.from(boxes).map(box => box.textContent).join("");
+  
+  // 4文字全て埋まったら判定を実施
+  if (userWord.length === 4) {
+    const jBox = document.getElementById("judgement-box");
+    const statusEl = document.getElementById("result-status");
+    const meaningEl = document.getElementById("result-meaning");
+    const nextBtn = document.getElementById("nextBtn");
+
+    jBox.style.display = "block";
+    nextBtn.style.display = "inline-block";
+
+    if (userWord === currentQuiz.kanji) {
+      jBox.className = "correct";
+      statusEl.textContent = "🎉 正解！";
+    } else {
+      jBox.className = "incorrect";
+      statusEl.textContent = `❌ 不正解... (正解: ${currentQuiz.kanji})`;
+    }
+
+    meaningEl.textContent = currentQuiz.meaning ? `【意味】${currentQuiz.meaning}` : "";
+  }
+}
+
+// アプリ起動時にCSVを読み込む
+loadCSV();
+</script>
+
+</body>
+</html>
