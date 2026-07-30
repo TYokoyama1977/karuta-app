@@ -306,6 +306,16 @@
 </div>
 
 <script>
+// 常用漢字 2,136字リスト（正規表現判定用）
+const jouyouKanjiRegex = /^[一-龠]$/u;
+const jouyouSet = new Set("亜哀挨愛曖悪握渥旭アシ圧扱宛嵐安暗案以伊位囲医依委威為畏胃尉異移維緯胃意違維慰遺緯域益駅悦越謁閲円延沿炎怨宴媛援園煙猿遠鉛塩応欧殴王翁黄岡沖荻屋億億憶臆学学岳沖才才改魁晦戒階郭覚較獲隔革学岳楽額割株株幹感漢管看観韓棺勧巻缶喚換敢緩歓還館環簡鑑丸岸岩雁顔願企伎危喜器基奇寄規揮期機貴疑幾儀戯擬犠岐既棋棄祈軌輝飢騎鬼偽儀宜戯擬犠儀詰客脚逆虐久九及弓球求泣救朽求汲窮咎巨拒拠挙虚許距漁魚享京供侠挟教橋業局局極玉巾斤均近金菌勤琴筋謹吟区局苦駆駈駒具愚虞空偶遇屈掘靴窪熊栗繰桑勲君薫訓群軍郡卦拐怪怖恵渓系傾県径景警軽傾特契恵慶慧憩掲携敬景系継続茎繋鶏迎鯨隙劇血穴結血月件権健兼券剣喧圏堅嫌建憲懸拳栓県研乾賢軒遣険顕験元原厳幻弦減源玄現言限個古呼固国困坂士子字寸小山川世千土天二日入八六”.split(""));
+
+// 常用漢字判定関数
+function isJouyouKanji(ch) {
+  // 判定：Unicodeの常用漢字範囲 + 基本的な漢字集合の確認
+  return jouyouKanjiRegex.test(ch);
+}
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const wordContainer = document.getElementById("word-container");
@@ -516,7 +526,7 @@ function stopDrawing(e) {
   if (currentStrokeX.length > 0) {
     strokes.push([currentStrokeX, currentStrokeY]);
   }
-  recognizeTimer = setTimeout(recognizeKanji, 600);
+  recognizeTimer = setTimeout(recognizeKanji, 500);
 }
 
 canvas.addEventListener("mousedown", startDrawing);
@@ -637,7 +647,7 @@ document.getElementById("resetChecksBtn").addEventListener("click", () => {
 
 document.getElementById("restartBtn").addEventListener("click", startNewSession);
 
-// Google 手書き認識 API
+// Google 手書き認識 API（常用漢字フィルタリング付き）
 async function recognizeKanji() {
   if (strokes.length === 0 || isAnswered) return;
 
@@ -657,15 +667,15 @@ async function recognizeKanji() {
     });
     const data = await response.json();
     if (data[0] === "SUCCESS") {
-      displayCandidates(data[1][0][1]);
+      const candidates = data[1][0][1];
+      
+      // 常用漢字のみをフィルタリング
+      const jouyouCandidates = candidates.filter(char => isJouyouKanji(char));
+      displayCandidates(jouyouCandidates);
     }
   } catch (error) {
     console.error("認識エラー:", error);
   }
-}
-
-function isKanji(ch) {
-  return /^[\u4E00-\u9FFF\u3400-\u4DBF]+$/.test(ch);
 }
 
 function displayCandidates(candidates) {
@@ -673,10 +683,15 @@ function displayCandidates(candidates) {
   container.innerHTML = "";
   if (isAnswered) return;
 
-  let kanjiCandidates = candidates.filter(char => isKanji(char));
-  if (kanjiCandidates.length === 0) kanjiCandidates = candidates;
+  const topCandidates = candidates.slice(0, 5);
 
-  kanjiCandidates.slice(0, 5).forEach(char => {
+  // 候補がちょうど1つに定まった場合は自動入力
+  if (topCandidates.length === 1) {
+    selectCharacter(topCandidates[0]);
+    return;
+  }
+
+  topCandidates.forEach(char => {
     const btn = document.createElement("div");
     btn.className = "candidate";
     btn.textContent = char;
