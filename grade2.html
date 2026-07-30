@@ -270,7 +270,8 @@
 
   <!-- 編集操作系ボタン -->
   <div class="controls">
-    <button id="clearBtn">一画消去</button>
+    <button id="undoBtn">一画消去</button>
+    <button id="clearBtn">全消去</button>
     <button id="backspaceBtn">1文字削除</button>
   </div>
 
@@ -306,14 +307,11 @@
 </div>
 
 <script>
-// 常用漢字 2,136字リスト（正規表現判定用）
-const jouyouKanjiRegex = /^[一-龠]$/u;
-const jouyouSet = new Set("亜哀挨愛曖悪握渥旭アシ圧扱宛嵐安暗案以伊位囲医依委威為畏胃尉異移維緯胃意違維慰遺緯域益駅悦越謁閲円延沿炎怨宴媛援園煙猿遠鉛塩応欧殴王翁黄岡沖荻屋億億憶臆学学岳沖才才改魁晦戒階郭覚較獲隔革学岳楽額割株株幹感漢管看観韓棺勧巻缶喚換敢緩歓還館環簡鑑丸岸岩雁顔願企伎危喜器基奇寄規揮期機貴疑幾儀戯擬犠岐既棋棄祈軌輝飢騎鬼偽儀宜戯擬犠儀詰客脚逆虐久九及弓球求泣救朽求汲窮咎巨拒拠挙虚許距漁魚享京供侠挟教橋業局局極玉巾斤均近金菌勤琴筋謹吟区局苦駆駈駒具愚虞空偶遇屈掘靴窪熊栗繰桑勲君薫訓群軍郡卦拐怪怖恵渓系傾県径景警軽傾特契恵慶慧憩掲携敬景系継続茎繋鶏迎鯨隙劇血穴結血月件権健兼券剣喧圏堅嫌建憲懸拳栓県研乾賢軒遣険顕験元原厳幻弦減源玄現言限個古呼固国困坂士子字寸小山川世千土天二日入八六”.split(""));
+// Unicodeの漢字判定用正規表現（CJK統合漢字）
+const kanjiRegex = /^[\u4E00-\u9FFF]$/u;
 
-// 常用漢字判定関数
-function isJouyouKanji(ch) {
-  // 判定：Unicodeの常用漢字範囲 + 基本的な漢字集合の確認
-  return jouyouKanjiRegex.test(ch);
+function isKanji(ch) {
+  return kanjiRegex.test(ch);
 }
 
 const canvas = document.getElementById("canvas");
@@ -465,9 +463,17 @@ function getBoxes() {
 
 // キャンバス初期化
 function initCanvas() {
+  strokes = [];
+  redrawCanvas();
+  document.getElementById("candidates").innerHTML = "";
+}
+
+// ストローク配列をもとにキャンバスを再描画
+function redrawCanvas() {
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // 補助ガイド線の描画
   ctx.strokeStyle = "#f0f0f0";
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -475,8 +481,24 @@ function initCanvas() {
   ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
   ctx.stroke();
 
-  strokes = [];
-  document.getElementById("candidates").innerHTML = "";
+  // 記録されている筆跡を描画
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 4;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  strokes.forEach(stroke => {
+    const xs = stroke[0];
+    const ys = stroke[1];
+    if (xs.length === 0) return;
+
+    ctx.beginPath();
+    ctx.moveTo(xs[0], ys[0]);
+    for (let i = 1; i < xs.length; i++) {
+      ctx.lineTo(xs[i], ys[i]);
+    }
+    ctx.stroke();
+  });
 }
 
 // マス目のアクティブ設定
@@ -537,10 +559,26 @@ canvas.addEventListener("touchstart", startDrawing, { passive: false });
 canvas.addEventListener("touchmove", draw, { passive: false });
 canvas.addEventListener("touchend", stopDrawing);
 
+// 一画消去 (Undo)
+document.getElementById("undoBtn").addEventListener("click", () => {
+  if (isAnswered) return;
+  if (strokes.length > 0) {
+    strokes.pop();
+    redrawCanvas();
+    if (strokes.length > 0) {
+      recognizeKanji();
+    } else {
+      document.getElementById("candidates").innerHTML = "";
+    }
+  }
+});
+
+// 全消去
 document.getElementById("clearBtn").addEventListener("click", () => {
   if (!isAnswered) initCanvas();
 });
 
+// 文字削除
 document.getElementById("backspaceBtn").addEventListener("click", () => {
   if (isAnswered) return;
   const boxes = getBoxes();
@@ -647,7 +685,7 @@ document.getElementById("resetChecksBtn").addEventListener("click", () => {
 
 document.getElementById("restartBtn").addEventListener("click", startNewSession);
 
-// Google 手書き認識 API（常用漢字フィルタリング付き）
+// Google 手書き認識 API（漢字フィルタリング付き）
 async function recognizeKanji() {
   if (strokes.length === 0 || isAnswered) return;
 
@@ -669,9 +707,9 @@ async function recognizeKanji() {
     if (data[0] === "SUCCESS") {
       const candidates = data[1][0][1];
       
-      // 常用漢字のみをフィルタリング
-      const jouyouCandidates = candidates.filter(char => isJouyouKanji(char));
-      displayCandidates(jouyouCandidates);
+      // 漢字のみをフィルタリング
+      const filteredCandidates = candidates.filter(char => isKanji(char));
+      displayCandidates(filteredCandidates);
     }
   } catch (error) {
     console.error("認識エラー:", error);
@@ -684,12 +722,6 @@ function displayCandidates(candidates) {
   if (isAnswered) return;
 
   const topCandidates = candidates.slice(0, 5);
-
-  // 候補がちょうど1つに定まった場合は自動入力
-  if (topCandidates.length === 1) {
-    selectCharacter(topCandidates[0]);
-    return;
-  }
 
   topCandidates.forEach(char => {
     const btn = document.createElement("div");
