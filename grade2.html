@@ -284,7 +284,7 @@
 
   <!-- 漢字候補 -->
   <div id="result-box">
-    <div style="font-size: 12px; color: #666;">候補（タップで選択）:</div>
+    <div style="font-size: 12px; color: #666;">候補（手動で選択も可）:</div>
     <div id="candidates" class="candidate-list"></div>
   </div>
 
@@ -336,6 +336,9 @@ let currentStrokeY = [];
 let drawing = false;
 let recognizeTimer = null;
 let isAnswered = false;     // 回答済みフラグ
+
+// 書き終わり検知タイムアウト（ミリ秒）: 1.3秒
+const DRAWING_TIMEOUT_MS = 1300;
 
 // ストレージからチェック状態を読み込み
 function loadCheckData() {
@@ -463,6 +466,7 @@ function getBoxes() {
 
 // キャンバス初期化
 function initCanvas() {
+  clearTimeout(recognizeTimer);
   strokes = [];
   redrawCanvas();
   document.getElementById("candidates").innerHTML = "";
@@ -525,7 +529,7 @@ function startDrawing(e) {
   if (isAnswered) return;
   e.preventDefault();
   drawing = true;
-  clearTimeout(recognizeTimer);
+  clearTimeout(recognizeTimer); // 描き始めたらタイマーを即時取り消し
   const pos = getPos(e);
   currentStrokeX = [pos.x]; currentStrokeY = [pos.y];
   ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
@@ -548,7 +552,8 @@ function stopDrawing(e) {
   if (currentStrokeX.length > 0) {
     strokes.push([currentStrokeX, currentStrokeY]);
   }
-  recognizeTimer = setTimeout(recognizeKanji, 500);
+  // 1.3秒間静止した場合に「書き終わり」と判定して認識APIを実行
+  recognizeTimer = setTimeout(recognizeKanji, DRAWING_TIMEOUT_MS);
 }
 
 canvas.addEventListener("mousedown", startDrawing);
@@ -562,11 +567,12 @@ canvas.addEventListener("touchend", stopDrawing);
 // 一画消去 (Undo)
 document.getElementById("undoBtn").addEventListener("click", () => {
   if (isAnswered) return;
+  clearTimeout(recognizeTimer);
   if (strokes.length > 0) {
     strokes.pop();
     redrawCanvas();
     if (strokes.length > 0) {
-      recognizeKanji();
+      recognizeTimer = setTimeout(recognizeKanji, DRAWING_TIMEOUT_MS);
     } else {
       document.getElementById("candidates").innerHTML = "";
     }
@@ -581,6 +587,7 @@ document.getElementById("clearBtn").addEventListener("click", () => {
 // 文字削除
 document.getElementById("backspaceBtn").addEventListener("click", () => {
   if (isAnswered) return;
+  clearTimeout(recognizeTimer);
   const boxes = getBoxes();
   if (boxes[currentIndex].textContent !== "") {
     boxes[currentIndex].textContent = "";
@@ -593,6 +600,7 @@ document.getElementById("backspaceBtn").addEventListener("click", () => {
 // 「答え合わせ」ボタン処理
 document.getElementById("checkAnswerBtn").addEventListener("click", () => {
   if (isAnswered) return;
+  clearTimeout(recognizeTimer);
 
   const boxes = getBoxes();
   const userWord = Array.from(boxes).map(box => box.textContent).join("");
@@ -641,6 +649,7 @@ document.getElementById("checkAnswerBtn").addEventListener("click", () => {
 // 「ギブアップ」ボタン処理
 document.getElementById("giveupBtn").addEventListener("click", () => {
   if (isAnswered) return;
+  clearTimeout(recognizeTimer);
 
   isAnswered = true;
   document.getElementById("checkAnswerBtn").disabled = true;
@@ -685,7 +694,7 @@ document.getElementById("resetChecksBtn").addEventListener("click", () => {
 
 document.getElementById("restartBtn").addEventListener("click", startNewSession);
 
-// Google 手書き認識 API（漢字フィルタリング付き）
+// Google 手書き認識 API（漢字フィルタリング ＆ 確定自動入力対応）
 async function recognizeKanji() {
   if (strokes.length === 0 || isAnswered) return;
 
@@ -709,7 +718,14 @@ async function recognizeKanji() {
       
       // 漢字のみをフィルタリング
       const filteredCandidates = candidates.filter(char => isKanji(char));
-      displayCandidates(filteredCandidates);
+
+      if (filteredCandidates.length > 0) {
+        // 【自動入力判定】
+        // 静止時間(1.3秒)経過後、筆頭候補が存在すれば自動選択して文字入力を行う
+        selectCharacter(filteredCandidates[0]);
+      } else {
+        document.getElementById("candidates").innerHTML = "";
+      }
     }
   } catch (error) {
     console.error("認識エラー:", error);
@@ -736,8 +752,11 @@ function selectCharacter(char) {
   if (isAnswered) return;
   const boxes = getBoxes();
   boxes[currentIndex].textContent = char;
+  
+  // 入力完了後、キャンバスと候補をリセット
   initCanvas();
 
+  // 次のマス目が存在する場合はアクティブ枠を移動
   if (currentIndex < targetLength - 1) {
     setActiveBox(currentIndex + 1);
   }
