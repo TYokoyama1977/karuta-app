@@ -22,10 +22,11 @@
       height: 100dvh;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center; /* PCでも間隔が広がりすぎないよう中央寄りに設定 */
       align-items: center;
       text-align: center;
       overflow: hidden;
+      gap: 15px; /* 要素同士の間隔を適度な広さに固定 */
     }
     header {
       margin-top: 5px;
@@ -46,7 +47,6 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      flex-grow: 1;
       justify-content: center;
     }
     .menu button {
@@ -84,6 +84,7 @@
       color: #777;
       padding-bottom: 5px;
       width: 100%;
+      margin-top: 10px;
     }
     footer a {
       color: #555;

@@ -300,7 +300,6 @@
 
     function speak(text) {
       if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
         utter.lang = "en-US";
         window.speechSynthesis.speak(utter);
@@ -321,6 +320,7 @@
       }
     };
 
+    /* ★ iOS/Android端末向け 音声再生制御の修正 */
     document.getElementById("readBtn").onclick = () => {
       if (speakList.length === 0) {
         alert("単語にチェックを入れてね！");
@@ -330,6 +330,14 @@
       if (currentIndex >= speakList.length) {
         alert("さいごまで読み終わりました！");
         return;
+      }
+
+      // スマホの音声再生制限（オートプレイブロック）を解除するウォームアップ処理
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const init = new SpeechSynthesisUtterance("");
+        init.lang = "en-US";
+        window.speechSynthesis.speak(init);
       }
 
       const word = speakList[currentIndex];
