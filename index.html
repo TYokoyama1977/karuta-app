@@ -3,71 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <title>読み上げかるた</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link href="https://fonts.googleapis.com/css2?family=Potta+One&family=Yomogi&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #FF9900;
+      --bg-color: #FFF9E6;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
       font-family: "Comic Sans MS", "Chalkboard SE", "Arial Rounded MT Bold", sans-serif;
-      background: #f7f7f7;
+      background-color: var(--bg-color);
       margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    h1 {
-      margin-top: 10px;
-      font-size: 40px;
-      font-family: "Potta One", "Yomogi", "Kosugi Maru", "Comic Sans MS", sans-serif;
-      background: linear-gradient(90deg,
-        #ff6ec4, #ff9a44, #ffd400, #4eff8b, #4ecbff, #b07bff
-      );
-      -webkit-background-clip: text;
-      color: transparent;
-      -webkit-text-stroke: 0.25px #cc0000;
-      text-shadow: 0 0 8px rgba(255,255,255,0.8);
-    }
-    .menu {
-      margin-top: 30px;
+      padding: 10px 15px;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      gap: 15px;
+      text-align: center;
+      overflow: hidden;
+    }
+    header {
+      margin-top: 5px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 8vw, 36px);
+      font-family: "Potta One", "Yomogi", sans-serif;
+      background: linear-gradient(90deg, #ff6ec4, #ff9a44, #ffd400, #4eff8b, #4ecbff, #b07bff);
+      -webkit-background-clip: text;
+      color: transparent;
+      -webkit-text-stroke: 0.5px #cc0000;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .menu {
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-grow: 1;
+      justify-content: center;
     }
     .menu button {
-      width: 260px;
-      padding: 14px;
-      font-size: 20px;
-      font-family: "Yomogi", "Comic Sans MS", sans-serif;
+      width: 100%;
+      padding: 12px 10px;
+      font-size: 18px;
+      font-family: "Yomogi", sans-serif;
       font-weight: bold;
-      border-radius: 10px;
+      border-radius: 20px;
       border: none;
-      background: #ffcc66;
+      background: #FFFFFF;
+      color: #444;
+      box-shadow: 0 4px 0 #E6D5B8, 0 5px 8px rgba(0,0,0,0.1);
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s, box-shadow 0.1s;
     }
-    .menu button:hover {
-      background: #ffdd88;
+    .menu button:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #E6D5B8, 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .menu button.btn-primary {
+      background: #FFCC33;
+      box-shadow: 0 4px 0 #D9A000, 0 5px 8px rgba(0,0,0,0.1);
+      color: #333;
+    }
+    .menu button.btn-primary:active {
+      box-shadow: 0 1px 0 #D9A000, 0 2px 4px rgba(0,0,0,0.1);
     }
     footer {
-      margin-top: 40px;
-      font-size: 12px;
-      color: #666;
-      padding-bottom: 20px;
+      font-size: 11px;
+      color: #777;
+      padding-bottom: 5px;
+      width: 100%;
+    }
+    footer a {
+      color: #555;
+      text-decoration: none;
+    }
+    .footer-links {
+      margin-bottom: 4px;
+    }
+    .footer-brand {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
     }
   </style>
-
   <script>
     function openContactForm() {
-      alert("お問い合わせフォームは別の画面（タブ）で開きます。書き終わったら、その画面を閉じてホームに戻ってください。");
+      alert("お問い合わせフォームは別の画面で開きます。");
       window.open("https://forms.gle/Z7jwYWgerrxvZAfSA", "_blank");
     }
   </script>
 </head>
 <body>
 
-  <h1>読み上げかるた</h1>
+  <header>
+    <h1>読み上げかるた</h1>
+  </header>
 
   <div class="menu">
-    <button onclick="location.href='user-words.html'">📚 マイ単語読み上げ</button>
-    <button onclick="location.href='play.html'">🔊 ジャンル読み上げ</button>
+    <button class="btn-primary" onclick="location.href='user-words.html'">📚 マイ単語読み上げ</button>
+    <button class="btn-primary" onclick="location.href='play.html'">🔊 ジャンル読み上げ</button>
     <button onclick="location.href='edit.html'">✏️ ジャンル単語一覧</button>
     <button onclick="location.href='illustration.html'">🖼️ ジャンル別カード</button>
     <button onclick="location.href='settings.html'">⚙️ 設定</button>
@@ -76,27 +123,26 @@
   </div>
 
   <footer>
-    <div style="margin-bottom:5px;">
+    <div class="footer-links">
       <a href="terms.html">📃 利用規約</a> |
       <a href="privacy.html">🔒 プライバシーポリシー</a>
     </div>
 
-    <div style="display:flex; justify-content:center; align-items:center; gap:10px;">
+    <div class="footer-brand">
       <span>© 2026 Studio OZ</span>
-      <img src="images/logo.png" alt="Studio OZ ロゴ" style="height:30px;">
+      <img src="images/logo.png" alt="Studio OZ ロゴ" style="height:20px; vertical-align:middle;">
     </div>
-    Version: <span id="versionText">読み込み中...</span>
+    <div>Version: <span id="versionText">読み込み中...</span></div>
   </footer>
 
   <script>
-    // version.txt を読み取って index.html のバージョン表示を更新する
     fetch("version.txt")
       .then(response => response.text())
       .then(text => {
         document.getElementById("versionText").textContent = text.trim();
       })
       .catch(() => {
-        document.getElementById("versionText").textContent = "読み込み失敗";
+        document.getElementById("versionText").textContent = "1.0.0";
       });
   </script>
 

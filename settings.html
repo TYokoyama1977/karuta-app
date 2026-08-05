@@ -3,112 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <title>設定 - 英語かるたアプリ</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
 <style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
 body {
-    font-family: "Arial", sans-serif;
-    background: #f7f7f7;
+    font-family: "Comic Sans MS", "Chalkboard SE", sans-serif;
+    background: #E0F7FA;
     margin: 0;
     padding: 0;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
     text-align: center;
+    overflow: hidden;
 }
 
-/* 上部ナビ */
 .header {
-    padding: 10px;
+    padding: 8px 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fff;
-    border-bottom: 1px solid #ddd;
+    background: #FFF;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 .nav-btn {
-    font-size: 18px;
-    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 6px 10px;
     border-radius: 10px;
     border: none;
-    background: #e6e6e6;
+    background: #F0F0F0;
     cursor: pointer;
 }
-.nav-btn:hover { background: #dcdcdc; }
 
-/* カード共通 */
+h2 {
+    margin: 8px 0;
+    font-size: 20px;
+    color: #00838F;
+}
+
+.setting-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 0 12px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
 .setting-card {
-    width: 90%;
-    max-width: 500px;
-    margin: 20px auto;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 380px;
+    padding: 14px;
+    border-radius: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     text-align: left;
 }
 
-/* マイ単語カード（ピンク） */
 .card-mywords {
-    background: #ffe6e6;
-    border-left: 8px solid #ff9999;
+    background: #FFEBEE;
+    border-left: 6px solid #FF8A80;
 }
 
-/* ジャンル読み上げカード（ブルー） */
 .card-play {
-    background: #e6f3ff;
-    border-left: 8px solid #66b3ff;
+    background: #FFF;
+    border-left: 6px solid #80D8FF;
 }
 
 .setting-title {
-    font-size: 22px;
+    font-size: 16px;
     font-weight: bold;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    color: #333;
 }
 
 .setting-row {
-    margin-bottom: 25px;
-    font-size: 20px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
 }
 
 .btn-group {
     display: flex;
-    gap: 15px;
-    margin-top: 10px;
+    gap: 10px;
+    margin-top: 6px;
 }
 .btn-option {
     flex: 1;
-    padding: 12px 0;
-    font-size: 20px;
-    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 12px;
     border: none;
-    background: #eee;
+    background: #F5F5F5;
     cursor: pointer;
     text-align: center;
+    color: #666;
 }
 .btn-option.selected {
-    background: #ffcc66;
-    border: 2px solid #ff9900;
+    background: #FFE082;
+    color: #E65100;
+    box-shadow: inset 0 0 0 2px #FFB300;
 }
 
 .interval-btn {
-    font-size: 22px;
-    padding: 10px 20px;
+    font-size: 18px;
+    padding: 6px 16px;
     border-radius: 10px;
-    background: #eee;
-    border: none;
+    background: #FFF;
+    border: 1px solid #DDD;
     cursor: pointer;
 }
 #intervalDisplay {
-    font-size: 26px;
-    width: 70px;
+    font-size: 20px;
+    font-weight: bold;
+    width: 50px;
     display: inline-block;
     text-align: center;
 }
 
 .delete-btn {
-    margin-top: 15px;
-    padding: 15px 40px;
-    font-size: 22px;
-    border-radius: 50px;
+    width: 100%;
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 12px;
     border: none;
-    background: #ff6666;
+    background: #FF5252;
     color: white;
     cursor: pointer;
 }
@@ -119,76 +146,68 @@ body {
 
 <div class="header">
     <button id="homeButton" class="nav-btn">🏠 ホーム</button>
-    <button id="myWordsButton" class="nav-btn">📚 マイ単語読み上げ</button>
-    <button id="playButton" class="nav-btn">🔊 ジャンル読み上げ</button>
+    <button id="myWordsButton" class="nav-btn">📚 マイ単語</button>
+    <button id="playButton" class="nav-btn">🔊 読む</button>
 </div>
 
 <h2>設定</h2>
 
-<!-- ① マイ単語設定（上） -->
-<div class="setting-card card-mywords">
+<div class="setting-container">
 
-    <div class="setting-title">マイ単語の登録単語</div>
+  <!-- ① マイ単語設定 -->
+  <div class="setting-card card-mywords">
+      <div class="setting-title">マイ単語の消去</div>
+      <button id="deleteWordsBtn" class="delete-btn">すべて消す</button>
+  </div>
 
-    <button id="deleteWordsBtn" class="delete-btn">全て消去</button>
+  <!-- ② ジャンル読み上げ設定 -->
+  <div class="setting-card card-play">
+      <div class="setting-title">読み上げの設定</div>
 
-</div>
+      <div class="setting-row">
+          こえの種類
+          <div class="btn-group">
+              <button id="voiceBoy" class="btn-option">男の子</button>
+              <button id="voiceGirl" class="btn-option">女の子</button>
+          </div>
+      </div>
 
-<!-- ② ジャンル読み上げ設定（下） -->
-<div class="setting-card card-play">
+      <div class="setting-row">
+          じどう再生
+          <div class="btn-group">
+              <button id="autoOn" class="btn-option">ON</button>
+              <button id="autoOff" class="btn-option">OFF</button>
+          </div>
+      </div>
 
-    <div class="setting-title">ジャンル読み上げの設定</div>
-
-    <!-- 声 -->
-    <div class="setting-row">
-        声
-        <div class="btn-group">
-            <button id="voiceBoy" class="btn-option">男性</button>
-            <button id="voiceGirl" class="btn-option">女性</button>
-        </div>
-    </div>
-
-    <!-- 自動再生 -->
-    <div class="setting-row">
-        自動再生
-        <div class="btn-group">
-            <button id="autoOn" class="btn-option">ON</button>
-            <button id="autoOff" class="btn-option">OFF</button>
-        </div>
-    </div>
-
-    <!-- 間隔 -->
-    <div class="setting-row">
-        間隔（秒）
-        <div style="display:flex; justify-content:center; align-items:center; gap:20px; margin-top:10px;">
-            <button id="intervalDown" class="interval-btn">▼</button>
-            <span id="intervalDisplay">6</span>
-            <button id="intervalUp" class="interval-btn">▲</button>
-        </div>
-    </div>
+      <div class="setting-row">
+          あく時間（秒）
+          <div style="display:flex; justify-content:center; align-items:center; gap:15px; margin-top:6px;">
+              <button id="intervalDown" class="interval-btn">▼</button>
+              <span id="intervalDisplay">6</span>
+              <button id="intervalUp" class="interval-btn">▲</button>
+          </div>
+      </div>
+  </div>
 
 </div>
 
 <script>
-// ページ移動
 homeButton.onclick = () => window.location.href = "index.html";
 myWordsButton.onclick = () => window.location.href = "user-words.html";
 playButton.onclick = () => window.location.href = "play.html";
 
-// 設定読み込み
 const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 let autoPlay = settings.autoPlay || false;
 let voice = settings.voice || "boy";
 let intervalValue = settings.interval || 6;
 
-// UI要素
 const autoOn = document.getElementById("autoOn");
 const autoOff = document.getElementById("autoOff");
 const voiceBoy = document.getElementById("voiceBoy");
 const voiceGirl = document.getElementById("voiceGirl");
 const intervalDisplay = document.getElementById("intervalDisplay");
 
-// UI更新
 function updateUI() {
     autoOn.classList.toggle("selected", autoPlay);
     autoOff.classList.toggle("selected", !autoPlay);
@@ -197,7 +216,6 @@ function updateUI() {
     intervalDisplay.textContent = intervalValue;
 }
 
-// 自動保存
 function saveSettings() {
     const newSettings = {
         autoPlay: autoPlay,
@@ -207,7 +225,6 @@ function saveSettings() {
     localStorage.setItem("settings", JSON.stringify(newSettings));
 }
 
-// イベント（変更した瞬間に保存）
 autoOn.onclick = () => { autoPlay = true; updateUI(); saveSettings(); };
 autoOff.onclick = () => { autoPlay = false; updateUI(); saveSettings(); };
 
@@ -225,15 +242,13 @@ intervalUp.onclick = () => {
     saveSettings();
 };
 
-// マイ単語削除
 deleteWordsBtn.onclick = () => {
     if (confirm("登録した単語をすべて消去しますか？")) {
         localStorage.removeItem("userWords");
-        alert("登録単語を消去しました");
+        alert("消去しました");
     }
 };
 
-// 初期表示
 updateUI();
 </script>
 

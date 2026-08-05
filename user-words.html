@@ -3,102 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <title>ユーザー追加単語 - 読み上げかるた</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
-      font-family: "Arial", sans-serif;
-      background: #f7f7f7;
+      font-family: "Comic Sans MS", "Chalkboard SE", sans-serif;
+      background: #FFF3E0;
       margin: 0;
       padding: 0;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
       text-align: center;
+      overflow: hidden;
     }
 
     .play-header {
-      padding: 10px;
+      padding: 8px 12px;
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      background: #fff;
-      border-bottom: 1px solid #ddd;
+      background: #FFF;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .play-header button {
-      font-size: 18px;
-      padding: 8px 14px;
-      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 10px;
       border: none;
-      background: #eee;
+      background: #F0F0F0;
       cursor: pointer;
     }
 
     h1 {
-      margin-top: 10px;
-      font-size: 28px;
-      color: #444;
+      margin: 6px 0;
+      font-size: 20px;
+      color: #E65100;
     }
 
     .reading-card {
-      background: #fff;
+      background: #FFF;
       width: 90%;
-      max-width: 500px;
-      margin: 20px auto;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 380px;
+      margin: 4px auto;
+      padding: 10px;
+      border-radius: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
     #displayWord {
-      font-size: 80px;
-      margin-top: 10px;
+      font-size: min(40px, 10vw);
+      font-weight: bold;
       color: #333;
-      min-height: 80px;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .top-btn {
-      font-size: 18px;
-      padding: 8px 14px;
+      font-size: 12px;
+      padding: 6px 12px;
       border-radius: 8px;
       border: none;
-      background: #eee;
-      margin: 5px;
+      background: #FFE0B2;
+      margin: 2px;
       cursor: pointer;
     }
 
     .main-btn {
-      margin-top: 15px;
-      padding: 18px 40px;
-      font-size: 22px;
-      border-radius: 50px;
+      margin-top: 8px;
+      padding: 10px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 20px;
       border: none;
-      background: #ffcc66;
       cursor: pointer;
-    }
-
-    .main-btn:hover {
-      background: #ffdd88;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.1);
     }
 
     #remainingCount {
-      font-size: 22px;
-      color: #444;
-      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+      margin: 4px 0;
     }
 
     .add-area {
-      margin-top: 25px;
+      margin: 6px 0;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
     }
 
     .add-area input {
-      font-size: 18px;
-      padding: 8px;
+      font-size: 16px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1.5px solid #FFB74D;
       width: 60%;
-      max-width: 250px;
+      max-width: 200px;
     }
 
     .add-area button {
-      font-size: 18px;
-      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 6px 12px;
       border-radius: 8px;
       border: none;
       background: #4CAF50;
@@ -107,36 +122,42 @@
     }
 
     .word-list {
-      margin-top: 20px;
-      width: 90%;
-      margin-left: auto;
-      margin-right: auto;
-      max-width: 600px;
-      text-align: left;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      flex-grow: 1;
+      width: 92%;
+      max-width: 400px;
+      margin: 4px auto;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 4px;
     }
 
     .word-item {
       display: flex;
-      justify-content: flex-start;
       align-items: center;
-      background: #fff;
-      padding: 8px 10px;
-      border-radius: 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      gap: 10px;
+      background: #FFF;
+      padding: 6px 10px;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      gap: 8px;
     }
 
     .delete-btn {
       border: none;
-      background: #ff6666;
+      background: #FF5252;
       color: white;
       border-radius: 6px;
       padding: 4px 8px;
+      font-size: 12px;
       cursor: pointer;
       margin-left: auto;
+    }
+
+    footer {
+      padding: 4px;
+      font-size: 11px;
+      color: #888;
     }
   </style>
 </head>
@@ -144,37 +165,36 @@
 <body>
 
   <div class="play-header">
-    <button onclick="location.href='index.html'">🏠 ホームへ</button>
+    <button onclick="location.href='index.html'">🏠 ホーム</button>
   </div>
 
-  <h1>ユーザー追加単語</h1>
+  <h1>マイ単語</h1>
 
   <div class="reading-card">
-    <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
+    <div style="position:relative;">
+      <button id="toggleDisplayBtn" class="top-btn" style="position:absolute; left:0; top:0;">👁 表示</button>
       <div id="displayWord">---</div>
-      <button id="toggleDisplayBtn" class="top-btn">👁 表示</button>
     </div>
 
     <p id="remainingCount">残り: 0 個</p>
 
-    <button id="readBtn" class="main-btn" style="background:#99ddff;">📖 読む</button>
-    <button id="shuffleBtn" class="main-btn" style="background:#ffcc66;">🔄 シャッフル</button>
+    <div style="display:flex; justify-content:center; gap:10px;">
+      <button id="readBtn" class="main-btn" style="background:#81D4FA; color:#01579B;">📖 読む</button>
+      <button id="shuffleBtn" class="main-btn" style="background:#FFE082; color:#E65100;">🔄 シャッフル</button>
+    </div>
   </div>
 
-  <!-- ★ 全てチェック / チェッククリア -->
-  <div style="margin-top:15px;">
-    <button id="checkAllBtn" class="top-btn">全てチェック</button>
-    <button id="clearCheckBtn" class="top-btn">チェッククリア</button>
+  <div style="margin:2px 0;">
+    <button id="checkAllBtn" class="top-btn">ぜんぶチェック</button>
+    <button id="clearCheckBtn" class="top-btn">クリア</button>
   </div>
 
   <div class="add-area">
-    <input type="text" id="newWordInput" placeholder="単語を追加">
+    <input type="text" id="newWordInput" placeholder="単語をいれる">
     <button id="addWordBtn">追加</button>
   </div>
 
-  <!-- ★ 注意書き追加 -->
-  <p style="font-size:14px; color:#555;">※ 英単語のみ登録できます（スペース不可）</p>
-  <p style="font-size:14px; color:#555;">※ 最大20個まで保存できます</p>
+  <p style="font-size:11px; color:#666; margin:0;">※英単語のみ（最大20個まで）</p>
 
   <div class="word-list" id="wordList"></div>
 
@@ -200,14 +220,16 @@
 
         const cb = document.createElement("input");
         cb.type = "checkbox";
-        cb.style.transform = "scale(1.3)";
+        cb.style.transform = "scale(1.2)";
         cb.onchange = updateSpeakList;
 
         const numSpan = document.createElement("span");
-        numSpan.textContent = (idx + 1) + ". ";
+        numSpan.textContent = (idx + 1) + ".";
+        numSpan.style.fontSize = "12px";
 
         const textSpan = document.createElement("span");
         textSpan.textContent = w;
+        textSpan.style.fontWeight = "bold";
 
         const delBtn = document.createElement("button");
         delBtn.textContent = "削除";
@@ -240,46 +262,33 @@
         }
       });
 
-      document.getElementById("remainingCount").textContent =
-        "残り: " + speakList.length + " 個";
+      updateRemaining();
     }
 
-    /* ★ 全てチェック */
     document.getElementById("checkAllBtn").addEventListener("click", () => {
-      document.querySelectorAll(".word-item input[type='checkbox']").forEach(cb => {
-        cb.checked = true;
-      });
+      document.querySelectorAll(".word-item input[type='checkbox']").forEach(cb => cb.checked = true);
       updateSpeakList();
     });
 
-    /* ★ チェッククリア */
     document.getElementById("clearCheckBtn").addEventListener("click", () => {
-      document.querySelectorAll(".word-item input[type='checkbox']").forEach(cb => {
-        cb.checked = false;
-      });
+      document.querySelectorAll(".word-item input[type='checkbox']").forEach(cb => cb.checked = false);
       updateSpeakList();
     });
 
-    /* ★ 単語のみ登録（スペース禁止・記号禁止） */
     addWordBtn.addEventListener("click", () => {
       const val = newWordInput.value.trim();
 
       if (!val) return;
-
       if (userWords.length >= 20) {
         alert("最大20個までです。");
         return;
       }
-
-      /* 半角スペース・全角スペース禁止 */
-      if (val.includes(" ") || val.includes("　")) {
-        alert("スペースが入っています。単語のみ登録できます。");
+      if (val.includes(" ") || val.includes(" ")) {
+        alert("スペースは入れられません。");
         return;
       }
-
-      /* 記号・数字・句読点禁止（英字のみ許可） */
       if (/[^a-zA-Z]/.test(val)) {
-        alert("英単語のみ登録できます（記号や数字は不可）");
+        alert("英単語のみ入力できます");
         return;
       }
 
@@ -290,15 +299,12 @@
     });
 
     function speak(text) {
-      const init = new SpeechSynthesisUtterance(" ");
-      init.lang = "en-US";
-      speechSynthesis.speak(init);
-
-      setTimeout(() => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
         utter.lang = "en-US";
-        speechSynthesis.speak(utter);
-      }, 100);
+        window.speechSynthesis.speak(utter);
+      }
     }
 
     document.getElementById("toggleDisplayBtn").onclick = () => {
@@ -312,18 +318,17 @@
         }
       } else {
         dw.style.visibility = "hidden";
-        dw.textContent = "";
       }
     };
 
     document.getElementById("readBtn").onclick = () => {
       if (speakList.length === 0) {
-        alert("チェックされた単語がありません");
+        alert("単語にチェックを入れてね！");
         return;
       }
 
       if (currentIndex >= speakList.length) {
-        alert("これ以上単語がありません");
+        alert("さいごまで読み終わりました！");
         return;
       }
 
@@ -333,10 +338,7 @@
         document.getElementById("displayWord").textContent = word;
       }
 
-      setTimeout(() => {
-        speak(word);
-      }, 3000);
-
+      speak(word);
       currentIndex++;
       updateRemaining();
     };
@@ -350,8 +352,7 @@
 
     function updateRemaining() {
       const remain = speakList.length - currentIndex;
-      document.getElementById("remainingCount").textContent =
-        "残り: " + remain + " 個";
+      document.getElementById("remainingCount").textContent = "残り: " + remain + " 個";
     }
 
     renderWords();

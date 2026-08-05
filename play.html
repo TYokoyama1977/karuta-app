@@ -3,167 +3,182 @@
 <head>
   <meta charset="UTF-8">
   <title>読み上げ - 英語かるたアプリ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
-      font-family: "Arial", sans-serif;
-      background: #f7f7f7;
+      font-family: "Comic Sans MS", "Chalkboard SE", sans-serif;
+      background: #E8F5E9;
       margin: 0;
       padding: 0;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
       text-align: center;
+      overflow: hidden;
     }
 
-    /* ★ 上部ナビを 左・中央・右 に配置 */
     .play-header {
       padding: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #fff;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .center-btn {
-      margin: 0 auto;
+      background: #FFF;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .home-btn, .edit-btn, .setting-btn {
-      font-size: 16px;
-      padding: 6px 12px;
-      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 8px 10px;
+      border-radius: 12px;
       border: none;
-      background: #eee;
+      background: #F0F0F0;
       cursor: pointer;
     }
 
     h2 {
-      margin-top: 8px;
-      font-size: 18px;
-      color: #444;
+      margin: 6px 0 2px 0;
+      font-size: 15px;
+      color: #2E7D32;
     }
 
-    /* ★ ジャンル選択の縦幅を短くする＋チェックボックス廃止 */
     .genre-icons {
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
-      margin-top: 8px;
+      gap: 6px;
+      padding: 0 5px;
+      margin-top: 4px;
     }
 
     .genre {
-      width: 85px;
+      width: 52px;
       text-align: center;
       cursor: pointer;
-      padding: 3px;
+      padding: 4px 2px;
       border-radius: 10px;
-      transition: 0.2s;
-      background: #fff;
-      border: 1px solid #ddd;
+      background: #FFF;
+      border: 2px solid #C8E6C9;
     }
 
     .genre img {
-      width: 50px;
-      height: 50px;
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
     }
 
     .genre p {
-      font-size: 14px;
-      margin: 2px 0;
-    }
-
-    .genre.selected {
-      border: 3px solid #ffcc33;
-      background: #fff7cc;
-    }
-
-    .reading-card {
-      background: #fff;
-      width: 92%;
-      max-width: 480px;
-      margin: 15px auto;
-      padding: 15px;
-      border-radius: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      position: relative;
-    }
-
-    #currentWord {
-      font-size: 60px;
-      margin-top: 5px;
+      font-size: 10px;
+      margin: 0;
+      font-weight: bold;
       color: #333;
     }
 
-    /* ★ 自動再生：ON を右上に小さく配置 */
+    .genre.selected {
+      border: 2.5px solid #FF9800;
+      background: #FFF3E0;
+    }
+
+    .top-btn {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 10px;
+      border: none;
+      background: #FFF;
+      margin: 2px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .reading-card {
+      background: #FFF;
+      width: 90%;
+      max-width: 380px;
+      margin: 8px auto;
+      padding: 12px;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      position: relative;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    #currentWord {
+      font-size: min(50px, 12vw);
+      font-weight: bold;
+      color: #333;
+      word-break: break-all;
+    }
+
     #autoPlayStatus {
       position: absolute;
       top: 8px;
       right: 12px;
-      font-size: 14px;
+      font-size: 12px;
+      font-weight: bold;
       color: #666;
     }
 
-    /* ★ ボタンのフォントを小さく＋折り返し禁止＋幅固定 */
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      align-items: center;
+    }
+
     .main-btn {
-      margin-top: 12px;
-      padding: 14px 32px;
-      font-size: 16px;
-      border-radius: 40px;
+      padding: 12px 0;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 25px;
       border: none;
-      background: #ffcc66;
+      width: 80%;
+      max-width: 220px;
       cursor: pointer;
-      width: 160px;
-      white-space: nowrap;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.15);
     }
 
-    .main-btn:hover {
-      background: #ffdd88;
+    .main-btn:active {
+      transform: translateY(2px);
+      box-shadow: none;
     }
 
-    .top-btn {
-      font-size: 16px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: none;
-      background: #eee;
-      margin: 5px;
-      cursor: pointer;
-    }
-
-    /* ★ 横並びカウントダウン（スマホ最適化） */
     .countdown-row {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 12px;
-      margin-top: 8px;
+      gap: 10px;
+      width: 100%;
     }
 
     #countdownMessage {
-      display: inline-block;
-      min-width: 3em;
-      min-height: 1.2em;
-      text-align: center;
       font-size: 22px;
-      color: #555;
+      font-weight: bold;
+      color: #E65100;
+      min-height: 28px;
     }
 
     #remainingCount {
-      font-size: 20px;
-      color: #444;
+      font-size: 14px;
+      font-weight: bold;
+      color: #555;
     }
 
-    /* ★ 自動再生OFFのとき停止ボタン非表示 */
     .autoPlayOff #pauseButton {
       display: none;
     }
 
     footer {
-      margin-top: 15px;
-      padding: 10px;
-      font-size: 14px;
-      color: #777;
+      padding: 4px;
+      font-size: 11px;
+      color: #888;
     }
   </style>
 </head>
@@ -172,48 +187,42 @@
 
   <div class="play-header">
     <button id="homeButton" class="home-btn">🏠 ホーム</button>
-
-    <button id="editButton" class="edit-btn center-btn">✏️ ジャンル単語一覧</button>
-
+    <button id="editButton" class="edit-btn">✏️ 一覧</button>
     <button id="settingButton" class="setting-btn">🔧 設定</button>
   </div>
 
-  <h2>ジャンルを選択してください</h2>
+  <h2>ジャンルをえらんでね</h2>
 
   <div class="genre-icons" id="genreArea"></div>
 
-  <div style="margin-top:10px;">
-    <button id="checkAllBtn" class="top-btn">全ジャンルチェック</button>
-    <button id="clearCheckBtn" class="top-btn">チェッククリア</button>
+  <div style="margin-top:4px;">
+    <button id="checkAllBtn" class="top-btn">ぜんぶ選ぶ</button>
+    <button id="clearCheckBtn" class="top-btn">クリア</button>
   </div>
 
   <div class="reading-card">
-
-    <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
-      <div id="currentWord">---</div>
-      <button id="toggleWordBtn" class="top-btn">👁 表示</button>
-    </div>
-
     <p id="autoPlayStatus">自動再生：OFF</p>
 
-    <div class="countdown-row">
-      <p id="remainingCount">残り単語数：0</p>
-      <p id="countdownMessage"></p>
+    <div style="display:flex; justify-content:center; align-items:center; gap:10px; width:100%;">
+      <div id="currentWord">---</div>
+      <button id="toggleWordBtn" class="top-btn" style="position:absolute; left:12px; top:8px;">👁 表示</button>
     </div>
 
-    <button id="startBtn" class="main-btn" style="background:#99ddff;">▶ 読む</button>
-    <button id="pauseButton" class="main-btn" style="background:#ff9999;">⏹ 停止</button>
+    <div class="countdown-row">
+      <span id="remainingCount">残り：0</span>
+      <span id="countdownMessage"></span>
+    </div>
 
-    <button id="shuffleResetBtn" class="main-btn" style="background:#ffcc66;">🔁 始めから</button>
-
+    <div class="btn-container">
+      <button id="startBtn" class="main-btn" style="background:#81D4FA; color:#01579B;">▶ 読む</button>
+      <button id="pauseButton" class="main-btn" style="background:#FFAB91; color:#BF360C;">⏹ 停止</button>
+      <button id="shuffleResetBtn" class="main-btn" style="background:#FFE082; color:#E65100;">🔁 最初から</button>
+    </div>
   </div>
 
-  <footer>
-    © 2026 Studio OZ
-  </footer>
+  <footer>© 2026 Studio OZ</footer>
 
 <script>
-/* 固定60語 */
 const wordsData = {
   Animal: ["dog","cat","bird","fish","rabbit","bear","lion","horse","elephant","zebra"],
   Color: ["red","blue","yellow","green","black","white","pink","purple","brown","gray"],
@@ -223,24 +232,20 @@ const wordsData = {
   Other: ["car","house","book","chair","clock","cup","ball","star","table","chopsticks"]
 };
 
-/* 画面遷移 */
 homeButton.addEventListener("click", () => window.location.href = "index.html");
 editButton.addEventListener("click", () => window.location.href = "edit.html");
 settingButton.addEventListener("click", () => window.location.href = "settings.html");
 
-/* 設定 */
 const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 const readInterval = settings.interval || 6;
 let autoPlay = settings.autoPlay || false;
 
-autoPlayStatus.textContent = "自動再生：" + (autoPlay ? "ON" : "OFF");
+autoPlayStatus.textContent = "自動：" + (autoPlay ? "ON" : "OFF");
 
-/* ★ 自動再生OFFなら停止ボタン非表示 */
 if (!autoPlay) {
   document.body.classList.add("autoPlayOff");
 }
 
-/* ジャンル生成（チェックボックス廃止版） */
 const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
 const genreArea = document.getElementById("genreArea");
 
@@ -250,7 +255,7 @@ genres.forEach(g => {
   div.dataset.genre = g;
 
   div.innerHTML = `
-    <img src="images/${g.toLowerCase()}_icon.png">
+    <img src="images/${g.toLowerCase()}_icon.png" alt="${g}">
     <p>${g}</p>
   `;
 
@@ -263,20 +268,15 @@ genres.forEach(g => {
 });
 
 checkAllBtn.addEventListener("click", () => {
-  document.querySelectorAll(".genre").forEach(g => {
-    g.classList.add("selected");
-  });
+  document.querySelectorAll(".genre").forEach(g => g.classList.add("selected"));
   loadWords();
 });
 
 clearCheckBtn.addEventListener("click", () => {
-  document.querySelectorAll(".genre").forEach(g => {
-    g.classList.remove("selected");
-  });
+  document.querySelectorAll(".genre").forEach(g => g.classList.remove("selected"));
   loadWords();
 });
 
-/* 読み上げ変数 */
 let words = [];
 let shuffled = [];
 let index = 0;
@@ -284,14 +284,8 @@ let index = 0;
 let audioPlayer = null;
 let isPlaying = false;
 let isPaused = false;
-
-let autoPlayTimer = null;
-let startDelayTimer = null;
-
-/* ★ カウントダウン用 */
 let countdownTimer = null;
 
-/* 単語読み込み */
 function loadWords() {
   words = [];
   document.querySelectorAll(".genre.selected").forEach(g => {
@@ -301,7 +295,6 @@ function loadWords() {
   shuffleWords();
 }
 
-/* シャッフル */
 function shuffleWords() {
   shuffled = [...words];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -311,17 +304,15 @@ function shuffleWords() {
   index = 0;
   updateRemaining();
   currentWord.textContent = "---";
-  countdownMessage.textContent = " ";
+  countdownMessage.textContent = "";
 }
 
 function updateRemaining() {
-  remainingCount.textContent = "残り単語数：" + (shuffled.length - index);
+  remainingCount.textContent = "残り：" + (shuffled.length - index);
 }
 
-/* 共通カウントダウン関数（UI揺れゼロ） */
 function startCountdown(seconds, callback) {
   clearInterval(countdownTimer);
-
   countdownMessage.textContent = seconds;
   let count = seconds;
 
@@ -331,13 +322,12 @@ function startCountdown(seconds, callback) {
 
     if (count <= 0) {
       clearInterval(countdownTimer);
-      countdownMessage.textContent = " ";
+      countdownMessage.textContent = "";
       callback();
     }
   }, 1000);
 }
 
-/* 読み上げ */
 function speakWord(word) {
   const voice = settings.voice || "boy";
 
@@ -360,16 +350,15 @@ function speakWord(word) {
     if (!autoPlay || isPaused) {
       isPlaying = false;
       startBtn.textContent = "▶ 読む";
-
       if (index >= shuffled.length) {
-        countdownMessage.textContent = "終わりました";
+        countdownMessage.textContent = "おわり！";
       }
       return;
     }
 
     startCountdown(readInterval, () => {
       if (index >= shuffled.length) {
-        countdownMessage.textContent = "終わりました";
+        countdownMessage.textContent = "おわり！";
         return;
       }
       const nextWord = shuffled[index];
@@ -380,18 +369,17 @@ function speakWord(word) {
   };
 }
 
-/* 読むボタン（固定3秒カウントダウン） */
 startBtn.addEventListener("click", () => {
   if (isPlaying) return;
-  if (shuffled.length === 0) return;
-
-  /* ★ 自動再生OFFのときは連打防止のため isPlaying = true にする */
-  if (!autoPlay) {
-    isPlaying = true;
+  if (shuffled.length === 0) {
+    alert("ジャンルをえらんでね！");
+    return;
   }
 
+  if (!autoPlay) isPlaying = true;
+
   isPaused = false;
-  pauseButton.style.background = "#ff9999";
+  pauseButton.style.background = "#FFAB91";
   pauseButton.textContent = "⏹ 停止";
 
   const word = shuffled[index];
@@ -400,8 +388,6 @@ startBtn.addEventListener("click", () => {
 
   startCountdown(3, () => {
     speakWord(word);
-
-    /* ★ 自動再生OFFのときは読み終わったら isPlaying を戻す */
     if (!autoPlay) {
       audioPlayer.onended = () => {
         isPlaying = false;
@@ -411,45 +397,32 @@ startBtn.addEventListener("click", () => {
   });
 });
 
-/* 停止ボタン */
 pauseButton.addEventListener("click", () => {
   isPaused = true;
-
   if (audioPlayer && !audioPlayer.paused) {
     audioPlayer.pause();
     audioPlayer.currentTime = 0;
   }
-
   isPlaying = false;
-
-  clearTimeout(startDelayTimer);
-  clearTimeout(autoPlayTimer);
   clearInterval(countdownTimer);
-
-  pauseButton.style.background = "#ff4444";
+  pauseButton.style.background = "#FF5252";
   pauseButton.textContent = "⏹ 停止中";
   startBtn.textContent = "▶ 再開";
 });
 
-/* 始めから（軽いリセットアイコン） */
 shuffleResetBtn.addEventListener("click", () => {
   isPaused = true;
-
-  clearTimeout(startDelayTimer);
-  clearTimeout(autoPlayTimer);
   clearInterval(countdownTimer);
-
   loadWords();
   currentWord.textContent = "---";
   index = 0;
   startBtn.textContent = "▶ 読む";
-  countdownMessage.textContent = " ";
+  countdownMessage.textContent = "";
   isPlaying = false;
 });
 
 loadWords();
 
-/* 表示切替 */
 const toggleWordBtn = document.getElementById("toggleWordBtn");
 let wordVisible = true;
 

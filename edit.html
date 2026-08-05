@@ -3,105 +3,126 @@
 <head>
   <meta charset="UTF-8">
   <title>単語編集 - 英語かるたアプリ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
-      font-family: "Arial", sans-serif;
-      background: #f7f7f7;
+      font-family: "Comic Sans MS", "Chalkboard SE", sans-serif;
+      background: #F3E5F5;
       margin: 0;
       padding: 0;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
       text-align: center;
+      overflow: hidden;
     }
 
     .edit-header {
-      padding: 10px;
+      padding: 8px 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: #FFF;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .home-btn, .play-btn {
-      font-size: 18px;
-      padding: 8px 14px;
-      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 10px;
       border: none;
-      background: #eee;
+      background: #F0F0F0;
+      cursor: pointer;
     }
 
     h1 {
-      margin-top: 10px;
-      font-size: 24px;
+      margin: 6px 0 2px 0;
+      font-size: 20px;
+      color: #7B1FA2;
     }
 
     h2 {
-      margin-top: 10px;
-      font-size: 20px;
-      color: #444;
+      margin: 0 0 6px 0;
+      font-size: 12px;
+      color: #666;
     }
 
     .genre-icons {
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
-      gap: 15px;
-      margin-top: 10px;
+      gap: 6px;
+      padding: 0 4px;
     }
 
     .genre {
-      width: 100px;
+      width: 52px;
       text-align: center;
       cursor: pointer;
-      padding: 5px;
+      padding: 4px 2px;
       border-radius: 10px;
-      transition: 0.2s;
-      background: #fff;
+      background: #FFF;
+      border: 2px solid #E1BEE7;
     }
 
     .genre img {
-      width: 70px;
-      height: 70px;
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    .genre p {
+      font-size: 10px;
+      margin: 0;
+      font-weight: bold;
     }
 
     .genre.selected {
-      border: 3px solid #ffcc33;
-      background: #fff7cc;
-    }
-
-    .genre input[type="checkbox"] {
-      margin-top: 5px;
-      transform: scale(1.3);
+      border: 2.5px solid #AB47BC;
+      background: #F3E5F5;
     }
 
     .word-list {
-      margin-top: 20px;
-      width: 90%;
-      margin-left: auto;
-      margin-right: auto;
-      max-width: 500px;
-      text-align: left;
+      flex-grow: 1;
+      width: 92%;
+      max-width: 400px;
+      margin: 8px auto;
+      overflow-y: auto;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      gap: 8px;
+      align-content: start;
+      padding-right: 2px;
     }
 
     .word-item {
       display: flex;
-      justify-content: flex-start;
       align-items: center;
-      background: #fff;
-      padding: 8px 10px;
-      margin-bottom: 0;
-      border-radius: 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      background: #FFF;
+      padding: 8px;
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
     .word-item input {
-      width: 70%;
-      font-size: 16px;
+      width: 100%;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 2px;
+      border: none;
+      background: transparent;
+      color: #333;
+    }
+
+    footer {
       padding: 4px;
-      background: #eee;
-      cursor: default;
+      font-size: 11px;
+      color: #888;
     }
   </style>
 </head>
@@ -110,24 +131,19 @@
 
   <div class="edit-header">
     <button id="homeButton" class="home-btn">🏠 ホーム</button>
-    <button id="playButton" class="play-btn">🔊 読み上げ</button>
+    <button id="playButton" class="play-btn">🔊 読む</button>
   </div>
 
-  <h1>単語一覧</h1>
-  <h2>アプリに登録されている英単語の一覧です</h2>
+  <h1>単語いちらん</h1>
+  <h2>登録されている英単語だよ</h2>
 
   <div class="genre-icons" id="genreArea"></div>
 
   <div class="word-list" id="wordList"></div>
 
   <script>
-    homeButton.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-
-    playButton.addEventListener("click", () => {
-      window.location.href = "play.html";
-    });
+    homeButton.addEventListener("click", () => window.location.href = "index.html");
+    playButton.addEventListener("click", () => window.location.href = "play.html");
 
     const defaultWordsData = {
       Animal: ["dog","cat","bird","fish","rabbit","bear","lion","horse","elephant","zebra"],
@@ -139,49 +155,30 @@
     };
 
     let wordsData = defaultWordsData;
-
-    const genres = [
-      "Animal", "Color", "Food",
-      "Fruit", "Body", "Other"
-    ];
-
+    const genres = ["Animal", "Color", "Food", "Fruit", "Body", "Other"];
     const genreArea = document.getElementById("genreArea");
     let currentGenre = "Animal";
 
-    genres.forEach(g => {
+    genres.forEach((g, idx) => {
       const div = document.createElement("div");
       div.className = "genre";
+      if (idx === 0) div.classList.add("selected");
       div.dataset.genre = g;
 
       div.innerHTML = `
-        <img src="images/${g.toLowerCase()}_icon.png">
+        <img src="images/${g.toLowerCase()}_icon.png" alt="${g}">
         <p>${g}</p>
-        <input type="checkbox">
       `;
 
-      div.addEventListener("click", (e) => {
-        if (e.target.tagName !== "INPUT") {
-          const cb = div.querySelector("input");
-          cb.checked = true;
-        }
-
-        document.querySelectorAll(".genre").forEach(x => {
-          x.classList.remove("selected");
-          x.querySelector("input").checked = false;
-        });
-
+      div.addEventListener("click", () => {
+        document.querySelectorAll(".genre").forEach(x => x.classList.remove("selected"));
         div.classList.add("selected");
-        div.querySelector("input").checked = true;
-
         currentGenre = g;
         renderWords();
       });
 
       genreArea.appendChild(div);
     });
-
-    document.querySelector(".genre").classList.add("selected");
-    document.querySelector(".genre input").checked = true;
 
     const wordList = document.getElementById("wordList");
 
@@ -194,9 +191,10 @@
         div.className = "word-item";
 
         const numSpan = document.createElement("span");
-        numSpan.textContent = (idx + 1) + ". ";
-        numSpan.style.marginRight = "8px";
-        numSpan.style.fontWeight = "bold";
+        numSpan.textContent = (idx + 1) + ".";
+        numSpan.style.marginRight = "6px";
+        numSpan.style.fontSize = "12px";
+        numSpan.style.color = "#888";
 
         const input = document.createElement("input");
         input.value = w;
@@ -211,9 +209,7 @@
     renderWords();
   </script>
 
-  <footer>
-    © 2026 Studio OZ
-  </footer>
+  <footer>© 2026 Studio OZ</footer>
 
 </body>
 </html>
