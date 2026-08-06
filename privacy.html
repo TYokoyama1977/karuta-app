@@ -3,12 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <title>プライバシーポリシー - 読み上げかるたアプリ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.7; }
-    h1 { font-size: 24px; }
-    h2 { margin-top: 20px; }
-    footer { margin-top: 30px; font-size: 12px; color: #666; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: "Comic Sans MS", "Chalkboard SE", sans-serif;
+      background: #E8F5E9;
+      margin: 0;
+      padding: 0;
+      line-height: 1.7;
+      color: #333;
+    }
+    .page-header {
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #FFF;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .home-btn {
+      font-size: 14px;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: none;
+      background: #F0F0F0;
+      cursor: pointer;
+    }
+    .home-btn:hover { background: #E0E0E0; }
+    
+    .card {
+      background: #FFF;
+      padding: 24px 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      max-width: 800px;
+      margin: 16px auto;
+      text-align: left;
+    }
+    h1 {
+      font-size: 22px;
+      color: #2E7D32;
+      margin-top: 0;
+      border-bottom: 2px solid #C8E6C9;
+      padding-bottom: 8px;
+    }
+    h2 {
+      margin-top: 24px;
+      font-size: 16px;
+      color: #2E7D32;
+    }
+    p, li { font-size: 14px; color: #444; }
+    footer { margin-top: 30px; font-size: 11px; color: #888; text-align: center; }
   </style>
 </head>
 <body>
@@ -17,53 +67,53 @@
   <button class="home-btn" onclick="location.href='index.html'">🏠 ホーム</button>
 </div>
 
-<style>
-  .page-header {
-    padding: 10px;
-    text-align: left;
-  }
-  .home-btn {
-    font-size: 18px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: none;
-    background: #eee;
-    cursor: pointer;
-  }
-  .home-btn:hover {
-    background: #ddd;
-  }
-</style>
+<div class="card">
+  <h1>プライバシーポリシー</h1>
 
-<h1>プライバシーポリシー</h1>
+  <p>
+    Studio OZ（以下、「当方」）は、提供する本アプリ「読み上げかるたアプリ」（以下、「本アプリ」）におけるユーザーの個人情報の取り扱いについて、以下の通りプライバシーポリシー（以下、「本ポリシー」）を定めます。
+  </p>
 
-<p>本アプリ「読み上げかるたアプリ」（以下、「本アプリ」）は、Studio OZ が提供する学習用アプリです。本アプリでは、ユーザーの個人情報を収集・保存・共有することはありません。</p>
+  <h2>第1条（収集する情報および利用目的）</h2>
+  <p>
+    本アプリは、ユーザーの氏名、住所、電話番号、メールアドレスなどの個人情報を直接収集・保持・共有することはありません。
+  </p>
 
-<h2>1. 収集する情報</h2>
-<p>本アプリは、ユーザーの個人情報（氏名、住所、メールアドレス、端末情報など）を一切収集しません。</p>
+  <h2>第2条（端末内データの使用について）</h2>
+  <p>
+    本アプリで使用・登録される単語データやアプリの各種設定情報は、ユーザーが利用する端末内（ブラウザのローカルストレージ）にのみ保存されます。これらのデータが当方の外部サーバーへ送信・保存されることはありません。
+  </p>
 
-<h2>2. ローカル保存について</h2>
-<p>本アプリで使用する単語データや設定情報は、ユーザーの端末内（ブラウザのローカルストレージ）にのみ保存され、外部に送信されることはありません。</p>
+  <h2>第3条（外部サービスおよび標準機能の利用）</h2>
+  <p>
+    本アプリでは、音声読み上げおよび文字入力認識のために、ブラウザ標準の音声合成機能（Web Speech API）や外部APIを利用する場合があります。これらは機能提供の目的でのみ処理され、個人情報を特定・蓄積する目的で使用されることはありません。
+  </p>
 
-<h2>3. 外部サービスの利用</h2>
-<p>本アプリは外部サーバーと通信せず、第三者にデータを提供することもありません。</p>
+  <h2>第4条（免責事項）</h2>
+  <p>
+    本アプリの利用により発生したトラブルや損害等について、当方は一切の責任を負いかねます。あらかじめご了承ください。
+  </p>
 
-<h2>4. 免責事項</h2>
-<p>本アプリの利用により発生したトラブルや損害について、Studio OZ は一切の責任を負いません。</p>
+  <h2>第5条（プライバシーポリシーの変更）</h2>
+  <p>
+    当方は、法令の改定やサービス内容の変更に伴い、本ポリシーを変更することがあります。変更後の内容は本ページに掲載した時点より効力を生じるものとします。
+  </p>
 
-<h2>5. プライバシーポリシーの変更</h2>
-<p>必要に応じて、本ポリシーの内容を変更する場合があります。変更後の内容は本ページに掲載します。</p>
+  <h2>第6条（お問い合わせ先）</h2>
+  <p>
+    運営者：Studio OZ<br>
+    住所：東京都〇〇区（※正式な表記へ変更してください）<br>
+    連絡先：oz.app.dev@gmail.com
+  </p>
 
-<h2>6. 運営者情報</h2>
-<p>
-  Studio OZ<br>
-  東京都〇〇区（バーチャルオフィス住所）<br>
-  oz.app.dev@gmail.com
-</p>
+  <p style="text-align: right; font-size: 12px; color: #888; margin-top: 30px;">
+    2026年2月1日 制定
+  </p>
 
-<footer>
-  © 2026 Studio OZ
-</footer>
+  <footer>
+    © 2026 Studio OZ
+  </footer>
+</div>
 
 </body>
 </html>

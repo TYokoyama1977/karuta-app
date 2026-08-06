@@ -25,7 +25,7 @@
     .play-header {
       padding: 8px 12px;
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
       align-items: center;
       background: #FFF;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -154,6 +154,50 @@
       margin-left: auto;
     }
 
+    /* モーダル用スタイル */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-card {
+      background: #FFF;
+      border-radius: 18px;
+      padding: 20px;
+      width: 90%;
+      max-width: 340px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    .modal-title { font-size: 18px; font-weight: bold; color: #E65100; margin-bottom: 8px; }
+    .modal-desc { font-size: 13px; color: #555; margin-bottom: 14px; line-height: 1.5; }
+    .btn-buy {
+      background: linear-gradient(135deg, #FF9800, #F57C00);
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 3px 0 #E65100;
+    }
+    .btn-close {
+      background: #EEE;
+      color: #666;
+      padding: 8px 16px;
+      font-size: 13px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
     footer {
       padding: 4px;
       font-size: 11px;
@@ -166,6 +210,7 @@
 
   <div class="play-header">
     <button onclick="location.href='index.html'">🏠 ホーム</button>
+    <button id="settingButton" onclick="location.href='settings.html'">🔧 設定</button>
   </div>
 
   <h1>マイ単語読み上げ</h1>
@@ -194,9 +239,25 @@
     <button id="addWordBtn">追加</button>
   </div>
 
-  <p style="font-size:11px; color:#666; margin:0;">※英単語のみ（最大20個まで）</p>
+  <p style="font-size:11px; color:#666; margin:0;">※無料版は最大20個まで</p>
 
   <div class="word-list" id="wordList"></div>
+
+  <!-- プレミアム案内モーダル -->
+  <div id="premiumModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-title">👑 プレミアム版のご案内</div>
+      <div class="modal-desc">
+        無料版のマイ単語登録数の上限（20個）に達しました。<br><br>
+        <strong>プレミアム版（有料）</strong>にアップグレードすると、単語登録数が<strong>無制限</strong>になります！
+      </div>
+      <button class="btn-buy" onclick="startParentGate()">アップグレードする</button>
+      <br>
+      <button class="btn-close" onclick="closeModal()">とじる</button>
+    </div>
+  </div>
+
+  <footer>© 2026 Studio OZ</footer>
 
   <script>
     let userWords = JSON.parse(localStorage.getItem("userWords") || "[]");
@@ -275,12 +336,13 @@
       updateSpeakList();
     });
 
+    // 単語追加（20個制限ポップアップ制御）
     addWordBtn.addEventListener("click", () => {
       const val = newWordInput.value.trim();
 
       if (!val) return;
       if (userWords.length >= 20) {
-        alert("最大20個までです。");
+        document.getElementById("premiumModal").style.display = "flex";
         return;
       }
       if (val.includes(" ") || val.includes(" ")) {
@@ -297,6 +359,23 @@
       newWordInput.value = "";
       renderWords();
     });
+
+    function closeModal() {
+      document.getElementById("premiumModal").style.display = "none";
+    }
+
+    // 保護者チェック（ペアレンタルゲート）
+    function startParentGate() {
+      const num1 = Math.floor(Math.random() * 8) + 2;
+      const num2 = Math.floor(Math.random() * 8) + 2;
+      const ans = prompt(`【保護者の方へ】次の計算の答えを入力してください：\n${num1} × ${num2} = ?`);
+      if (parseInt(ans) === num1 * num2) {
+        alert("有料版の購入ページへ移動します。（※ストア課金画面へ遷移）");
+        // location.href = "purchase.html"; など実際の決済画面へ遷移
+      } else if (ans !== null) {
+        alert("答えが違います。");
+      }
+    }
 
     function speak(text) {
       if ('speechSynthesis' in window) {
@@ -320,7 +399,6 @@
       }
     };
 
-    /* ★ iOS/Android端末向け 音声再生制御の修正 */
     document.getElementById("readBtn").onclick = () => {
       if (speakList.length === 0) {
         alert("単語にチェックを入れてね！");
@@ -332,7 +410,6 @@
         return;
       }
 
-      // スマホの音声再生制限（オートプレイブロック）を解除するウォームアップ処理
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const init = new SpeechSynthesisUtterance("");

@@ -65,6 +65,30 @@ h2 {
     text-align: left;
 }
 
+/* プレミアム導線カード */
+.card-premium {
+    background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+    border: 2px solid #FF9800;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.card-premium:active {
+    transform: scale(0.98);
+}
+.premium-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #E65100;
+    font-weight: bold;
+    font-size: 16px;
+}
+.premium-sub {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
 .card-mywords {
     background: #FFEBEE;
     border-left: 6px solid #FF8A80;
@@ -146,13 +170,22 @@ h2 {
 
 <div class="header">
     <button id="homeButton" class="nav-btn">🏠 ホーム</button>
-    <button id="myWordsButton" class="nav-btn">📚 マイ単語読み上げ</button>
-    <button id="playButton" class="nav-btn">🔊 ジャンル読み上げ</button>
+    <button id="myWordsButton" class="nav-btn">📚 マイ単語</button>
+    <button id="playButton" class="nav-btn">🔊 ジャンル</button>
 </div>
 
 <h2>設定</h2>
 
 <div class="setting-container">
+
+  <!-- 👑 プレミアム版への誘導カード -->
+  <div class="setting-card card-premium" onclick="openPurchaseWithGate()">
+      <div class="premium-header">
+          <span>👑 プレミアム版にアップグレード</span>
+          <span>➔</span>
+      </div>
+      <div class="premium-sub">マイ単語の登録数が無制限になります！</div>
+  </div>
 
   <!-- ① マイ単語設定 -->
   <div class="setting-card card-mywords">
@@ -248,6 +281,18 @@ deleteWordsBtn.onclick = () => {
         alert("消去しました");
     }
 };
+
+// 保護者確認（ペアレンタルゲート）
+function openPurchaseWithGate() {
+  const num1 = Math.floor(Math.random() * 8) + 2;
+  const num2 = Math.floor(Math.random() * 8) + 2;
+  const ans = prompt(`【保護者の方へ】次の計算の答えを入力してください：\n${num1} × ${num2} = ?`);
+  if (parseInt(ans) === num1 * num2) {
+    alert("有料版の購入画面へ遷移します。");
+  } else if (ans !== null) {
+    alert("答えが違います。");
+  }
+}
 
 updateUI();
 </script>
