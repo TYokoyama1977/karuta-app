@@ -205,7 +205,7 @@
     color: #fff;
   }
 
-  /* 判定結果・解説領域 */
+  /* 判定結果領域 */
   #judgement-box {
     max-width: 450px;
     margin: 8px auto 0 auto;
@@ -223,7 +223,6 @@
     border: 1px solid #f5c6cb;
   }
   #result-status { font-size: 18px; font-weight: bold; }
-  #result-meaning { font-size: 13px; margin-top: 3px; text-align: left; }
 
   /* 結果発表画面 */
   #session-result {
@@ -288,10 +287,9 @@
     <div id="candidates" class="candidate-list"></div>
   </div>
 
-  <!-- 判定・解説 -->
+  <!-- 判定結果 -->
   <div id="judgement-box" style="display:none;">
     <div id="result-status"></div>
-    <div id="result-meaning"></div>
   </div>
 </div>
 
@@ -351,7 +349,7 @@ function saveCheckData() {
   localStorage.setItem("sentence_kanji_check_map", JSON.stringify(checkMap));
 }
 
-// CSV読み込み
+// CSV読み込み（meaning列を除外した4列対応）
 async function loadCSV() {
   try {
     const response = await fetch('bunshou_kanji.csv');
@@ -369,8 +367,7 @@ async function loadCSV() {
           id: cols[0].trim(),
           kanji: cols[1].trim(),
           hiragana: cols[2].trim(),
-          sentence: cols[3].trim(),
-          meaning: cols[4] ? cols[4].trim() : ""
+          sentence: cols[3].trim()
         });
       }
     }
@@ -529,7 +526,7 @@ function startDrawing(e) {
   if (isAnswered) return;
   e.preventDefault();
   drawing = true;
-  clearTimeout(recognizeTimer); // 描き始めたらタイマーを即時取り消し
+  clearTimeout(recognizeTimer);
   const pos = getPos(e);
   currentStrokeX = [pos.x]; currentStrokeY = [pos.y];
   ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
@@ -552,7 +549,6 @@ function stopDrawing(e) {
   if (currentStrokeX.length > 0) {
     strokes.push([currentStrokeX, currentStrokeY]);
   }
-  // 1.3秒間静止した場合に「書き終わり」と判定して認識APIを実行
   recognizeTimer = setTimeout(recognizeKanji, DRAWING_TIMEOUT_MS);
 }
 
@@ -616,7 +612,6 @@ document.getElementById("checkAnswerBtn").addEventListener("click", () => {
 
   const jBox = document.getElementById("judgement-box");
   const statusEl = document.getElementById("result-status");
-  const meaningEl = document.getElementById("result-meaning");
 
   jBox.style.display = "block";
   const qKey = currentQuiz.id || currentQuiz.kanji;
@@ -642,8 +637,6 @@ document.getElementById("checkAnswerBtn").addEventListener("click", () => {
     jBox.className = "incorrect";
     statusEl.textContent = `❌ 不正解... (正解: ${currentQuiz.kanji})`;
   }
-
-  meaningEl.textContent = currentQuiz.meaning ? `【解説】${currentQuiz.meaning}` : "";
 });
 
 // 「ギブアップ」ボタン処理
@@ -664,12 +657,10 @@ document.getElementById("giveupBtn").addEventListener("click", () => {
 
   const jBox = document.getElementById("judgement-box");
   const statusEl = document.getElementById("result-status");
-  const meaningEl = document.getElementById("result-meaning");
 
   jBox.style.display = "block";
   jBox.className = "incorrect";
   statusEl.textContent = `🏳 ギブアップ (正解: ${currentQuiz.kanji})`;
-  meaningEl.textContent = currentQuiz.meaning ? `【解説】${currentQuiz.meaning}` : "";
 });
 
 // 「次の問題」ボタン
@@ -694,7 +685,7 @@ document.getElementById("resetChecksBtn").addEventListener("click", () => {
 
 document.getElementById("restartBtn").addEventListener("click", startNewSession);
 
-// Google 手書き認識 API（漢字フィルタリング ＆ 確定自動入力対応）
+// Google 手書き認識 API
 async function recognizeKanji() {
   if (strokes.length === 0 || isAnswered) return;
 
@@ -715,13 +706,9 @@ async function recognizeKanji() {
     const data = await response.json();
     if (data[0] === "SUCCESS") {
       const candidates = data[1][0][1];
-      
-      // 漢字のみをフィルタリング
       const filteredCandidates = candidates.filter(char => isKanji(char));
 
       if (filteredCandidates.length > 0) {
-        // 【自動入力判定】
-        // 静止時間(1.3秒)経過後、筆頭候補が存在すれば自動選択して文字入力を行う
         selectCharacter(filteredCandidates[0]);
       } else {
         document.getElementById("candidates").innerHTML = "";
@@ -732,31 +719,13 @@ async function recognizeKanji() {
   }
 }
 
-function displayCandidates(candidates) {
-  const container = document.getElementById("candidates");
-  container.innerHTML = "";
-  if (isAnswered) return;
-
-  const topCandidates = candidates.slice(0, 5);
-
-  topCandidates.forEach(char => {
-    const btn = document.createElement("div");
-    btn.className = "candidate";
-    btn.textContent = char;
-    btn.onclick = () => selectCharacter(char);
-    container.appendChild(btn);
-  });
-}
-
 function selectCharacter(char) {
   if (isAnswered) return;
   const boxes = getBoxes();
   boxes[currentIndex].textContent = char;
   
-  // 入力完了後、キャンバスと候補をリセット
   initCanvas();
 
-  // 次のマス目が存在する場合はアクティブ枠を移動
   if (currentIndex < targetLength - 1) {
     setActiveBox(currentIndex + 1);
   }
