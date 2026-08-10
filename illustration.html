@@ -161,8 +161,9 @@
       <p>${key}</p>
     `;
 
+    // 共通ビューア (viewer.html?category=ジャンル名) へ遷移
     div.addEventListener("click", () => {
-      window.location.href = `${key.toLowerCase()}-viewer.html`;
+      window.location.href = `viewer.html?category=${key.toLowerCase()}`;
     });
 
     genreArea.appendChild(div);
